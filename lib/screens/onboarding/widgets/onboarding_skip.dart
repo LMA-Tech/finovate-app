@@ -19,7 +19,7 @@ class OnboardingSkip extends StatelessWidget {
       right: FinSizes.defaultSpace,
       child: TextButton(
         onPressed: () => OnBoardingController.instance.skipPage(),
-        child: Text('Skip',
+        child: Text('Pular',
             style: TextStyle(color: dark ? FinColors.light : FinColors.dark)),
       ),
     );

@@ -6,6 +6,10 @@ class FinImages {
   static const String lightAppLogo = "assets/logos/splash-logo-white.png";
   static const String darkAppLogo = "assets/logos/splash-logo-white.png";
 
+  // -- Social Logos
+  static const String google = "assets/logos/google_icon.png";
+  static const String facebook = "assets/logos/facebook_icon.png";
+
   // -- Onboarding Images
   static const String onboardingImage1 = "assets/animations/onboarding/onboarding_1.json";
   static const String onboardingImage2 = "assets/animations/onboarding/onboarding_2.json";
