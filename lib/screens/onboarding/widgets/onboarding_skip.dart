@@ -15,12 +15,19 @@ class OnboardingSkip extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = FinHelperFunctions.isDarkMode(context);
     return Positioned(
-      top: FinDeviceUtils.getAppBarHeight(),
-      right: FinSizes.defaultSpace,
+      bottom: FinDeviceUtils.getBottomNavigationBarHeight() + 8,
+      left: FinSizes.defaultSpace,
       child: TextButton(
         onPressed: () => OnBoardingController.instance.skipPage(),
-        child: Text('Pular',
-            style: TextStyle(color: dark ? FinColors.light : FinColors.dark)),
+        child: Text(
+          'Pular',
+          style: TextStyle(
+              color: dark ? FinColors.light : FinColors.dark,
+              fontSize: FinSizes.fontSizeMd,
+              fontWeight: FontWeight.w500,
+              decoration: TextDecoration.underline,
+          ),
+        ),
       ),
     );
   }

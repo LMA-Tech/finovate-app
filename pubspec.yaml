@@ -42,8 +42,9 @@ flutter:
 
   #--------------- LOCAL ASSETS ------------------#
   assets:
-    - assets/animations/onboarding/
+    - assets/images/onboarding/
     - assets/logos/
+    - assets/backgrounds/
 
   #--------------- LOCAL FONTS ------------------#
   fonts:

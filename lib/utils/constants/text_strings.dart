@@ -12,12 +12,12 @@ class FinTexts {
 
   // -- Onboarding Texts
   static const String onboardingTitle1 = "Acompanhe seus Investimentos";
-  static const String onboardingTitle2 = "Acompanhe a conjuntura econômica";
+  static const String onboardingTitle2 = "Acompanhe indicadores econômicos";
   static const String onboardingTitle3 = "Conheça a SofIA";
 
-  static const String onboardingSubTitle1 = "Nosso app é projetado para proporcionar uma visão clara e abrangente do seu patrimônio, ajudando você a tomar decisões financeiras mais informadas e eficazes, reduzindo a assimetria no mercado. Monitore sua carteira de investimentos e tome decisões baseadas em nossas ferramentas de análise.";
-  static const String onboardingSubTitle2 = "Monitore indicadores econômicos chave para entender o impacto da conjuntura econômica sobre sua carteira. Esteja sempre um passo à frente e tome decisões com um conjunto de informações completo.";
-  static const String onboardingSubTitle3 = "Nossa inteligência artificial que oferece análises completas e personalizadas da sua carteira de investimentos reduzindo a assimetria de informação e auxiliando na tomada decisões baseadas em uma visão completa e detalhada do mercado.";
+  static const String onboardingSubTitle1 = "Tenha uma visão clara do seu dinheiro e tome decisões inteligentes com nossas ferramentas de análise e acompanhamento de investimentos.";
+  static const String onboardingSubTitle2 = "Monitore indicadores essenciais e veja como eles impactam sua carteira. Esteja à frente com decisões baseadas em informações completas.";
+  static const String onboardingSubTitle3 = "Nossa inteligência artificial traz análises personalizadas da sua carteira de investimentos, ajudando você a tomar decisões mais seguras e bem informadas sobre o mercado.";
 
   // -- Authentication Forms
   static const String firstName = "First Name";

@@ -1,4 +1,6 @@
+import 'package:finovate_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
+import '../../common/styles/dark_mode_bg.dart';
 import 'onboarding_controller.dart';
 import 'package:get/get.dart';
 import 'package:finovate_app/screens/onboarding/widgets/onboarding_dot_navigation.dart';
@@ -18,30 +20,42 @@ class OnBoardingScreen extends StatelessWidget {
 
     return Scaffold(
         body: Stack(
-      children: [
+        children: [
+        /// If dark mode, apply background theme
+        const FinDarkBg(),
+
         /// Horizontal Scrollable Pages
         PageView(
           controller: onboardingCon.pageController,
           onPageChanged: (index) {
-            // Trigger the animation for the new page
+            /// Trigger the animation for the new page
             OnBoardingController.instance.updatePageIndicator(
               index,
               const Duration(seconds: 5), // Adjust the full animation duration
             );
           },
-          children: const [
+          children: [
             OnBoardingPage(
-                lottiePath: FinImages.onboardingImage1,
+                imagePath: FinImages.onboardingImage1,
                 title: FinTexts.onboardingTitle1,
-                subTitle: FinTexts.onboardingSubTitle1),
+                subTitle: FinTexts.onboardingSubTitle1,
+                imageWidth: FinHelperFunctions.screenHeight() * 0.8,
+                imageHeight: FinHelperFunctions.screenHeight()* 0.4,
+            ),
             OnBoardingPage(
-                lottiePath: FinImages.onboardingImage2,
+                imagePath: FinImages.onboardingImage2,
                 title: FinTexts.onboardingTitle2,
-                subTitle: FinTexts.onboardingSubTitle2),
+                subTitle: FinTexts.onboardingSubTitle2,
+                imageWidth: FinHelperFunctions.screenHeight() * 0.9,
+                imageHeight: FinHelperFunctions.screenHeight() * 0.4,
+            ),
             OnBoardingPage(
-                lottiePath: FinImages.onboardingImage3,
+                imagePath: FinImages.onboardingImage3,
                 title: FinTexts.onboardingTitle3,
-                subTitle: FinTexts.onboardingSubTitle3),
+                subTitle: FinTexts.onboardingSubTitle3,
+                imageWidth: FinHelperFunctions.screenHeight() * 0.8,
+                imageHeight: FinHelperFunctions.screenHeight()* 0.4,
+            ),
           ],
         ),
 

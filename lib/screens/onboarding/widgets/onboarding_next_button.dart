@@ -17,15 +17,18 @@ class OnboardingNextButton extends StatelessWidget {
     final dark = FinHelperFunctions.isDarkMode(context);
     return Positioned(
       right: FinSizes.defaultSpace,
-      bottom: FinDeviceUtils.getBottomNavigationBarHeight(),
+      bottom: FinDeviceUtils.getBottomNavigationBarHeight() + 8,
       child: ElevatedButton(
         onPressed: () => OnBoardingController.instance.nextPage(
           const Duration(seconds: 5), // Full duration for the next animation
         ),
         style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
-            backgroundColor: dark ? FinColors.primary : Colors.black),
-        child: const Icon(Iconsax.arrow_right_3),
+            backgroundColor: dark ? FinColors.white : Colors.black),
+        child: Icon(
+          Iconsax.arrow_right_3,
+          color: dark ? FinColors.black : Colors.white, // Set the icon color to black
+        ),
       ),
     );
   }

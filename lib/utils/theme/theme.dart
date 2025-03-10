@@ -38,7 +38,7 @@ class FinAppTheme {
     primaryColor: FinColors.primary,
     textTheme: FinTextTheme.darkTextTheme,
     chipTheme: FinChipTheme.darkChipTheme,
-    scaffoldBackgroundColor: FinColors.black,
+    scaffoldBackgroundColor: Colors.transparent,
     appBarTheme: FinAppBarTheme.darkAppBarTheme,
     checkboxTheme: FinCheckboxTheme.darkCheckboxTheme,
     bottomSheetTheme: FinBottomSheetTheme.darkBottomSheetTheme,
@@ -46,4 +46,8 @@ class FinAppTheme {
     outlinedButtonTheme: FinOutlinedButtonTheme.darkOutlinedButtonTheme,
     inputDecorationTheme: FinTextFormFieldTheme.darkInputDecorationTheme,
   );
+
+
+
+
 }
