@@ -12,7 +12,7 @@ import '../../utils/constants/sizes.dart';
 part 'login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   createState() => _LoginScreen();

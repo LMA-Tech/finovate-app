@@ -1,95 +1,94 @@
+import 'package:finovate_app/screens/get_started/get_started_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../login/login_screen.dart';
+import '../../services/onboarding_service.dart';
 
-class OnBoardingController extends GetxController
-    with GetSingleTickerProviderStateMixin {
+class OnBoardingController extends GetxController {
   static OnBoardingController get instance => Get.find();
 
-  /// Variables
-  final pageController = PageController();
-  Rx<int> currentPageIndex =
-      0.obs; //Rx type is defined to indicate state change
-  late final AnimationController
-      animationController; // Manages Lottie animations
+  // Constants
+  static const int pageCount = 3;
+  static const Duration pageTransitionDuration = Duration(milliseconds: 300);
+  static const Curve transitionCurve = Curves.easeInOut;
 
-  /// Set immersive mode when the controller is initialized
+  // Controller variables
+  final pageController = PageController();
+  final Rx<int> currentPageIndex = 0.obs;
+
+  // Service for tracking onboarding completion
+  final OnboardingService _onboardingService = OnboardingService();
+
   @override
   void onInit() {
     super.onInit();
+    // Set immersive mode for fullscreen experience
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
-    animationController = AnimationController(vsync: this);
   }
 
-  /// Reset system UI mode when the controller is disposed
   @override
   void onClose() {
-    animationController.dispose();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-        overlays: SystemUiOverlay.values);
+    // Cleanup resources
+    pageController.dispose();
+
+    // Restore normal UI mode
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: SystemUiOverlay.values,
+    );
     super.onClose();
   }
 
-  /// Play Lottie animation
-  void playAnimation(Duration fullDuration) {
-    animationController.duration = fullDuration;
-
-    // Play the animation fully and stop
-    animationController.forward().then((_) {
-      animationController.stop(); // Stop at the end
-    });
-  }
-
-  /// Reset Lottie animation
-  void resetAnimation() {
-    animationController.stop();
-    animationController.reset();
-  }
-
-  /// Update Current Index when Page Scroll
-  void updatePageIndicator(index, Duration fullDuration) {
+  // Update page indicator
+  void updatePageIndicator(int index) {
     currentPageIndex.value = index;
-    // Reset and play the animation for the new page
-    resetAnimation();
-    playAnimation(fullDuration);
   }
 
-  /// Jump to specific dot selected page
-  void dotNavigationClick(index) {
+  // Navigate to specific page when dot is clicked
+  void dotNavigationClick(int index) {
     currentPageIndex.value = index;
-    resetAnimation(); // Reset the current animation
+
     pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      duration: pageTransitionDuration,
+      curve: transitionCurve,
     );
   }
 
-  /// Update Current Index & jump to next page
-  void nextPage(Duration fullDuration) {
-    if (currentPageIndex.value == 2) {
-      Get.offAll(const LoginScreen());
+  // Navigate to next page or login screen
+  void nextPage() {
+    final bool isLastPage = currentPageIndex.value == pageCount - 1;
+
+    if (isLastPage) {
+      _completeOnboarding();
+      Get.offAll(() => const GetStartedScreen());
     } else {
-      int page = currentPageIndex.value + 1;
-      resetAnimation(); // Reset the current animation
-      playAnimation(fullDuration); // Play the animation for the next page
+      final int nextPage = currentPageIndex.value + 1;
+
       pageController.animateToPage(
-        page,
-        duration: const Duration(milliseconds: 300), // Smooth transition
-        curve: Curves.easeInOut,
+        nextPage,
+        duration: pageTransitionDuration,
+        curve: transitionCurve,
       );
     }
   }
 
-  /// Update Current Index & jump to last page
+  // Skip to last page
   void skipPage() {
-    currentPageIndex.value = 2;
+    _completeOnboarding();
+
+    currentPageIndex.value = pageCount - 1;
+
     pageController.animateToPage(
-      2,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+      pageCount - 1,
+      duration: pageTransitionDuration,
+      curve: transitionCurve,
     );
+  }
+
+  // Mark onboarding as complete
+  void _completeOnboarding() {
+    _onboardingService.completeOnboarding();
   }
 }

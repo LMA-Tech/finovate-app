@@ -16,58 +16,55 @@ class OnBoardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onboardingCon = Get.put(OnBoardingController());
+    // Initialize controller using GetX
+    final controller = Get.put(OnBoardingController());
+
+    // Calculate responsive image dimensions
+    final double screenHeight = FinHelperFunctions.screenHeight();
+    final double imageHeight = screenHeight * 0.4;
+    final double imageWidth = screenHeight * 0.8;
 
     return Scaffold(
         body: Stack(
-        children: [
-        /// If dark mode, apply background theme
-        const FinDarkBg(),
-
-        /// Horizontal Scrollable Pages
-        PageView(
-          controller: onboardingCon.pageController,
-          onPageChanged: (index) {
-            /// Trigger the animation for the new page
-            OnBoardingController.instance.updatePageIndicator(
-              index,
-              const Duration(seconds: 5), // Adjust the full animation duration
-            );
-          },
           children: [
-            OnBoardingPage(
-                imagePath: FinImages.onboardingImage1,
-                title: FinTexts.onboardingTitle1,
-                subTitle: FinTexts.onboardingSubTitle1,
-                imageWidth: FinHelperFunctions.screenHeight() * 0.8,
-                imageHeight: FinHelperFunctions.screenHeight()* 0.4,
+            // Background layer
+            const FinDarkBg(),
+
+            // Page content
+            PageView(
+              controller: controller.pageController,
+              onPageChanged: controller.updatePageIndicator,
+              children: [
+                OnBoardingPage(
+                  imagePath: FinImages.onboardingImage1,
+                  title: FinTexts.onboardingTitle1,
+                  subTitle: FinTexts.onboardingSubTitle1,
+                  imageWidth: imageWidth,
+                  imageHeight: imageHeight,
+                ),
+                OnBoardingPage(
+                  imagePath: FinImages.onboardingImage2,
+                  title: FinTexts.onboardingTitle2,
+                  subTitle: FinTexts.onboardingSubTitle2,
+                  imageWidth: imageWidth * 1.1, // Slightly wider image
+                  imageHeight: imageHeight,
+                ),
+                OnBoardingPage(
+                  imagePath: FinImages.onboardingImage3,
+                  title: FinTexts.onboardingTitle3,
+                  subTitle: FinTexts.onboardingSubTitle3,
+                  imageWidth: imageWidth,
+                  imageHeight: imageHeight,
+                ),
+              ],
             ),
-            OnBoardingPage(
-                imagePath: FinImages.onboardingImage2,
-                title: FinTexts.onboardingTitle2,
-                subTitle: FinTexts.onboardingSubTitle2,
-                imageWidth: FinHelperFunctions.screenHeight() * 0.9,
-                imageHeight: FinHelperFunctions.screenHeight() * 0.4,
-            ),
-            OnBoardingPage(
-                imagePath: FinImages.onboardingImage3,
-                title: FinTexts.onboardingTitle3,
-                subTitle: FinTexts.onboardingSubTitle3,
-                imageWidth: FinHelperFunctions.screenHeight() * 0.8,
-                imageHeight: FinHelperFunctions.screenHeight()* 0.4,
-            ),
+
+            // Navigation controls
+            const OnboardingSkip(),
+            const OnboardingDotNavigation(),
+            const OnboardingNextButton(),
           ],
-        ),
-
-        /// Skip Button
-        const OnboardingSkip(),
-
-        /// Dot Navigation SmoothPageIndicator
-        const OnboardingDotNavigation(),
-
-        /// Circular Button
-        const OnboardingNextButton(),
-      ],
-    ));
+        )
+    );
   }
 }

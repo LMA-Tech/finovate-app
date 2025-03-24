@@ -3,8 +3,9 @@
 class FinImages {
 
   // -- App Logos
-  static const String lightAppLogo = "assets/logos/finovate-light.svg";
-  static const String darkAppLogo = "assets/logos/finovate-dark.svg";
+  static const String lightAppLogo = "assets/logos/finovate-light-icon.svg";
+  static const String darkAppLogo = "assets/logos/finovate-dark-icon.svg";
+  static const String appLogoLettering = "assets/logos/finovate-light.svg";
 
   // -- Background Images
   static const String darkAppBg = "assets/backgrounds/bg-dark.svg";
@@ -17,7 +18,10 @@ class FinImages {
 
   // -- Onboarding Images
   static const String onboardingImage1 = "assets/images/onboarding/onboarding_1.png";
-  static const String onboardingImage2 = "assets/images/onboarding/onboarding_2.png";
+  static const String onboardingImage2 = "assets/images/onboarding/onboardingu_2.png";
   static const String onboardingImage3 = "assets/images/onboarding/onboarding_3.png";
+
+
+
 
 }

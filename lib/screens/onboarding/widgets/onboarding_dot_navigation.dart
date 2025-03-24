@@ -3,7 +3,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../onboarding_controller.dart';
 import '../../../utils/constants/colors.dart';
-import '../../../utils/constants/sizes.dart';
 import '../../../utils/device/device_utility.dart';
 import '../../../utils/helpers/helper_functions.dart';
 
@@ -12,17 +11,17 @@ class OnboardingDotNavigation extends StatelessWidget {
     super.key,
   });
 
+  // Constants
+  static const double barWidth = 108.0;
+  static const double barHeight = 6.0;
+  static const double spacing = 17.0;
+  static const int totalBars = 3;
+  static const double barRadius = 6.0;
+
   @override
   Widget build(BuildContext context) {
     final onboardingCon = OnBoardingController.instance;
     final dark = FinHelperFunctions.isDarkMode(context);
-
-    // Variables
-    const barWidth = 108.0;
-    const barHeight = 6.0;
-    const spacing = 17.0;
-    const totalBars = 3;
-    const barRadius = 6.0;
 
     return Positioned(
       top: FinDeviceUtils.getAppBarHeight(),
@@ -38,13 +37,13 @@ class OnboardingDotNavigation extends StatelessWidget {
             activeDotDecoration: DotDecoration(
               width: barWidth,
               height: barHeight,
-              color: dark ? FinColors.primary : FinColors.dark, // Active bar color
+              color: FinColors.primary, // Active bar color
               borderRadius: BorderRadius.circular(barRadius),
             ),
             dotDecoration: DotDecoration(
               width: barWidth,
               height: barHeight,
-              color: (dark ? FinColors.accent : FinColors.dark), // Inactive bar color
+              color: FinColors.accent.withOpacity(0.6), // Inactive bar color
               borderRadius: BorderRadius.circular(barRadius),
             ),
             spacing: spacing,
