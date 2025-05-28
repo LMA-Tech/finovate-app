@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
 class FinColors {
+  // Brand color palette
+  static const Color lightGray = Color(0xFFDCDCDC);   // CMYK 13, 9, 10, 0 | RGB 220, 220, 220
+  static const Color cyan = Color(0xFF00C9FF);        // CMYK 63, 0, 0, 0 | RGB 0, 201, 255
+  static const Color blue = Color(0xFF1B6FFF);        // CMYK 79, 58, 0, 0 | RGB 27, 111, 255
+  static const Color royalBlue = Color(0xFF1559CC);   // CMYK 86, 68, 0, 0 | RGB 21, 89, 204
+  static const Color navy = Color(0xFF0D377F);        // CMYK 100, 90, 22, 7 | RGB 13, 55, 127
+  static const Color darkNavy = Color(0xFF071735);    // CMYK 97, 87, 47, 60 | RGB 7, 23, 53
+
   // App theme colors
   static const Color primary = Color(0xFF1355FF);
   static const Color secondary = Color(0xFFFFE24B);

@@ -4,10 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 import '../../services/onboarding_service.dart';
-import '../../common/styles/dark_mode_bg.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/helpers/helper_functions.dart';
-import '../../utils/constants/sizes.dart';
 
 part 'splash_controller.dart';
 
@@ -34,15 +32,16 @@ class _SplashScreen extends SplashController {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background
-          const FinDarkBg(),
-
           // Logo centered in screen
           Center(
             child: SvgPicture.asset(
-              FinImages.appLogoLettering,
+              FinImages.darkLogoTipo ,
               width: logoWidth,
               fit: BoxFit.contain,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
             ),
           ),
 

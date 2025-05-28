@@ -1,8 +1,11 @@
+import 'package:finovate_app/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
+import '../login_controller.dart';
 
 class FinLoginForm extends StatelessWidget {
   const FinLoginForm({
@@ -11,6 +14,9 @@ class FinLoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controller using GetX
+    final controller = Get.put(LoginController());
+
     return Form(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -19,6 +25,7 @@ class FinLoginForm extends StatelessWidget {
           children: [
             ///Email
             TextFormField(
+              controller: controller.emailController,
               decoration: const InputDecoration(
                   prefixIcon: Icon(Iconsax.direct_right),
                   labelText: FinTexts.email),
@@ -27,6 +34,7 @@ class FinLoginForm extends StatelessWidget {
 
             /// Password
             TextFormField(
+              controller: controller.passwordController,
               decoration: const InputDecoration(
                   prefixIcon: Icon(Iconsax.password_check),
                   labelText: FinTexts.password,
@@ -58,17 +66,17 @@ class FinLoginForm extends StatelessWidget {
             SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => controller.login(context),
                     child: const Text(FinTexts.signIn))),
             const SizedBox(height: FinSizes.spaceBtwItems),
 
             /// Create Account Button
-            SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                    onPressed: () {},
-                    child: const Text(FinTexts.createAccount))),
-            const SizedBox(height: FinSizes.spaceBtwItems),
+            // SizedBox(
+            //     width: double.infinity,
+            //     child: OutlinedButton(
+            //         onPressed: () {},
+            //         child: const Text(FinTexts.createAccount))),
+            // const SizedBox(height: FinSizes.spaceBtwItems),
           ],
         ),
       ),

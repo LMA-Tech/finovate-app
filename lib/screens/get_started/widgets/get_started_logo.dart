@@ -1,3 +1,4 @@
+import 'package:finovate_app/utils/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -21,6 +22,10 @@ class GetStartedLogo extends StatelessWidget {
       dark ? FinImages.darkAppLogo : FinImages.lightAppLogo,
       width: logoWidth,
       fit: BoxFit.contain,
+      colorFilter: const ColorFilter.mode(
+        FinColors.cyan,
+        BlendMode.srcIn,
+      ),
     );
   }
 }

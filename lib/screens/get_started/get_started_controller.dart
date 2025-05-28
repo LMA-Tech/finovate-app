@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../login/login_screen.dart';
-// import '../signup/signup_screen.dart';
+import '../signup/signup_screen.dart';
 
 class GetStartedController extends GetxController {
   static GetStartedController get instance => Get.find();
@@ -12,6 +12,6 @@ class GetStartedController extends GetxController {
 
   // Navigate to signup screen
   void navigateToSignup() {
-    // Get.to(() => const SignupScreen()); // Create this screen if it doesn't exist yet
+    Get.to(() => const SignupScreen());
   }
 }

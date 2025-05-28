@@ -1,6 +1,5 @@
 import 'package:finovate_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
-import '../../common/styles/dark_mode_bg.dart';
 import 'onboarding_controller.dart';
 import 'package:get/get.dart';
 import 'package:finovate_app/screens/onboarding/widgets/onboarding_dot_navigation.dart';
@@ -27,9 +26,6 @@ class OnBoardingScreen extends StatelessWidget {
     return Scaffold(
         body: Stack(
           children: [
-            // Background layer
-            const FinDarkBg(),
-
             // Page content
             PageView(
               controller: controller.pageController,

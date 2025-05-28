@@ -4,7 +4,6 @@ import 'package:finovate_app/screens/get_started/widgets/get_started_message.dar
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:finovate_app/utils/constants/sizes.dart';
-import 'package:finovate_app/common/styles/dark_mode_bg.dart';
 import 'get_started_controller.dart';
 
 class GetStartedScreen extends StatelessWidget {
@@ -18,9 +17,6 @@ class GetStartedScreen extends StatelessWidget {
     return const Scaffold(
       body: Stack(
         children: [
-          // Background
-          FinDarkBg(),
-
           // Main content
           SafeArea(
             child: Padding(

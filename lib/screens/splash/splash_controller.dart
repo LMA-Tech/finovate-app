@@ -6,10 +6,15 @@ abstract class SplashController extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-cache onboarding images for smoother transitions
-    _precacheImages();
     // Start navigation after a delay
     navigateToNextScreen();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Pre-cache images here instead of in initState
+    _precacheImages();
   }
 
   // Pre-cache images used in onboarding
@@ -32,25 +37,25 @@ abstract class SplashController extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
 
     // TEMPORARY FOR TESTING: Always go to onboarding
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/onboarding');
-    }
-
-    // // Check if this is the first launch
-    // bool isFirstLaunch = await _onboardingService.isFirstLaunch();
-    //
-    // if (isFirstLaunch) {
-    //   // If it's the first launch, show onboarding
-    //   // Note: We're NOT marking onboarding as complete here
-    //   // That will happen when the user completes or skips onboarding
-    //   if (mounted) {
-    //     Navigator.pushReplacementNamed(context, '/onboarding');
-    //   }
-    // } else {
-    //   // If not the first launch, go directly to home
-    //   if (mounted) {
-    //     Navigator.pushReplacementNamed(context, '/home');
-    //   }
+    // if (mounted) {
+    //   Navigator.pushReplacementNamed(context, '/onboarding');
     // }
+
+    // Check if this is the first launch
+    bool isFirstLaunch = await _onboardingService.isFirstLaunch();
+
+    if (isFirstLaunch) {
+      // If it's the first launch, show onboarding
+      // Note: We're NOT marking onboarding as complete here
+      // That will happen when the user completes or skips onboarding
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/onboarding');
+      }
+    } else {
+      // If not the first launch, go directly to home
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/getStarted');
+      }
+    }
   }
 }

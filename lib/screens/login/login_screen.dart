@@ -1,44 +1,49 @@
 import 'package:finovate_app/common/styles/spacing_styles.dart';
 import 'package:finovate_app/screens/login/widgets/login_form.dart';
 import 'package:finovate_app/screens/login/widgets/login_header.dart';
-import 'package:finovate_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-import '../../common/widgets/login_signup/form_divider.dart';
-import '../../common/widgets/login_signup/social_buttons.dart';
-import '../../utils/constants/sizes.dart';
+import '../../utils/constants/colors.dart';
+import '../../utils/helpers/helper_functions.dart';
 
-part 'login_controller.dart';
-
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  createState() => _LoginScreen();
-}
-
-class _LoginScreen extends LoginController {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      /// App Bar and Back Button
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.chevron_left,
+            color: FinHelperFunctions.isDarkMode(context)
+                ? FinColors.white
+                : FinColors.dark,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+
+      body: const SingleChildScrollView(
         child: Padding(
           padding: FinSpacingStyle.paddingWithAppBarHeight,
           child: Column(
             children: [
               /// Logo, Title, & Sub-Title
-              const FinLoginHeader(),
+              FinLoginHeader(),
 
               /// Form
-              const FinLoginForm(),
+              FinLoginForm(),
 
               /// Divider
-              FinFormDivider(dividerText: FinTexts.orSignInWith.capitalize!),
-              const SizedBox(height: FinSizes.spaceBtwSections),
+              ///FinFormDivider(dividerText: FinTexts.orSignInWith.capitalize!),
+              ///const SizedBox(height: FinSizes.spaceBtwSections),
 
               /// Footer
-              const FinSocialButtons()
+              ///const FinSocialButtons()
             ],
           ),
         ),
@@ -46,11 +51,3 @@ class _LoginScreen extends LoginController {
     );
   }
 }
-
-
-
-
-
-
-
-

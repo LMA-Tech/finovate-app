@@ -20,13 +20,13 @@ class FinTexts {
   static const String onboardingSubTitle3 = "Nossa inteligência artificial traz análises personalizadas da sua carteira de investimentos, ajudando você a tomar decisões mais seguras e bem informadas sobre o mercado.";
 
   // -- Authentication Forms
-  static const String firstName = "First Name";
-  static const String lastName = "Last Name";
+  static const String firstName = "Primeiro Nome";
+  static const String lastName = "Sobrenome";
   static const String email = "Email";
   static const String password = "Senha";
   static const String newPassword = "New Password";
   static const String username = "Username";
-  static const String phoneNo = "Phone Number";
+  static const String phoneNo = "Numero do seu celular";
   static const String rememberMe = "Lembre de mim";
   static const String forgetPassword = "Esqueceu a senha?";
   static const String signIn = "Entrar";
@@ -42,9 +42,9 @@ class FinTexts {
 
 
   // -- Authentication Headings
-  static const String loginTitle = "Seja bem vindo,";
-  static const String loginSubTitle = "Suas escolhas inteligentes começam aqui.";
-  static const String signupTitle = "Let’s create your account";
+  static const String loginTitle = "Seja bem vindo!";
+  static const String loginSubTitle = "Investimento sem ruído.";
+  static const String signupTitle = "Vamos criar a sua conta";
   static const String forgetPasswordTitle = "Forget password";
   static const String forgetPasswordSubTitle = "Don’t worry sometimes people can forget too, enter your email and we will send you a password reset link.";
   static const String changeYourPasswordTitle = "Password Reset Email Sent";
