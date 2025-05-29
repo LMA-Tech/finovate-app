@@ -1,3 +1,14 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Sensitive files
+*.key
+*.pem
+google-services.json
+GoogleService-Info.plist
+
 # Flutter related
 .flutter-plugins
 .flutter-plugins-dependencies

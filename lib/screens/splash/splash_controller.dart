@@ -6,18 +6,15 @@ abstract class SplashController extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Start navigation after a delay
     navigateToNextScreen();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Pre-cache images here instead of in initState
     _precacheImages();
   }
 
-  // Pre-cache images used in onboarding
   Future<void> _precacheImages() async {
     try {
       await Future.wait([
@@ -26,36 +23,34 @@ abstract class SplashController extends State<SplashScreen> {
         precacheImage(const AssetImage(FinImages.onboardingImage3), context),
       ]);
     } catch (e) {
-      // Fail silently, as this is just an optimization
       debugPrint('Error precaching onboarding images: $e');
     }
   }
 
-  // Navigate to the appropriate screen based on first launch status
   void navigateToNextScreen() async {
-    // Wait for 3 seconds to show splash screen
+    // Show splash for 3 seconds
     await Future.delayed(const Duration(seconds: 3));
 
-    // TEMPORARY FOR TESTING: Always go to onboarding
-    // if (mounted) {
-    //   Navigator.pushReplacementNamed(context, '/onboarding');
-    // }
+    if (!mounted) return;
 
-    // Check if this is the first launch
+    // Check authentication state first
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      // User is authenticated, go to home
+      Get.offAllNamed('/home');
+      return;
+    }
+
+    // User not authenticated, check if first launch
     bool isFirstLaunch = await _onboardingService.isFirstLaunch();
 
     if (isFirstLaunch) {
-      // If it's the first launch, show onboarding
-      // Note: We're NOT marking onboarding as complete here
-      // That will happen when the user completes or skips onboarding
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
-      }
+      // First launch, show onboarding
+      Get.offAllNamed('/onboarding');
     } else {
-      // If not the first launch, go directly to home
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/getStarted');
-      }
+      // Not first launch, show get started screen
+      Get.offAllNamed('/getStarted');
     }
   }
 }
