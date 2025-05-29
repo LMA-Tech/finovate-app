@@ -22,8 +22,12 @@ class FinTexts {
   // -- Authentication Forms
   static const String firstName = "Primeiro Nome";
   static const String lastName = "Sobrenome";
+  static const String middleName = "Segundo Nome (opcional)";
   static const String email = "Email";
   static const String password = "Senha";
+  static const String cpf = "CPF";
+  static const String birthDate = "Data de nascimento";
+  static const String selectBirthDate = "Selecione sua data de nascimento";
   static const String newPassword = "New Password";
   static const String username = "Username";
   static const String phoneNo = "Numero do seu celular";

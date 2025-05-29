@@ -4,122 +4,126 @@ import 'package:flutter/foundation.dart';
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Sign in with email and password
-  /// Rate limiting is handled by Supabase's built-in rate limits
-  Future<AuthResponse> loginWithEmailPassword(String email, String password) async {
-    try {
-      final response = await _supabase.auth.signInWithPassword(
-        email: email.trim().toLowerCase(),
-        password: password,
-      );
-      return response;
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw 'Connection error. Please check your internet and try again.';
-    }
-  }
-
-  /// Sign up with email and password
-  Future<AuthResponse> signUp(String email, String password, {
-    String? firstName,
-    String? lastName,
-    String? phone,
+  /// Sign up with complete user data
+  Future<AuthResponse> signUp({
+    required String email,
+    required String password,
+    required Map<String, dynamic> userData,
   }) async {
     try {
       final response = await _supabase.auth.signUp(
         email: email.trim().toLowerCase(),
         password: password,
-        data: {
-          if (firstName?.isNotEmpty == true) 'first_name': firstName!.trim(),
-          if (lastName?.isNotEmpty == true) 'last_name': lastName!.trim(),
-          if (phone?.isNotEmpty == true) 'phone': phone!.trim(),
-        },
-        // Supabase handles email confirmation automatically
+        data: userData, // This will be available in the trigger as raw_user_meta_data
       );
+
       return response;
     } on AuthException catch (e) {
-      throw _handleAuthException(e);
+      throw _getErrorMessage(e.message);
     } catch (e) {
       throw 'Connection error. Please check your internet and try again.';
     }
   }
 
-  /// Reset password - Supabase handles email sending and rate limiting
-  Future<void> resetPassword(String email) async {
+  /// Login remains the same
+  Future<AuthResponse> login(String email, String password) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(
-        email.trim().toLowerCase(),
-        // Supabase will use your configured redirect URL
+      return await _supabase.auth.signInWithPassword(
+        email: email.trim().toLowerCase(),
+        password: password,
       );
     } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw 'Failed to send reset email. Please try again.';
+      throw _getErrorMessage(e.message);
     }
   }
 
-  /// Sign out - Supabase handles session cleanup
-  Future<void> signOut() async {
+  /// Get user profile from custom users table
+  Future<Map<String, dynamic>?> getUserProfile() async {
     try {
-      await _supabase.auth.signOut();
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return null;
+
+      final response = await _supabase
+          .from('users')
+          .select()
+          .eq('auth_id', userId)
+          .single();
+
+      return response;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Sign out error: $e');
+        debugPrint('Error getting user profile: $e');
       }
-      // Even if API call fails, clear local session
-      rethrow;
+      return null;
     }
   }
 
-  /// Get current user
-  User? getCurrentUser() => _supabase.auth.currentUser;
+  /// Update user profile in custom users table
+  Future<void> updateUserProfile({
+    String? firstName,
+    String? lastName,
+    String? middleName,
+    DateTime? birthdate,
+    String? cpf,
+    String? phoneNumber,
+  }) async {
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) throw 'User not authenticated';
 
-  /// Get current session
-  Session? getCurrentSession() => _supabase.auth.currentSession;
+      final updates = <String, dynamic>{
+        'updated_at': DateTime.now().toIso8601String(),
+      };
 
-  /// Check if user is authenticated
+      if (firstName != null) updates['first_name'] = firstName.trim();
+      if (lastName != null) updates['last_name'] = lastName.trim();
+      if (middleName != null) updates['middle_name'] = middleName.trim();
+      if (birthdate != null) updates['birthdate'] = birthdate.toIso8601String().split('T')[0]; // Date only
+      if (cpf != null) updates['cpf'] = cpf.trim();
+      if (phoneNumber != null) updates['phone_number'] = phoneNumber.trim();
+
+      await _supabase
+          .from('users')
+          .update(updates)
+          .eq('auth_id', userId);
+    } catch (e) {
+      throw 'Failed to update profile: $e';
+    }
+  }
+
+  /// Reset password
+  Future<void> resetPassword(String email) async {
+    try {
+      await _supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    }
+  }
+
+  /// Sign out
+  Future<void> signOut() async {
+    await _supabase.auth.signOut();
+  }
+
+  /// Current user getters
+  User? get currentUser => _supabase.auth.currentUser;
+  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
   bool get isAuthenticated => _supabase.auth.currentUser != null;
 
-  /// Listen to auth state changes - Supabase handles session management
-  Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
-
-  /// Refresh session - Supabase handles this automatically
-  Future<AuthResponse> refreshSession() async {
-    try {
-      return await _supabase.auth.refreshSession();
-    } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    }
-  }
-
-  /// Handle Supabase auth exceptions
-  String _handleAuthException(AuthException e) {
-    if (kDebugMode) {
-      debugPrint('Auth Exception: ${e.message}');
-    }
-
-    // Map Supabase errors to user-friendly messages
-    final message = e.message.toLowerCase();
-
-    if (message.contains('invalid login credentials')) {
-      return 'Invalid email or password. Please check your credentials.';
-    } else if (message.contains('email not confirmed')) {
-      return 'Please check your email and click the confirmation link.';
-    } else if (message.contains('user already registered')) {
-      return 'An account with this email already exists.';
-    } else if (message.contains('password should be at least')) {
-      return 'Password must be at least 6 characters long.';
-    } else if (message.contains('signup disabled')) {
-      return 'Account creation is currently disabled.';
-    } else if (message.contains('rate limit')) {
-      return 'Too many attempts. Please wait a moment before trying again.';
-    } else if (message.contains('weak password')) {
-      return 'Please choose a stronger password.';
-    } else if (message.contains('invalid email')) {
-      return 'Please enter a valid email address.';
+  /// Error handling
+  String _getErrorMessage(String error) {
+    if (error.contains('Invalid login credentials')) {
+      return 'Invalid email or password';
+    } else if (error.contains('Email not confirmed')) {
+      return 'Please verify your email first';
+    } else if (error.contains('User already registered')) {
+      return 'Email already exists';
+    } else if (error.contains('duplicate key value violates unique constraint "users_email_key"')) {
+      return 'This email is already registered';
+    } else if (error.contains('duplicate key value violates unique constraint "users_cpf_key"')) {
+      return 'This CPF is already registered';
     } else {
-      return e.message; // Return original message for other cases
+      return error;
     }
   }
 }

@@ -28,6 +28,8 @@ abstract class SplashController extends State<SplashScreen> {
   }
 
   void navigateToNextScreen() async {
+    print('Starting navigation logic...');
+
     // Show splash for 3 seconds
     await Future.delayed(const Duration(seconds: 3));
 
@@ -35,21 +37,27 @@ abstract class SplashController extends State<SplashScreen> {
 
     // Check authentication state first
     final user = Supabase.instance.client.auth.currentUser;
+    print('Current user: ${user?.email ?? 'null'}');
 
     if (user != null) {
       // User is authenticated, go to home
+      print('User authenticated - going to home');
       Get.offAllNamed('/home');
       return;
     }
 
     // User not authenticated, check if first launch
+    print('User not authenticated - checking first launch');
     bool isFirstLaunch = await _onboardingService.isFirstLaunch();
+    print('Is first launch: $isFirstLaunch');
 
     if (isFirstLaunch) {
       // First launch, show onboarding
+      print('Going to onboarding');
       Get.offAllNamed('/onboarding');
     } else {
       // Not first launch, show get started screen
+      print('Going to get started');
       Get.offAllNamed('/getStarted');
     }
   }

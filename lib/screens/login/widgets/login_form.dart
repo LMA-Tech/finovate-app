@@ -1,85 +1,100 @@
-import 'package:finovate_app/screens/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../login_controller.dart';
 
 class FinLoginForm extends StatelessWidget {
-  const FinLoginForm({
-    super.key,
-  });
+  const FinLoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controller using GetX
     final controller = Get.put(LoginController());
 
-    return Form(
+    return Obx(() => Form(
+      key: controller.formKey,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: FinSizes.spaceBtwSections),
+        padding: const EdgeInsets.symmetric(vertical: FinSizes.spaceBtwSections),
         child: Column(
           children: [
-            ///Email
+            // Email Field
             TextFormField(
               controller: controller.emailController,
+              validator: controller.validateEmail,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
-                  prefixIcon: Icon(Iconsax.direct_right),
-                  labelText: FinTexts.email),
+                prefixIcon: Icon(Iconsax.direct_right),
+                labelText: FinTexts.email,
+              ),
             ),
             const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-            /// Password
+            // Password Field
             TextFormField(
               controller: controller.passwordController,
-              decoration: const InputDecoration(
-                  prefixIcon: Icon(Iconsax.password_check),
-                  labelText: FinTexts.password,
-                  suffixIcon: Icon(Iconsax.eye_slash)),
+              validator: controller.validatePassword,
+              obscureText: controller.hidePassword.value,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => controller.login(),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Iconsax.password_check),
+                labelText: FinTexts.password,
+                suffixIcon: IconButton(
+                  onPressed: controller.togglePassword,
+                  icon: Icon(
+                    controller.hidePassword.value ? Iconsax.eye_slash : Iconsax.eye,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: FinSizes.spaceBtwInputFields / 2),
 
-            /// Remember Me & Forget Password
+            // Remember Me & Forget Password
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                /// Remember Me
+                // Remember Me
                 Row(
                   children: [
-                    Checkbox(value: true, onChanged: (value) {}),
+                    Checkbox(
+                      value: controller.rememberMe.value,
+                      onChanged: controller.toggleRememberMe,
+                    ),
                     const Text(FinTexts.rememberMe),
                   ],
                 ),
 
-                ///  Forget Password
+                // Forget Password
                 TextButton(
-                    onPressed: () {},
-                    child: const Text(FinTexts.forgetPassword)),
+                  onPressed: controller.isLoading.value ? null : controller.resetPassword,
+                  child: const Text(FinTexts.forgetPassword),
+                ),
               ],
             ),
             const SizedBox(height: FinSizes.spaceBtwSections),
 
-            ///  Sign In Button
+            // Sign In Button
             SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                    onPressed: () => controller.login(context),
-                    child: const Text(FinTexts.signIn))),
-            const SizedBox(height: FinSizes.spaceBtwItems),
-
-            /// Create Account Button
-            // SizedBox(
-            //     width: double.infinity,
-            //     child: OutlinedButton(
-            //         onPressed: () {},
-            //         child: const Text(FinTexts.createAccount))),
-            // const SizedBox(height: FinSizes.spaceBtwItems),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: controller.isLoading.value ? null : controller.login,
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : const Text(FinTexts.signIn),
+              ),
+            ),
           ],
         ),
       ),
-    );
+    ));
   }
 }

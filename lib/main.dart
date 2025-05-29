@@ -6,6 +6,7 @@ import 'package:finovate_app/utils/theme/widget_themes/background_theme.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/env_config.dart';
+import 'services/session_manager.dart';  // Add this import
 import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/get_started/get_started_screen.dart';
@@ -63,6 +64,10 @@ class FinovateApp extends StatelessWidget {
         return FinThemeBackground(child: child!);
       },
       home: const SplashScreen(),
+      initialBinding: BindingsBuilder(() {
+        // Initialize SessionManager once for the entire app
+        Get.put(SessionManager(), permanent: true);
+      }),
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),
         GetPage(name: '/onboarding', page: () => const OnBoardingScreen()),
