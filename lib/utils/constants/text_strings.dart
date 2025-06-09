@@ -22,7 +22,6 @@ class FinTexts {
   // -- Authentication Forms
   static const String firstName = "Primeiro Nome";
   static const String lastName = "Sobrenome";
-  static const String middleName = "Segundo Nome (opcional)";
   static const String email = "Email";
   static const String password = "Senha";
   static const String cpf = "CPF";
@@ -37,9 +36,9 @@ class FinTexts {
   static const String createAccount = "Criar Conta";
   static const String orSignInWith = "ou faça login com";
   static const String orSignUpWith = "or sign up with";
-  static const String iAgreeTo = "I agree to";
-  static const String privacyPolicy = "Privacy Policy";
-  static const String termsOfUse = "Terms of use";
+  static const String iAgreeTo = "Ao continuar, você concorda com a";
+  static const String privacyPolicy = "Política de Privacidade";
+  static const String termsOfUse = "Termos de Serviço";
   static const String verificationCode = "verificationCode";
   static const String resendEmail = "Resend Email";
   static const String resendEmailIn = "Resend email in";

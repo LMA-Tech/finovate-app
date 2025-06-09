@@ -80,16 +80,6 @@ class SignupScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                    // Middle Name
-                    TextFormField(
-                      controller: controller.middleNameController,
-                      decoration: const InputDecoration(
-                        labelText: FinTexts.middleName,
-                        prefixIcon: Icon(Iconsax.user),
-                      ),
-                    ),
-                    const SizedBox(height: FinSizes.spaceBtwInputFields),
-
                     // Email
                     TextFormField(
                       controller: controller.emailController,
