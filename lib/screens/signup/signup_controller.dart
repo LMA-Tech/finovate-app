@@ -3,41 +3,44 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import '../../services/auth_service.dart';
+import '../../utils/constants/text_strings.dart';
 
+/// Controller for managing the multi-step signup process
+///
+/// This controller handles:
+/// - Multi-step form navigation (4 steps total)
+/// - Reactive form validation using reactive_forms package
+/// - Real-time validation feedback
+/// - User authentication via AuthService
+/// - UI state management for buttons, loading states, etc.
 class SignupController extends GetxController with GetSingleTickerProviderStateMixin {
+  // Services
   final AuthService _auth = AuthService();
+
+  // Navigation
   final PageController pageController = PageController();
 
-  // Form keys for each step
-  final step1FormKey = GlobalKey<FormState>();
-  final step2FormKey = GlobalKey<FormState>();
-  final step3FormKey = GlobalKey<FormState>();
+  // Reactive forms for each signup step
+  // These handle validation automatically and provide real-time feedback
+  late FormGroup step1Form;  // Email, password, confirm password
+  late FormGroup step2Form;  // First name, last name, middle name
+  late FormGroup step3Form;  // CPF, phone, birthdate (all optional)
 
-  // Text Controllers for all fields
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
-  final middleNameController = TextEditingController();
-  final cpfController = TextEditingController();
-  final birthdateController = TextEditingController();
-  final phoneController = TextEditingController();
+  // Reactive state variables for UI updates
+  final RxInt currentStep = 0.obs;                    // Current step index (0-3)
+  final RxBool isLoading = false.obs;                 // Loading state for signup process
+  final RxBool hidePassword = true.obs;               // Password visibility toggle
+  final RxBool hideConfirmPassword = true.obs;        // Confirm password visibility toggle
+  final RxBool acceptTerms = false.obs;               // Terms and conditions acceptance
+  final RxBool saveInfo = false.obs;                  // Save information checkbox
+  final Rx<DateTime?> selectedBirthdate = Rx<DateTime?>(null);  // Selected birthdate
 
-  // Observable states
-  final RxInt currentStep = 0.obs;
-  final RxBool isLoading = false.obs;
-  final RxBool hidePassword = true.obs;
-  final RxBool hideConfirmPassword = true.obs;
-  final RxBool acceptTerms = false.obs;
-  final RxBool saveInfo = false.obs;
-  final Rx<DateTime?> selectedBirthdate = Rx<DateTime?>(null);
-
-  // Add reactive variable to track if we can proceed (make it public for debugging)
+  // Reactive variable to track if user can proceed to next step
   final RxBool canProceedReactive = false.obs;
 
-  // Animation controller for shake effect
+  // Animation controller for shake effect on validation errors
   AnimationController? shakeController;
   Animation<double>? shakeAnimation;
 
@@ -50,7 +53,21 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   void onInit() {
     super.onInit();
 
-    // Initialize shake animation controller
+    // Initialize reactive forms with validation rules
+    _initializeReactiveForms();
+
+    // Initialize shake animation for validation error feedback
+    _initializeShakeAnimation();
+
+    // Set up listeners for real-time validation updates
+    _setupValidationListeners();
+
+    // Initialize reactive state
+    _updateCanProceed();
+  }
+
+  /// Initialize shake animation controller for validation error feedback
+  void _initializeShakeAnimation() {
     shakeController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -63,66 +80,104 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       parent: shakeController!,
       curve: Curves.elasticIn,
     ));
+  }
 
-    // Add listeners to text controllers to trigger reactivity
-    emailController.addListener(_updateCanProceed);
-    passwordController.addListener(_updateCanProceed);
-    confirmPasswordController.addListener(_updateCanProceed);
-    firstNameController.addListener(_updateCanProceed);
-    lastNameController.addListener(_updateCanProceed);
-
-    // Also listen to currentStep changes
+  /// Set up listeners for real-time validation state updates
+  void _setupValidationListeners() {
+    // Listen to step and terms changes
     ever(currentStep, (_) => _updateCanProceed());
     ever(acceptTerms, (_) => _updateCanProceed());
 
-    // Initialize the reactive state
-    _updateCanProceed();
+    // Listen to form validation changes
+    step1Form.statusChanged.listen((_) => _updateCanProceed());
+    step2Form.statusChanged.listen((_) => _updateCanProceed());
   }
 
-  // Method to update the reactive state
+  /// Initialize reactive forms with validation rules for each signup step
+  void _initializeReactiveForms() {
+    // Step 1: Authentication credentials
+    step1Form = FormGroup({
+      'email': FormControl<String>(
+        validators: [
+          Validators.required,  // Email is required
+          Validators.email,     // Must be valid email format
+        ],
+      ),
+      'password': FormControl<String>(
+        validators: [
+          Validators.required,        // Password is required
+          Validators.minLength(6),    // Minimum 6 characters
+        ],
+      ),
+      'confirmPassword': FormControl<String>(
+        validators: [Validators.required], // Confirmation is required
+      ),
+    }, validators: [
+      // Cross-field validation: passwords must match
+      Validators.mustMatch('password', 'confirmPassword')
+    ]);
+
+    // Step 2: Personal information (required)
+    step2Form = FormGroup({
+      'firstName': FormControl<String>(
+        validators: [
+          Validators.required,        // First name is required
+          Validators.minLength(2),    // Minimum 2 characters
+        ],
+      ),
+      'lastName': FormControl<String>(
+        validators: [
+          Validators.required,        // Last name is required
+          Validators.minLength(2),    // Minimum 2 characters
+        ],
+      ),
+      'middleName': FormControl<String>(), // Optional field
+    });
+
+    // Step 3: Additional information (all optional)
+    step3Form = FormGroup({
+      'cpf': FormControl<String>(),       // Optional CPF
+      'phone': FormControl<String>(),     // Optional phone number
+      'birthdate': FormControl<DateTime>(), // Optional birthdate
+    });
+  }
+
+  /// Update the reactive canProceed state based on current step validation
   void _updateCanProceed() {
     final newValue = canProceed;
-    print('DEBUG: _updateCanProceed called, canProceed: $newValue, currentStep: ${currentStep.value}');
-    print('DEBUG: email: "${emailController.text}", password: "${passwordController.text}", confirm: "${confirmPasswordController.text}"');
-    print('DEBUG: email empty: ${emailController.text.isEmpty}, password empty: ${passwordController.text.isEmpty}, confirm empty: ${confirmPasswordController.text.isEmpty}');
-    print('DEBUG: passwords match: ${passwordController.text == confirmPasswordController.text}');
     canProceedReactive.value = newValue;
-    print('DEBUG: canProceedReactive set to: ${canProceedReactive.value}');
   }
 
-  // Test method to manually check state
-  void debugCheckState() {
-    print('=== DEBUG CHECK STATE ===');
-    print('currentStep: ${currentStep.value}');
-    print('email: "${emailController.text}" (empty: ${emailController.text.isEmpty})');
-    print('password: "${passwordController.text}" (empty: ${passwordController.text.isEmpty})');
-    print('confirm: "${confirmPasswordController.text}" (empty: ${confirmPasswordController.text.isEmpty})');
-    print('passwords match: ${passwordController.text == confirmPasswordController.text}');
-    print('canProceed getter: ${canProceed}');
-    print('canProceedReactive: ${canProceedReactive.value}');
-    print('========================');
-  }
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // UI LOGIC METHODS
+  // These methods control the visual state and behavior of the signup UI
+  // ═══════════════════════════════════════════════════════════════════════════════════════
 
-  // UI Logic Methods
+  /// Whether to show the progress indicator (hidden on first step)
   bool shouldShowProgressIndicator() => currentStep.value > 0;
 
+  /// Get the appropriate button text based on current step
   String getButtonText() {
-    return currentStep.value == totalSteps - 1 ? 'Finalizar Cadastro' : 'Continuar';
+    return currentStep.value == totalSteps - 1
+        ? FinTexts.signupFinalizeButton
+        : FinTexts.signupContinueButton;
   }
 
+  /// Get button color based on validation state and loading status
   Color getButtonColor() {
-    print('DEBUG: getButtonColor called, canProceedReactive: ${canProceedReactive.value}, isLoading: ${isLoading.value}');
     if (canProceedReactive.value && !isLoading.value) {
-      return const Color(0xFF1B6FFF); // Full blue
+      return const Color(0xFF1B6FFF); // Full blue when enabled
     }
-    return const Color(0xFF1B6FFF).withOpacity(0.4); // 40% opacity
+    return const Color(0xFF1B6FFF).withOpacity(0.4); // 40% opacity when disabled
   }
 
+  /// Get button action callback - null when disabled, nextStep when enabled
   VoidCallback? getButtonAction() {
     if (isLoading.value || !canProceedReactive.value) return null;
     return nextStep;
   }
 
+  /// Handle back navigation - either go to previous step or exit signup
   void handleBackNavigation(BuildContext context) {
     if (currentStep.value > 0) {
       previousStep();
@@ -131,22 +186,16 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
+  /// Update current step index (used by UI components)
   void updateCurrentStep(int index) => currentStep.value = index;
 
-  // Handle page changes (validates when swiping forward)
+  /// Handle page changes (validates when swiping forward)
   void handlePageChange(int newIndex) {
-    print('DEBUG: handlePageChange called - from: ${currentStep.value} to: $newIndex');
-
     // If trying to go forward, validate current step
     if (newIndex > currentStep.value) {
-      print('DEBUG: Trying to go forward, validating step ${currentStep.value}');
-
       if (!_validateCurrentStep()) {
-        print('DEBUG: Validation failed, triggering shake animation');
-
         // Trigger shake animation
         _triggerShakeAndShowError();
-
         // Force return to current step without animation
         pageController.jumpToPage(currentStep.value);
         return;
@@ -154,11 +203,10 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
 
     // Update current step if validation passed or going backward
-    print('DEBUG: Navigation allowed, updating currentStep to: $newIndex');
     currentStep.value = newIndex;
   }
 
-  // Trigger shake animation and show error
+  /// Trigger shake animation and show error
   void _triggerShakeAndShowError() {
     // Reset and start shake animation
     shakeController?.reset();
@@ -178,22 +226,17 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     );
   }
 
-  // Get appropriate validation message for current step
+  /// Get appropriate validation error message for current step
   String _getValidationMessage() {
     switch (currentStep.value) {
       case 0:
-        if (emailController.text.isEmpty) return 'Por favor, digite seu email';
-        if (passwordController.text.isEmpty) return 'Por favor, digite sua senha';
-        if (confirmPasswordController.text.isEmpty) return 'Por favor, confirme sua senha';
-        if (passwordController.text != confirmPasswordController.text) return 'As senhas não coincidem';
-        if (!GetUtils.isEmail(emailController.text)) return 'Por favor, digite um email válido';
-        if (passwordController.text.length < 6) return 'A senha deve ter pelo menos 6 caracteres';
+        if (!step1Form.control('email').valid) return FinTexts.signupValidationEmailRequired;
+        if (!step1Form.control('password').valid) return FinTexts.signupValidationPasswordRequired;
+        if (!step1Form.control('confirmPassword').valid) return FinTexts.signupValidationConfirmPasswordRequired;
         return 'Por favor, preencha todos os campos obrigatórios';
       case 1:
-        if (firstNameController.text.isEmpty) return 'Por favor, digite seu primeiro nome';
-        if (lastNameController.text.isEmpty) return 'Por favor, digite seu sobrenome';
-        if (firstNameController.text.length < 2) return 'O nome deve ter pelo menos 2 caracteres';
-        if (lastNameController.text.length < 2) return 'O sobrenome deve ter pelo menos 2 caracteres';
+        if (!step2Form.control('firstName').valid) return FinTexts.signupValidationFirstNameRequired;
+        if (!step2Form.control('lastName').valid) return FinTexts.signupValidationLastNameRequired;
         return 'Por favor, preencha todos os campos obrigatórios';
       case 2:
         return 'Por favor, verifique as informações inseridas';
@@ -204,31 +247,36 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  // Business Logic Methods
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // BUSINESS LOGIC METHODS
+  // These methods handle the core functionality of the signup process
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Toggle password visibility for password field
   void togglePassword() => hidePassword.toggle();
+
+  /// Toggle password visibility for confirm password field
   void toggleConfirmPassword() => hideConfirmPassword.toggle();
+
+  /// Toggle terms and conditions acceptance
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
+
+  /// Toggle save information checkbox
   void toggleSaveInfo(bool? value) => saveInfo.value = value ?? false;
 
+  /// Proceed to next step or complete signup if on final step
   void nextStep() {
-    print('DEBUG: nextStep() called - currentStep: ${currentStep.value}, totalSteps: $totalSteps');
-
     if (currentStep.value < totalSteps - 1) {
-      print('DEBUG: Not last step, checking validation...');
       if (_validateCurrentStep()) {
-        print('DEBUG: Validation passed, moving to next step');
         currentStep.value++;
-        print('DEBUG: currentStep updated to: ${currentStep.value}');
         _animateToPage(currentStep.value);
-      } else {
-        print('DEBUG: Validation failed!');
       }
     } else {
-      print('DEBUG: Last step, calling signUp()');
       signUp();
     }
   }
 
+  /// Go back to previous step
   void previousStep() {
     if (currentStep.value > 0) {
       currentStep.value--;
@@ -236,6 +284,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
+  /// Jump directly to a specific step (used by progress indicator)
   void goToStep(int step) {
     if (step >= 0 && step < totalSteps) {
       currentStep.value = step;
@@ -243,161 +292,88 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
+  /// Show date picker and handle birthdate selection
   Future<void> selectBirthdate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)),
-      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 13)),
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)), // Default to 25 years ago
+      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),  // 100 years ago
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 13)),    // Must be at least 13 years old
     );
 
     if (picked != null) {
       selectedBirthdate.value = picked;
-      birthdateController.text = DateFormat('dd/MM/yyyy').format(picked);
+      step3Form.control('birthdate').value = picked;
     }
   }
 
-  // Private Helper Methods
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // PRIVATE HELPER METHODS
+  // Internal methods for navigation, validation, and animation
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Animate to specific page with smooth transition
   void _animateToPage(int page) {
-    print('DEBUG: _animateToPage called with page: $page');
     pageController.animateToPage(
       page,
       duration: pageTransitionDuration,
       curve: transitionCurve,
     );
-    print('DEBUG: Page animation initiated');
   }
 
+  /// Validate current step using reactive forms
   bool _validateCurrentStep() {
-    print('DEBUG: _validateCurrentStep() called for step: ${currentStep.value}');
-
     switch (currentStep.value) {
       case 0:
-        final isValid = step1FormKey.currentState?.validate() ?? false;
-        print('DEBUG: Step 0 validation result: $isValid');
-        return isValid;
+        step1Form.markAllAsTouched(); // Show validation errors
+        return step1Form.valid;
       case 1:
-        final isValid = step2FormKey.currentState?.validate() ?? false;
-        print('DEBUG: Step 1 validation result: $isValid');
-        return isValid;
+        step2Form.markAllAsTouched(); // Show validation errors
+        return step2Form.valid;
       case 2:
-        final isValid = step3FormKey.currentState?.validate() ?? false;
-        print('DEBUG: Step 2 validation result: $isValid');
-        return isValid;
+        step3Form.markAllAsTouched(); // Show validation errors
+        return step3Form.valid;
       case 3:
-        final isValid = acceptTerms.value;
-        print('DEBUG: Step 3 validation result: $isValid');
-        return isValid;
+        return acceptTerms.value;
       default:
-        print('DEBUG: Unknown step, returning true');
         return true;
     }
   }
 
-  // Computed Properties
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // COMPUTED PROPERTIES
+  // Dynamic properties that compute values based on current state
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Check if user can proceed to next step based on current step validation
   bool get canProceed {
     switch (currentStep.value) {
       case 0:
-        final emailFilled = emailController.text.isNotEmpty;
-        final passwordFilled = passwordController.text.isNotEmpty;
-        final confirmPasswordFilled = confirmPasswordController.text.isNotEmpty;
-        final passwordsMatch = passwordController.text == confirmPasswordController.text;
-
-        print('DEBUG: Step 0 - email: $emailFilled, password: $passwordFilled, confirm: $confirmPasswordFilled, match: $passwordsMatch');
-
-        return emailFilled && passwordFilled && confirmPasswordFilled && passwordsMatch;
+        return step1Form.valid; // Email, password, confirm password validation
       case 1:
-        return firstNameController.text.isNotEmpty &&
-            lastNameController.text.isNotEmpty;
+        return step2Form.controls['firstName']!.valid &&
+            step2Form.controls['lastName']!.valid; // Name validation
       case 2:
-        return true; // Optional fields
+        return true; // Step 3 fields are optional
       case 3:
-        return acceptTerms.value;
+        return acceptTerms.value; // Terms acceptance required
       default:
         return false;
     }
   }
 
+  /// Calculate progress percentage for progress indicator
   double get stepProgress => (currentStep.value + 1) / totalSteps;
 
-  // Validation Methods
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email é obrigatório';
-    }
-    if (!GetUtils.isEmail(value)) {
-      return 'Digite um email válido';
-    }
-    return null;
-  }
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // AUTHENTICATION LOGIC
+  // Methods for user registration and account creation
+  // ═══════════════════════════════════════════════════════════════════════════════════════
 
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Senha é obrigatória';
-    }
-    if (value.length < 6) {
-      return 'Senha deve ter pelo menos 6 caracteres';
-    }
-    return null;
-  }
-
-  String? validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Confirmação de senha é obrigatória';
-    }
-    if (value != passwordController.text) {
-      return 'Senhas não coincidem';
-    }
-    return null;
-  }
-
-  String? validateFirstName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Primeiro nome é obrigatório';
-    }
-    if (value.length < 2) {
-      return 'Nome deve ter pelo menos 2 caracteres';
-    }
-    return null;
-  }
-
-  String? validateLastName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Sobrenome é obrigatório';
-    }
-    if (value.length < 2) {
-      return 'Sobrenome deve ter pelo menos 2 caracteres';
-    }
-    return null;
-  }
-
-  String? validateCPF(String? value) {
-    if (value != null && value.isNotEmpty) {
-      String cleanCPF = value.replaceAll(RegExp(r'[^\d]'), '');
-      if (cleanCPF.length != 11) {
-        return 'CPF deve ter 11 dígitos';
-      }
-      if (!_isValidCPF(cleanCPF)) {
-        return 'Digite um CPF válido';
-      }
-    }
-    return null;
-  }
-
-  String? validatePhone(String? value) {
-    if (value != null && value.isNotEmpty) {
-      String cleanPhone = value.replaceAll(RegExp(r'[^\d]'), '');
-      if (cleanPhone.length < 10 || cleanPhone.length > 11) {
-        return 'Digite um número válido (10-11 dígitos)';
-      }
-    }
-    return null;
-  }
-
-  // Authentication Logic
+  /// Attempt to sign up user with provided information
   Future<void> signUp() async {
     if (!acceptTerms.value) {
-      Get.snackbar('Erro', 'Aceite os termos e condições para continuar');
+      Get.snackbar('Erro', FinTexts.signupErrorTermsRequired);
       return;
     }
 
@@ -406,8 +382,8 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       final userData = _buildUserData();
 
       final response = await _auth.signUp(
-        email: emailController.text.trim(),
-        password: passwordController.text,
+        email: step1Form.control('email').value,
+        password: step1Form.control('password').value,
         userData: userData,
       );
 
@@ -419,37 +395,46 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  // Private Authentication Helpers
+  /// Build user data object from form inputs
   Map<String, dynamic> _buildUserData() {
     final userData = <String, dynamic>{
-      'first_name': firstNameController.text.trim(),
-      'last_name': lastNameController.text.trim(),
+      'first_name': step2Form.control('firstName').value,
+      'last_name': step2Form.control('lastName').value,
     };
 
-    if (middleNameController.text.isNotEmpty) {
-      userData['middle_name'] = middleNameController.text.trim();
+    // Add optional fields if provided
+    final middleName = step2Form.control('middleName').value;
+    if (middleName != null && middleName.isNotEmpty) {
+      userData['middle_name'] = middleName;
     }
-    if (phoneController.text.isNotEmpty) {
-      userData['phone_number'] = phoneController.text.trim();
+
+    final phone = step3Form.control('phone').value;
+    if (phone != null && phone.isNotEmpty) {
+      userData['phone_number'] = phone;
     }
-    if (cpfController.text.isNotEmpty) {
-      userData['cpf'] = cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
+
+    final cpf = step3Form.control('cpf').value;
+    if (cpf != null && cpf.isNotEmpty) {
+      userData['cpf'] = cpf.replaceAll(RegExp(r'[^\d]'), '');
     }
-    if (selectedBirthdate.value != null) {
-      userData['birthdate'] = selectedBirthdate.value!.toIso8601String();
+
+    final birthdate = step3Form.control('birthdate').value;
+    if (birthdate != null) {
+      userData['birthdate'] = birthdate.toIso8601String();
     }
 
     return userData;
   }
 
+  /// Handle successful signup response
   void _handleSignUpResponse(response) {
     if (response.user != null) {
       if (response.user!.emailConfirmedAt == null) {
         _showEmailVerificationDialog();
       } else {
         Get.snackbar(
-          'Sucesso',
-          'Conta criada com sucesso!',
+          FinTexts.signupSuccessTitle,
+          FinTexts.signupSuccessMessage,
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
@@ -457,9 +442,10 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
+  /// Show signup error message
   void _showSignUpError(String error) {
     Get.snackbar(
-      'Erro no Cadastro',
+      FinTexts.signupErrorTitle,
       error,
       backgroundColor: Colors.red,
       colorText: Colors.white,
@@ -467,6 +453,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     );
   }
 
+  /// Show email verification dialog
   void _showEmailVerificationDialog() {
     Get.dialog(
       AlertDialog(
@@ -477,7 +464,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
             const Icon(Icons.email_outlined, size: 64, color: Colors.blue),
             const SizedBox(height: 16),
             Text(
-              'Enviamos um email de verificação para ${emailController.text}. Verifique sua caixa de entrada e clique no link de verificação.',
+              'Enviamos um email de verificação para ${step1Form.control('email').value}. Verifique sua caixa de entrada e clique no link de verificação.',
               textAlign: TextAlign.center,
             ),
           ],
@@ -496,36 +483,19 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     );
   }
 
-  bool _isValidCPF(String cpf) {
-    if (RegExp(r'^(\d)\1{10}$').hasMatch(cpf)) {
-      return false;
-    }
-    return true;
-  }
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // CLEANUP AND DISPOSAL
+  // Proper resource cleanup when controller is destroyed
+  // ═══════════════════════════════════════════════════════════════════════════════════════
 
   @override
   void onClose() {
     // Dispose animation controller
     shakeController?.dispose();
 
-    // Remove listeners before disposing
-    emailController.removeListener(_updateCanProceed);
-    passwordController.removeListener(_updateCanProceed);
-    confirmPasswordController.removeListener(_updateCanProceed);
-    firstNameController.removeListener(_updateCanProceed);
-    lastNameController.removeListener(_updateCanProceed);
-
-    // Dispose controllers
+    // Dispose page controller
     pageController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    firstNameController.dispose();
-    lastNameController.dispose();
-    middleNameController.dispose();
-    cpfController.dispose();
-    birthdateController.dispose();
-    phoneController.dispose();
+
     super.onClose();
   }
 }

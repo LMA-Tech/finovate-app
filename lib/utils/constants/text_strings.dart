@@ -44,13 +44,6 @@ class FinTexts {
   static const String termsOfUse = "Termos de Serviço";
   static const String privacyAgreementEnd = " da Finovate.";
   static const String continueText = "Continuar";
-  // Validation messages
-  static const String emailRequired = "Email é obrigatório";
-  static const String emailInvalid = "Digite um email válido";
-  static const String passwordRequired = "Senha é obrigatória";
-  static const String passwordTooShort = "Senha deve ter pelo menos 6 caracteres";
-  static const String confirmPasswordRequired = "Confirmação de senha é obrigatória";
-  static const String passwordsDoNotMatch = "Senhas não coincidem";
 
   // -- Sign Up Screen 2
   static const String signupTitle2 = "Informações pessoais";
@@ -72,7 +65,25 @@ class FinTexts {
   static const String resendEmail = "Resend Email";
   static const String resendEmailIn = "Resend email in";
 
-
+  // -- Signup Process Texts
+  static const String signupContinueButton = "Continuar";
+  static const String signupFinalizeButton = "Finalizar Cadastro";
+  static const String signupValidationEmailRequired = "Email é obrigatório";
+  static const String signupValidationEmailInvalid = "Digite um email válido";
+  static const String signupValidationPasswordRequired = "Senha é obrigatória";
+  static const String signupValidationPasswordMinLength = "Senha deve ter pelo menos 6 caracteres";
+  static const String signupValidationConfirmPasswordRequired = "Confirmação de senha é obrigatória";
+  static const String signupValidationPasswordsMustMatch = "Senhas não coincidem";
+  static const String signupValidationFirstNameRequired = "Primeiro nome é obrigatório";
+  static const String signupValidationFirstNameMinLength = "Nome deve ter pelo menos 2 caracteres";
+  static const String signupValidationLastNameRequired = "Sobrenome é obrigatório";
+  static const String signupValidationLastNameMinLength = "Sobrenome deve ter pelo menos 2 caracteres";
+  static const String signupValidationCpfInvalid = "CPF deve ter 11 dígitos";
+  static const String signupValidationPhoneInvalid = "Digite um número válido (10-11 dígitos)";
+  static const String signupErrorTermsRequired = "Aceite os termos e condições para continuar";
+  static const String signupSuccessTitle = "Sucesso";
+  static const String signupSuccessMessage = "Conta criada com sucesso!";
+  static const String signupErrorTitle = "Erro no Cadastro";
 
 
 

@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../../utils/constants/colors.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+import '../../utils/constants/colors.dart';
 
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String? Function(String?) validator;
+/// Simple reactive text field that keeps your exact styling
+class CustomTextFieldReactive extends StatelessWidget {
+  final String formControlName;
   final String label;
   final bool obscureText;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final Widget? suffixIcon;
+  final Map<String, String Function(Object)>? validationMessages;
 
-  const CustomTextField({
+  const CustomTextFieldReactive({
     super.key,
-    required this.controller,
-    required this.validator,
+    required this.formControlName,
     required this.label,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
     this.suffixIcon,
+    this.validationMessages,
   });
 
   @override
@@ -39,13 +41,13 @@ class CustomTextField extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Text Field Container
-        TextFormField(
-          controller: controller,
-          validator: validator,
+        // Reactive text field with your styling
+        ReactiveTextField<String>(
+          formControlName: formControlName,
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
+          validationMessages: validationMessages ?? {},
           style: const TextStyle(
             color: FinColors.white,
             fontSize: 16,
@@ -55,7 +57,7 @@ class CustomTextField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF2D3245), // Dark container
+            fillColor: const Color(0xFF2D3245),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(

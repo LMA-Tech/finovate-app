@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+import '../../../utils/constants/policy_content.dart';
+import '../../../utils/constants/sizes.dart';
+
+/// Bottom sheet widget for displaying privacy policy or terms of service
+class PolicyBottomSheet extends StatelessWidget {
+  final String title;
+  final String content;
+
+  const PolicyBottomSheet({
+    super.key,
+    required this.title,
+    required this.content,
+  });
+
+  /// Show privacy policy bottom sheet
+  static void showPrivacyPolicy(BuildContext context) {
+    _showPolicySheet(
+      context,
+      title: 'Política de Privacidade',
+      content: PolicyContent.privacyPolicy,
+    );
+  }
+
+  /// Show terms of service bottom sheet
+  static void showTermsOfService(BuildContext context) {
+    _showPolicySheet(
+      context,
+      title: 'Termos de Serviço',
+      content: PolicyContent.termsOfService,
+    );
+  }
+
+  /// Generic method to show policy bottom sheet
+  static void _showPolicySheet(
+      BuildContext context, {
+        required String title,
+        required String content,
+      }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PolicyBottomSheet(
+        title: title,
+        content: content,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.8,
+      decoration: const BoxDecoration(
+        color: Color(0xFF2D3245), // Same as your input fields
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header with title and close button
+          Padding(
+            padding: const EdgeInsets.all(FinSizes.defaultSpace),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: FinSizes.defaultSpace,
+                vertical: FinSizes.sm,
+              ),
+              child: Text(
+                content,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  height: 1.6,
+                ),
+              ),
+            ),
+          ),
+
+          // Bottom padding
+          const SizedBox(height: FinSizes.defaultSpace),
+        ],
+      ),
+    );
+  }
+}

@@ -1,5 +1,7 @@
+import 'package:finovate_app/screens/signup/widgets/policy_bottom_sheet.dart';
 import 'package:flutter/material.dart';
-import '../../../utils/constants/colors.dart';
+import 'package:flutter/gestures.dart';
+
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 
@@ -18,13 +20,13 @@ class DisclaimerWidget extends StatelessWidget {
     return Padding(
       padding: padding ?? const EdgeInsets.only(bottom: FinSizes.md),
       child: Text.rich(
-        _getTextSpan(),
+        _getTextSpan(context),
         textAlign: TextAlign.left,
       ),
     );
   }
 
-  TextSpan _getTextSpan() {
+  TextSpan _getTextSpan(BuildContext context) {
     switch (type) {
       case DisclaimerType.privacy:
         return TextSpan(
@@ -36,9 +38,15 @@ class DisclaimerWidget extends StatelessWidget {
           ),
           children: [
             _normalText(FinTexts.privacyAgreement),
-            _linkText(FinTexts.privacyPolicy),
+            _clickableLinkText(
+              FinTexts.privacyPolicy,
+              onTap: () => PolicyBottomSheet.showPrivacyPolicy(context),
+            ),
             _normalText(' ${FinTexts.and} '),
-            _linkText(FinTexts.termsOfUse),
+            _clickableLinkText(
+              FinTexts.termsOfUse,
+              onTap: () => PolicyBottomSheet.showTermsOfService(context),
+            ),
             _normalText(FinTexts.privacyAgreementEnd),
           ],
         );
@@ -62,7 +70,7 @@ class DisclaimerWidget extends StatelessWidget {
     );
   }
 
-  TextSpan _linkText(String text) {
+  TextSpan _clickableLinkText(String text, {required VoidCallback onTap}) {
     return TextSpan(
       text: text,
       style: const TextStyle(
@@ -71,6 +79,7 @@ class DisclaimerWidget extends StatelessWidget {
         color: Colors.white,
         decoration: TextDecoration.underline,
       ),
+      recognizer: TapGestureRecognizer()..onTap = onTap,
     );
   }
 }
