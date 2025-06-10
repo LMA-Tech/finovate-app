@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
-import '../../utils/constants/colors.dart';
-import '../../utils/constants/sizes.dart';
+import '../../../utils/constants/colors.dart';
 
-class FinCustomTextField extends StatelessWidget {
-  final String label;
+class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String? Function(String?)? validator;
+  final String? Function(String?) validator;
+  final String label;
   final bool obscureText;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final Widget? suffixIcon;
-  final VoidCallback? onTap;
-  final bool readOnly;
-  final String? hintText;
 
-  const FinCustomTextField({
+  const CustomTextField({
     super.key,
-    required this.label,
     required this.controller,
-    this.validator,
+    required this.validator,
+    required this.label,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
     this.suffixIcon,
-    this.onTap,
-    this.readOnly = false,
-    this.hintText,
   });
 
   @override
@@ -37,68 +30,72 @@ class FinCustomTextField extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: FinColors.lightGray, // Using existing color constant
-            fontSize: FinSizes.fontSizeSm - 1, // 13px
+            color: FinColors.lightGray,
+            fontSize: 13,
             fontWeight: FontWeight.w500,
             height: 1.50,
             letterSpacing: -0.13,
           ),
         ),
-        const SizedBox(height: FinSizes.xs * 2), // 8px
+        const SizedBox(height: 8),
 
         // Text Field Container
-        Container(
-          width: double.infinity,
-          height: 56,
-          decoration: ShapeDecoration(
-            color: const Color(0xFF2D3245), // Local-input color
-            shape: RoundedRectangleBorder(
-              side: const BorderSide(
-                width: 1,
-                color: Color(0xFFE3EBFF), // brand-primary-lighter
-              ),
-              borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
-            ),
-            shadows: const [
-              BoxShadow(
-                color: Color(0x3DE4E5E7),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-                spreadRadius: 0,
-              ),
-            ],
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          style: const TextStyle(
+            color: FinColors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            height: 1.38,
+            letterSpacing: -0.16,
           ),
-          child: TextFormField(
-            controller: controller,
-            validator: validator,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            textInputAction: textInputAction,
-            onTap: onTap,
-            readOnly: readOnly,
-            style: const TextStyle(
-              color: Color(0xFFE3EBFF), // brand-primary-lighter
-              fontSize: FinSizes.fontSizeMd,
-              fontWeight: FontWeight.w500,
-              height: 1.38,
-              letterSpacing: -0.16,
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              contentPadding: const EdgeInsets.all(FinSizes.sm + 6), // 14px
-              suffixIcon: suffixIcon,
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: const Color(0xFFE3EBFF).withOpacity(0.5),
-                fontSize: FinSizes.fontSizeMd,
-                fontWeight: FontWeight.w500,
-                height: 1.38,
-                letterSpacing: -0.16,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFF2D3245), // Dark container
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                width: 1,
               ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: Color(0xFFE3EBFF),
+                width: 1,
+              ),
+            ),
+            errorBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: FinColors.error,
+                width: 1,
+              ),
+            ),
+            focusedErrorBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: FinColors.error,
+                width: 1,
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(16),
+            suffixIcon: suffixIcon,
+            errorStyle: const TextStyle(
+              color: FinColors.error,
+              fontSize: 12,
             ),
           ),
         ),

@@ -23,7 +23,7 @@ class SignupStep1 extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            Text(
+            const Text(
               FinTexts.signupTitle,
               style: TextStyle(
                 fontSize: FinSizes.fontSizeLg + 6, // 24px
@@ -34,149 +34,97 @@ class SignupStep1 extends StatelessWidget {
             ),
             const SizedBox(height: FinSizes.spaceBtwSections),
 
-            // Form Container - matches Figma structure
+            // Form Container
+
             Form(
               key: controller.step1FormKey,
-              child: Container(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Form Fields Container
-                    Container(
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Email Field
-                          FinCustomTextField(
-                            label: FinTexts.email,
-                            controller: controller.emailController,
-                            validator: controller.validateEmail,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          const SizedBox(height: FinSizes.md),
+              child: Column(
+                children: [
 
-                          // Password Field
-                          Obx(() => FinCustomTextField(
-                            label: FinTexts.password,
-                            controller: controller.passwordController,
-                            validator: controller.validatePassword,
-                            obscureText: controller.hidePassword.value,
-                            textInputAction: TextInputAction.next,
-                            suffixIcon: IconButton(
-                              onPressed: controller.togglePassword,
-                              icon: Icon(
-                                controller.hidePassword.value
-                                    ? Iconsax.eye_slash
-                                    : Iconsax.eye,
-                                color: const Color(0xFFE3EBFF),
-                                size: FinSizes.iconSm,
-                              ),
-                            ),
-                          )),
-                          const SizedBox(height: FinSizes.md),
+                  // Email Field
+                  CustomTextField(
+                      controller: controller.emailController,
+                      validator: controller.validateEmail,
+                      label: FinTexts.email,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                          // Confirm Password Field
-                          Obx(() => FinCustomTextField(
-                            label: 'Confirmar senha', // Add this to FinTexts if you want
-                            controller: controller.confirmPasswordController,
-                            validator: controller.validateConfirmPassword,
-                            obscureText: controller.hideConfirmPassword.value,
-                            textInputAction: TextInputAction.done,
-                            suffixIcon: IconButton(
-                              onPressed: controller.toggleConfirmPassword,
-                              icon: Icon(
-                                controller.hideConfirmPassword.value
-                                    ? Iconsax.eye_slash
-                                    : Iconsax.eye,
-                                color: const Color(0xFFE3EBFF),
-                                size: FinSizes.iconSm,
-                              ),
-                            ),
-                          )),
-                        ],
+                  // Password Field
+                  Obx(() => CustomTextField(
+                    controller: controller.passwordController,
+                    validator: controller.validatePassword,
+                    label: FinTexts.password,
+                    obscureText: controller.hidePassword.value,
+                    textInputAction: TextInputAction.next,
+                    suffixIcon: IconButton(
+                      onPressed: controller.togglePassword,
+                      icon: Icon(
+                        controller.hidePassword.value
+                            ? Iconsax.eye_slash
+                            : Iconsax.eye,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(height: FinSizes.xs),
+                  )),
+                  const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                    // Checkbox Section - matches Figma exactly
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Save Info Checkbox
-                          Obx(() => Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: ShapeDecoration(
-                                  color: controller.saveInfo.value
-                                      ? FinColors.primary
-                                      : Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(
-                                      width: 1.2,
-                                      color: controller.saveInfo.value
-                                          ? FinColors.primary
-                                          : const Color(0xFFEFEFF0),
-                                    ),
-                                    borderRadius: BorderRadius.circular(2.4),
-                                  ),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () => controller.toggleSaveInfo(!controller.saveInfo.value),
-                                    borderRadius: BorderRadius.circular(2.4),
-                                    child: controller.saveInfo.value
-                                        ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 8,
-                                    )
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: FinSizes.xs / 2), // 6px spacing
-                              const Text(
-                                'Manter informações salvas',
-                                style: TextStyle(
-                                  color: Color(0xFFEFEFF0),
-                                  fontSize: FinSizes.fontSizeSm - 1, // 13px
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.50,
-                                  letterSpacing: -0.13,
-                                ),
-                              ),
-                            ],
-                          )),
-
-                          // Invisible "Forgot password" for spacing
-                          const Opacity(
-                            opacity: 0,
-                            child: Text(
-                              'Esqueci minha senha',
-                              style: TextStyle(
-                                color: Color(0xFF1B6FFF),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                height: 1.40,
-                                letterSpacing: -0.13,
-                              ),
-                            ),
-                          ),
-                        ],
+                  // Confirm Password Field
+                  Obx(() => CustomTextField(
+                    controller: controller.confirmPasswordController,
+                    validator: controller.validateConfirmPassword,
+                    label: FinTexts.confirmPassword,
+                    obscureText: controller.hidePassword.value,
+                    textInputAction: TextInputAction.done,
+                    suffixIcon: IconButton(
+                      onPressed: controller.toggleConfirmPassword,
+                      icon: Icon(
+                        controller.hideConfirmPassword.value
+                            ? Iconsax.eye_slash
+                            : Iconsax.eye,
+                        color: Colors.white,
+                        size: 20,
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  )),
+                  const SizedBox(height: FinSizes.spaceBtwInputFields),
+
+                  // Save Information Checkbox
+                  Obx(() => Row(
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: Checkbox(
+                          value: controller.saveInfo.value,
+                          onChanged: controller.toggleSaveInfo,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(
+                              width: 1.20,
+                              color: FinColors.neutralGray
+                            ),
+                            borderRadius: BorderRadius.circular(2.40),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        FinTexts.keepInfoSaved,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          height: 1.50,
+                          letterSpacing: -0.13,
+                        ),
+                      ),
+                    ],
+                  )),
+                  const SizedBox(height: FinSizes.spaceBtwSections),
+                ],
+              )
             ),
 
             // Add some bottom spacing so button doesn't feel cramped
