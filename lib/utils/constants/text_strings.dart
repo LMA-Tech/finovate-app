@@ -20,10 +20,13 @@ class FinTexts {
   static const String onboardingSubTitle3 = "Nossa inteligência artificial traz análises personalizadas da sua carteira de investimentos, ajudando você a tomar decisões mais seguras e bem informadas sobre o mercado.";
 
   // -- Authentication Forms
+  static const String signupStep1Title = "Vamos criar a sua conta";
   static const String firstName = "Primeiro Nome";
   static const String lastName = "Sobrenome";
   static const String email = "Email";
   static const String password = "Senha";
+  static const String confirmPassword = "Confirmar senha";
+  static const String keepInfoSaved = "Manter informações salvas";
   static const String cpf = "CPF";
   static const String birthDate = "Data de nascimento";
   static const String selectBirthDate = "Selecione sua data de nascimento";
@@ -36,7 +39,7 @@ class FinTexts {
   static const String createAccount = "Criar Conta";
   static const String orSignInWith = "ou faça login com";
   static const String orSignUpWith = "or sign up with";
-  static const String iAgreeTo = "Ao continuar, você concorda com a";
+  static const String privacyAgreement = "Ao continuar, você concorda com a ";
   static const String privacyPolicy = "Política de Privacidade";
   static const String termsOfUse = "Termos de Serviço";
   static const String verificationCode = "verificationCode";
