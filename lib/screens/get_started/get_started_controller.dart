@@ -7,11 +7,11 @@ class GetStartedController extends GetxController {
 
   // Navigate to login screen
   void navigateToLogin() {
-    Get.to(() => const LoginScreen());
+    Get.toNamed('/login'); // Use named route instead of Get.to()
   }
 
   // Navigate to signup screen
   void navigateToSignup() {
-    Get.to(() => const SignupScreen());
+    Get.toNamed('/signup'); // Use named route instead of Get.to()
   }
 }

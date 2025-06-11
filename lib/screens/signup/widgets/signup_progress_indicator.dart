@@ -18,15 +18,14 @@ class SignupProgressIndicator extends StatelessWidget {
         vertical: FinSizes.md,
       ),
       child: Obx(() => Row(
-        children: List.generate(SignupController.totalSteps, (index) {
-          final isActive = index <= controller.currentStep.value;
-          final isCompleted = index < controller.currentStep.value;
+        children: List.generate(SignupController.totalProgressLevels, (index) { // Use totalProgressLevels
+          final isActive = index <= controller.progressLevel; // Use progressLevel getter
 
           return Expanded(
             child: Container(
               height: 6,
               margin: EdgeInsets.only(
-                right: index < SignupController.totalSteps - 1 ? 8 : 0,
+                right: index < SignupController.totalProgressLevels - 1 ? 8 : 0, // Use totalProgressLevels
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),

@@ -56,6 +56,18 @@ class DisclaimerWidget extends StatelessWidget {
             _normalText(FinTexts.identityDocumentDisclaimer),
           ],
         );
+      case DisclaimerType.dataCollection:  // ADD THIS CASE
+        return TextSpan(
+          children: [
+            _normalText("Coletamos informações para garantir sua segurança e cumprir obrigações legais de proteção de dados."),
+          ],
+        );
+      case DisclaimerType.verification:  // ADD THIS CASE
+        return TextSpan(
+          children: [
+            _normalText("Enviaremos um código de 6 dígitos para verificar sua conta."),
+          ],
+        );
     }
   }
 
@@ -84,7 +96,4 @@ class DisclaimerWidget extends StatelessWidget {
   }
 }
 
-enum DisclaimerType {
-  privacy,
-  identityDocument
-}
+enum DisclaimerType { privacy, identityDocument, dataCollection, verification }

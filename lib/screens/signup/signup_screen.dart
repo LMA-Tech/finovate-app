@@ -1,15 +1,14 @@
+import 'package:finovate_app/screens/signup/widgets/signup_step_3.dart';
+import 'package:finovate_app/screens/signup/widgets/signup_step_4.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../utils/constants/sizes.dart';
 import '../../utils/helpers/helper_functions.dart';
 import 'signup_controller.dart';
 import 'widgets/signup_progress_indicator.dart';
 import 'widgets/signup_step_1.dart';
-// import 'widgets/signup_step_2.dart';
-// import 'widgets/signup_step_3.dart';
-// import 'widgets/signup_step_4.dart';
-import 'widgets/signup_continue_button.dart';
+import 'widgets/signup_step_2.dart';
+
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -34,9 +33,9 @@ class SignupScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(), // Disable swiping
               children: const [
                 SignupStep1(),
-                // SignupStep2(),
-                // SignupStep3(),
-                // SignupStep4(),
+                SignupStep2(),
+                SignupStep3(),
+                SignupStep4(),
               ],
             ),
           ),

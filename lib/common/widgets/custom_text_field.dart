@@ -6,6 +6,7 @@ import '../../utils/constants/colors.dart';
 class CustomTextFieldReactive extends StatelessWidget {
   final String formControlName;
   final String label;
+  final String? hintText;
   final bool obscureText;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
@@ -16,6 +17,7 @@ class CustomTextFieldReactive extends StatelessWidget {
     super.key,
     required this.formControlName,
     required this.label,
+    this.hintText,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
@@ -58,6 +60,12 @@ class CustomTextFieldReactive extends StatelessWidget {
           decoration: InputDecoration(
             filled: true,
             fillColor: const Color(0xFF2D3245),
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: FinColors.white.withOpacity(0.4),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(

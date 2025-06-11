@@ -52,6 +52,7 @@ class SignupStep1 extends StatelessWidget {
                         CustomTextFieldReactive(
                           formControlName: 'email',
                           label: FinTexts.email,
+                          hintText: 'exemplo@email.com',
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           validationMessages: {
@@ -107,38 +108,7 @@ class SignupStep1 extends StatelessWidget {
                             ),
                           ),
                         )),
-                        const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                        // Save Information Checkbox
-                        Obx(() => Row(
-                          children: [
-                            SizedBox(
-                              width: 12,
-                              height: 12,
-                              child: Checkbox(
-                                value: controller.saveInfo.value,
-                                onChanged: controller.toggleSaveInfo,
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      width: 1.20,
-                                      color: FinColors.neutralGray),
-                                  borderRadius: BorderRadius.circular(2.40),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              FinTexts.keepInfoSaved,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                height: 1.50,
-                                letterSpacing: -0.13,
-                              ),
-                            ),
-                          ],
-                        )),
                         const SizedBox(height: FinSizes.spaceBtwSections),
                       ],
                     )),

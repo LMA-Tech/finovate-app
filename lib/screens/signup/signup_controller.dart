@@ -34,8 +34,8 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   final RxBool hidePassword = true.obs;               // Password visibility toggle
   final RxBool hideConfirmPassword = true.obs;        // Confirm password visibility toggle
   final RxBool acceptTerms = false.obs;               // Terms and conditions acceptance
-  final RxBool saveInfo = false.obs;                  // Save information checkbox
   final Rx<DateTime?> selectedBirthdate = Rx<DateTime?>(null);  // Selected birthdate
+  final Rx<VerificationMethod> selectedVerificationMethod = VerificationMethod.email.obs; // Verification Method
 
   // Reactive variable to track if user can proceed to next step
   final RxBool canProceedReactive = false.obs;
@@ -91,6 +91,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     // Listen to form validation changes
     step1Form.statusChanged.listen((_) => _updateCanProceed());
     step2Form.statusChanged.listen((_) => _updateCanProceed());
+    step3Form.statusChanged.listen((_) => _updateCanProceed());
   }
 
   /// Initialize reactive forms with validation rules for each signup step
@@ -134,11 +135,23 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       'middleName': FormControl<String>(), // Optional field
     });
 
-    // Step 3: Additional information (all optional)
+    // Step 3: Personal information (required)
     step3Form = FormGroup({
-      'cpf': FormControl<String>(),       // Optional CPF
-      'phone': FormControl<String>(),     // Optional phone number
-      'birthdate': FormControl<DateTime>(), // Optional birthdate
+      'cpf': FormControl<String>(
+        validators: [
+          Validators.required,           // ADD THIS
+          Validators.pattern(r'^\d{11}$'),
+        ],
+      ),
+      'phone': FormControl<String>(
+        validators: [
+          Validators.required,           // ADD THIS
+          Validators.pattern(r'^\d{10,11}$'),
+        ],
+      ),
+      'birthdate': FormControl<DateTime>(
+        validators: [Validators.required],  // ADD THIS
+      ),
     });
   }
 
@@ -247,6 +260,19 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
+  /// Select verification method (Email or SMS)
+  void selectVerificationMethod(VerificationMethod method) {
+    if (method == VerificationMethod.email) {
+      selectedVerificationMethod.value = method;
+    }
+    // SMS is disabled, so no action for SMS selection
+  }
+
+  /// Check if verification can be sent
+  bool canSendVerification() {
+    return selectedVerificationMethod.value == VerificationMethod.email && !isLoading.value;
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // BUSINESS LOGIC METHODS
   // These methods handle the core functionality of the signup process
@@ -260,9 +286,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   /// Toggle terms and conditions acceptance
   void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
-
-  /// Toggle save information checkbox
-  void toggleSaveInfo(bool? value) => saveInfo.value = value ?? false;
 
   /// Proceed to next step or complete signup if on final step
   void nextStep() {
@@ -296,14 +319,14 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   Future<void> selectBirthdate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)), // Default to 25 years ago
-      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),  // 100 years ago
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 13)),    // Must be at least 13 years old
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 13)),
     );
 
     if (picked != null) {
       selectedBirthdate.value = picked;
-      step3Form.control('birthdate').value = picked;
+      step3Form.control('birthdate').value = picked; // This should be the primary way
     }
   }
 
@@ -349,14 +372,14 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   bool get canProceed {
     switch (currentStep.value) {
       case 0:
-        return step1Form.valid; // Email, password, confirm password validation
+        return step1Form.valid;
       case 1:
         return step2Form.controls['firstName']!.valid &&
-            step2Form.controls['lastName']!.valid; // Name validation
+            step2Form.controls['lastName']!.valid;
       case 2:
-        return true; // Step 3 fields are optional
+        return step3Form.valid;
       case 3:
-        return acceptTerms.value; // Terms acceptance required
+        return selectedVerificationMethod.value == VerificationMethod.email; // CHANGE THIS LINE
       default:
         return false;
     }
@@ -365,6 +388,22 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   /// Calculate progress percentage for progress indicator
   double get stepProgress => (currentStep.value + 1) / totalSteps;
 
+  /// Get the progress level for the progress indicator
+  /// Steps 1 and 2 are both considered "personal info" so same progress level
+  int get progressLevel {
+    switch (currentStep.value) {
+      case 0: return 0;  // Email/password step
+      case 1:
+      case 2: return 1;  // Personal info steps (both name and additional info)
+      case 3: return 2;  // Terms step
+      default: return 0;
+    }
+  }
+
+  /// Total progress levels (different from total steps)
+  static const int totalProgressLevels = 3;
+
+
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // AUTHENTICATION LOGIC
   // Methods for user registration and account creation
@@ -372,11 +411,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   /// Attempt to sign up user with provided information
   Future<void> signUp() async {
-    if (!acceptTerms.value) {
-      Get.snackbar('Erro', FinTexts.signupErrorTermsRequired);
-      return;
-    }
-
     try {
       isLoading.value = true;
       final userData = _buildUserData();
@@ -498,4 +532,9 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
     super.onClose();
   }
+}
+
+enum VerificationMethod {
+  email,
+  sms,
 }

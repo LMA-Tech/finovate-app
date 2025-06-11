@@ -56,11 +56,13 @@ class FinTexts {
   // -- Sign Up Screen 3
   static const String cpf = "CPF";
   static const String birthDate = "Sua data de nascimento";
-  static const String selectBirthDate = "Selecione sua data de nascimento";
   static const String newPassword = "New Password";
   static const String phoneNo = "Numero do seu celular";
+  // Disclaimer
+  static const String identityDocumentDisclaimer2 = "Digite seu nome completo exatamente como consta em seu documento de identidade oficial.";
 
   // -- Sign Up Screen 4
+  static const String signupTitle3 = "Vamos verificar sua conta";
   static const String verificationCode = "verificationCode";
   static const String resendEmail = "Resend Email";
   static const String resendEmailIn = "Resend email in";

@@ -1,12 +1,12 @@
+import 'package:finovate_app/screens/signup/signup_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:finovate_app/utils/theme/theme.dart';
 import 'package:finovate_app/utils/theme/widget_themes/background_theme.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/env_config.dart';
-import 'services/session_manager.dart';  // Add this import
+import 'services/session_manager.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/get_started/get_started_screen.dart';
@@ -73,6 +73,7 @@ class FinovateApp extends StatelessWidget {
         GetPage(name: '/onboarding', page: () => const OnBoardingScreen()),
         GetPage(name: '/getStarted', page: () => const GetStartedScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/signup', page: () => const SignupScreen()), // Add this
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/auth', page: () => const AuthGate()),
       ],
