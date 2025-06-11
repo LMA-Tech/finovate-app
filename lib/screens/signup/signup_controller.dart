@@ -369,12 +369,30 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       );
 
       if (response.user != null) {
-        // Success - go to step 6 (account created screen)
+        // SUCCESS: Email is now verified
+        print('Email verification successful! User: ${response.user?.email}');
+        print('Email confirmed at: ${response.user?.emailConfirmedAt}');
+
+        // IMPORTANT: Keep signup flow active to prevent auto-navigation to home
+        // The SessionManager will detect the auth change but won't navigate because isInSignupFlow = true
+
+        // Go to step 6 (account created success screen)
+        print('Going to step 6 for success screen');
         currentStep.value = 5; // Step 6 (index 5)
         _animateToPage(5);
+
+        // Note: Don't clear isInSignupFlow here - let Step 6 handle it when user clicks "Continue"
+      } else {
+        _showSignUpError('Erro ao verificar código');
       }
     } catch (e) {
-      Get.snackbar('Erro', 'Código inválido ou expirado');
+      print('OTP verification error: $e');
+      Get.snackbar(
+        'Erro',
+        'Código inválido ou expirado',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       verificationCode.value = ''; // Clear the code
     } finally {
       isLoading.value = false;
