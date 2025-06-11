@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -34,8 +35,10 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   final RxBool hidePassword = true.obs;               // Password visibility toggle
   final RxBool hideConfirmPassword = true.obs;        // Confirm password visibility toggle
   final RxBool acceptTerms = false.obs;               // Terms and conditions acceptance
-  final Rx<DateTime?> selectedBirthdate = Rx<DateTime?>(null);  // Selected birthdate
   final Rx<VerificationMethod> selectedVerificationMethod = VerificationMethod.email.obs; // Verification Method
+  final RxString verificationCode = ''.obs;
+  final RxInt resendTimer = 300.obs;
+  final RxBool canResendCode = false.obs;
 
   // Reactive variable to track if user can proceed to next step
   final RxBool canProceedReactive = false.obs;
@@ -45,7 +48,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   Animation<double>? shakeAnimation;
 
   // Constants
-  static const int totalSteps = 4;
+  static const int totalSteps = 5;
   static const Duration pageTransitionDuration = Duration(milliseconds: 300);
   static const Curve transitionCurve = Curves.easeInOut;
 
@@ -139,18 +142,21 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     step3Form = FormGroup({
       'cpf': FormControl<String>(
         validators: [
-          Validators.required,           // ADD THIS
-          Validators.pattern(r'^\d{11}$'),
+          Validators.required,
+          Validators.pattern(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$'), // CPF with formatting
         ],
       ),
       'phone': FormControl<String>(
         validators: [
-          Validators.required,           // ADD THIS
-          Validators.pattern(r'^\d{10,11}$'),
+          Validators.required,
+          Validators.pattern(r'^\(\d{2}\) \d{5}-\d{4}$'), // Phone with formatting
         ],
       ),
-      'birthdate': FormControl<DateTime>(
-        validators: [Validators.required],  // ADD THIS
+      'birthdate': FormControl<String>(
+        validators: [
+          Validators.required,
+          Validators.pattern(r'^\d{2}/\d{2}/\d{4}$'), // Date with formatting
+        ],
       ),
     });
   }
@@ -315,18 +321,68 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  /// Show date picker and handle birthdate selection
-  Future<void> selectBirthdate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)),
-      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),
-      lastDate: DateTime.now().subtract(const Duration(days: 365 * 13)),
-    );
+  /// Start countdown timer for resend code
+  void startResendTimer() {
+    resendTimer.value = 300; // 5 minutes
+    canResendCode.value = false;
 
-    if (picked != null) {
-      selectedBirthdate.value = picked;
-      step3Form.control('birthdate').value = picked; // This should be the primary way
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resendTimer.value > 0) {
+        resendTimer.value--;
+      } else {
+        canResendCode.value = true;
+        timer.cancel();
+      }
+    });
+  }
+
+  /// Format timer display (4:59 format)
+  String get formattedTimer {
+    int minutes = resendTimer.value ~/ 60;
+    int seconds = resendTimer.value % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// Validate verification code input
+  void onCodeChanged(String code) {
+    verificationCode.value = code;
+  }
+
+  /// Verify the OTP code using Supabase
+  Future<void> verifyCode() async {
+    if (verificationCode.value.length != 6) return;
+
+    try {
+      isLoading.value = true;
+      final email = step1Form.control('email').value;
+
+      // Use Supabase's built-in OTP verification
+      final response = await _auth.verifyOTP(
+        email: email,
+        token: verificationCode.value,
+      );
+
+      if (response.user != null) {
+        // Success - user is now verified and logged in
+        Get.offAllNamed('/home');
+      }
+    } catch (e) {
+      Get.snackbar('Erro', 'Código inválido ou expirado');
+      verificationCode.value = ''; // Clear the code
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Resend OTP code
+  Future<void> resendCode() async {
+    try {
+      final email = step1Form.control('email').value;
+      await _auth.resendOTP(email);
+      startResendTimer();
+      Get.snackbar('Sucesso', 'Código reenviado!');
+    } catch (e) {
+      Get.snackbar('Erro', 'Erro ao reenviar código');
     }
   }
 
@@ -358,6 +414,8 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
         return step3Form.valid;
       case 3:
         return acceptTerms.value;
+      case 4:
+        return verificationCode.value.length == 6;
       default:
         return true;
     }
@@ -380,6 +438,8 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
         return step3Form.valid;
       case 3:
         return selectedVerificationMethod.value == VerificationMethod.email; // CHANGE THIS LINE
+      case 4:
+        return verificationCode.value.length == 6; // 6-digit code required
       default:
         return false;
     }
@@ -394,14 +454,15 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     switch (currentStep.value) {
       case 0: return 0;  // Email/password step
       case 1:
-      case 2: return 1;  // Personal info steps (both name and additional info)
-      case 3: return 2;  // Terms step
+      case 2: return 1;  // Personal info steps
+      case 3: return 2;  // Verification method
+      case 4: return 3;  // Code verification
       default: return 0;
     }
   }
 
   /// Total progress levels (different from total steps)
-  static const int totalProgressLevels = 3;
+  static const int totalProgressLevels = 4;
 
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -436,25 +497,31 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       'last_name': step2Form.control('lastName').value,
     };
 
-    // Add optional fields if provided
-    final middleName = step2Form.control('middleName').value;
-    if (middleName != null && middleName.isNotEmpty) {
-      userData['middle_name'] = middleName;
-    }
-
-    final phone = step3Form.control('phone').value;
-    if (phone != null && phone.isNotEmpty) {
-      userData['phone_number'] = phone;
-    }
-
     final cpf = step3Form.control('cpf').value;
     if (cpf != null && cpf.isNotEmpty) {
       userData['cpf'] = cpf.replaceAll(RegExp(r'[^\d]'), '');
     }
 
+    final phone = step3Form.control('phone').value;
+    if (phone != null && phone.isNotEmpty) {
+      userData['phone_number'] = phone.replaceAll(RegExp(r'[^\d]'), '');
+    }
+
     final birthdate = step3Form.control('birthdate').value;
-    if (birthdate != null) {
-      userData['birthdate'] = birthdate.toIso8601String();
+    if (birthdate != null && birthdate.isNotEmpty) {
+      try {
+        final parts = birthdate.split('/');
+        if (parts.length == 3) {
+          final date = DateTime(
+            int.parse(parts[2]), // year
+            int.parse(parts[1]), // month
+            int.parse(parts[0]), // day
+          );
+          userData['birthdate'] = date.toIso8601String();
+        }
+      } catch (e) {
+        print('Invalid date format: $birthdate');
+      }
     }
 
     return userData;
@@ -464,14 +531,13 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   void _handleSignUpResponse(response) {
     if (response.user != null) {
       if (response.user!.emailConfirmedAt == null) {
-        _showEmailVerificationDialog();
+        // User created but needs OTP verification - go to step 5
+        currentStep.value = 4; // Go to verification code step
+        _animateToPage(4);
+        startResendTimer(); // Start the timer for resend functionality
       } else {
-        Get.snackbar(
-          FinTexts.signupSuccessTitle,
-          FinTexts.signupSuccessMessage,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        // User already confirmed (shouldn't happen with OTP flow)
+        Get.offAllNamed('/home');
       }
     }
   }
@@ -484,36 +550,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       backgroundColor: Colors.red,
       colorText: Colors.white,
       duration: const Duration(seconds: 4),
-    );
-  }
-
-  /// Show email verification dialog
-  void _showEmailVerificationDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Verifique seu Email'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.email_outlined, size: 64, color: Colors.blue),
-            const SizedBox(height: 16),
-            Text(
-              'Enviamos um email de verificação para ${step1Form.control('email').value}. Verifique sua caixa de entrada e clique no link de verificação.',
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-              Get.offAllNamed('/login');
-            },
-            child: const Text('Ir para Login'),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
     );
   }
 

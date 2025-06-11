@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
@@ -14,14 +16,46 @@ class AuthService {
       final response = await _supabase.auth.signUp(
         email: email.trim().toLowerCase(),
         password: password,
-        data: userData, // This will be available in the trigger as raw_user_meta_data
+        data: userData,
       );
-
       return response;
     } on AuthException catch (e) {
       throw _getErrorMessage(e.message);
     } catch (e) {
       throw 'Connection error. Please check your internet and try again.';
+    }
+  }
+
+  /// Verify OTP code
+  Future<AuthResponse> verifyOTP({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      final response = await _supabase.auth.verifyOTP(
+        type: OtpType.signup,
+        token: token,
+        email: email,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Invalid or expired code';
+    }
+  }
+
+  /// Resend OTP
+  Future<void> resendOTP(String email) async {
+    try {
+      await _supabase.auth.resend(
+        type: OtpType.signup,
+        email: email,
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Failed to resend code';
     }
   }
 

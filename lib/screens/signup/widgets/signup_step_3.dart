@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:intl/intl.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../common/widgets/custom_text_field.dart';
 import '../../../utils/constants/colors.dart';
@@ -62,12 +63,20 @@ class SignupStep3 extends StatelessWidget {
                     formGroup: controller.step3Form,
                     child: Column(
                       children: [
-                        // CPF Field
+                        // CPF Field with formatting
                         CustomTextFieldReactive(
                           formControlName: 'cpf',
                           label: FinTexts.cpf,
+                          hintText: '000.000.000-00',
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
+                          inputFormatters: [
+                            MaskTextInputFormatter(
+                              mask: '###.###.###-##',
+                              filter: {"#": RegExp(r'[0-9]')},
+                              type: MaskAutoCompletionType.lazy,
+                            ),
+                          ],
                           validationMessages: {
                             ValidationMessage.required: (_) =>
                             'CPF é obrigatório',
@@ -77,74 +86,46 @@ class SignupStep3 extends StatelessWidget {
                         ),
                         const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                        // Date of Birth Field (Clickable)
-                        GestureDetector(
-                          onTap: () => controller.selectBirthdate(context),
-                          child: AbsorbPointer(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Label
-                                const Text(
-                                  FinTexts.birthDate,
-                                  style: TextStyle(
-                                    color: FinColors.lightGray,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.50,
-                                    letterSpacing: -0.13,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-
-                                // Date display field
-                                Obx(() => Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2D3245),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: const Color(0xFFE3EBFF).withOpacity(0.3),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        controller.selectedBirthdate.value != null
-                                            ? DateFormat('dd/MM/yyyy').format(controller.selectedBirthdate.value!)
-                                            : '',
-                                        style: const TextStyle(
-                                          color: FinColors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.38,
-                                          letterSpacing: -0.16,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.calendar_today_outlined,
-                                        color: FinColors.white.withOpacity(0.6),
-                                        size: 20,
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                              ],
+                        // Date of Birth Field with formatting
+                        CustomTextFieldReactive(
+                          formControlName: 'birthdate',
+                          label: FinTexts.birthDate,
+                          hintText: 'DD/MM/AAAA',
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          inputFormatters: [
+                            MaskTextInputFormatter(
+                              mask: '##/##/####',
+                              filter: {"#": RegExp(r'[0-9]')},
+                              type: MaskAutoCompletionType.lazy,
                             ),
-                          ),
+                          ],
+                          validationMessages: {
+                            ValidationMessage.required: (_) =>
+                            'Data de nascimento é obrigatória',
+                            ValidationMessage.pattern: (_) =>
+                            'Digite uma data válida (DD/MM/AAAA)',
+                          },
                         ),
                         const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                        // Phone Number Field
+                        // Phone Number Field with formatting
                         CustomTextFieldReactive(
                           formControlName: 'phone',
                           label: FinTexts.phoneNo,
+                          hintText: '(11) 99999-9999',
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.done,
+                          inputFormatters: [
+                            MaskTextInputFormatter(
+                              mask: '(##) #####-####',
+                              filter: {"#": RegExp(r'[0-9]')},
+                              type: MaskAutoCompletionType.lazy,
+                            ),
+                          ],
                           validationMessages: {
+                            ValidationMessage.required: (_) =>
+                            'Telefone é obrigatório',
                             ValidationMessage.pattern: (_) =>
                             FinTexts.signupValidationPhoneInvalid,
                           },

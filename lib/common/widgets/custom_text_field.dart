@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../utils/constants/colors.dart';
 
@@ -11,6 +12,7 @@ class CustomTextFieldReactive extends StatelessWidget {
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final Widget? suffixIcon;
+  final List<TextInputFormatter>? inputFormatters;
   final Map<String, String Function(Object)>? validationMessages;
 
   const CustomTextFieldReactive({
@@ -22,6 +24,7 @@ class CustomTextFieldReactive extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
     this.suffixIcon,
+    this.inputFormatters,
     this.validationMessages,
   });
 
@@ -49,6 +52,7 @@ class CustomTextFieldReactive extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
+          inputFormatters: inputFormatters,
           validationMessages: validationMessages ?? {},
           style: const TextStyle(
             color: FinColors.white,
