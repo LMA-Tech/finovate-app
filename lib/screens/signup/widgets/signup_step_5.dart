@@ -1,0 +1,216 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pinput/pinput.dart';
+
+import '../../../utils/constants/colors.dart';
+import '../../../utils/constants/sizes.dart';
+import '../signup_controller.dart';
+
+class SignupStep5 extends StatelessWidget {
+  const SignupStep5({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<SignupController>();
+
+    return Padding(
+      padding: const EdgeInsets.all(FinSizes.defaultSpace),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title
+          const Text(
+            'Digite seu código de verificação',
+            style: TextStyle(
+              fontSize: FinSizes.fontSizeLg + 6, // 24px
+              fontWeight: FontWeight.w600,
+              height: 1.33,
+              letterSpacing: -0.48,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: FinSizes.spaceBtwSections),
+
+          // Subtitle based on verification method
+          Obx(() => Text(
+            controller.selectedVerificationMethod.value == VerificationMethod.email
+                ? 'Enviamos um Email com um código de verificação para o email ${controller.step1Form.control('email').value}.'
+                : 'Enviamos um SMS com um código de verificação para o número ${controller.step3Form.control('phone').value}.',
+            style: const TextStyle(
+              color: Color(0xFFDFDFE0), // Neutral-gray-200
+              fontSize: FinSizes.fontSizeMd,
+              fontWeight: FontWeight.w400,
+              height: 1.50,
+              letterSpacing: -0.16,
+            ),
+          )),
+          const SizedBox(height: FinSizes.spaceBtwSections),
+
+          // PIN Input
+          Center(
+            child: Pinput(
+              length: 6,
+              onChanged: controller.onCodeChanged,
+              onCompleted: (code) => controller.verifyCode(),
+              defaultPinTheme: PinTheme(
+                width: 48,
+                height: 56,
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D3245),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+              ),
+              focusedPinTheme: PinTheme(
+                width: 48,
+                height: 56,
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D3245),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE3EBFF),
+                    width: 1,
+                  ),
+                ),
+              ),
+              submittedPinTheme: PinTheme(
+                width: 48,
+                height: 56,
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2D3245),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF1B6FFF),
+                    width: 1,
+                  ),
+                ),
+              ),
+              keyboardType: TextInputType.number,
+              separatorBuilder: (index) => const SizedBox(width: 12),
+            ),
+          ),
+          const SizedBox(height: FinSizes.spaceBtwSections),
+
+          // Resend timer disclaimer
+          Center(
+            child: Obx(() => RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: const TextStyle(
+                  color: Color(0xFFDFDFE0),
+                  fontSize: FinSizes.fontSizeSm,
+                  fontWeight: FontWeight.w400,
+                  height: 1.29,
+                ),
+                children: [
+                  const TextSpan(
+                    text: 'Caso não tenha recebido o código, você poderá solicitá-lo novamente em ',
+                  ),
+                  TextSpan(
+                    text: controller.formattedTimer,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: FinColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            )),
+          ),
+          const SizedBox(height: FinSizes.spaceBtwInputFields),
+
+          // Resend button (when timer expires)
+          Center(
+            child: Obx(() => controller.canResendCode.value
+                ? TextButton(
+              onPressed: () {
+                // Resend code logic
+                controller.startResendTimer();
+              },
+              child: const Text(
+                'Reenviar código',
+                style: TextStyle(
+                  color: FinColors.primary,
+                  fontSize: FinSizes.fontSizeMd,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+                : const SizedBox.shrink()),
+          ),
+
+          // Spacer to push button to bottom
+          const Spacer(),
+
+          // Verify button
+          Obx(() => Container(
+            width: double.infinity,
+            height: 48,
+            decoration: ShapeDecoration(
+              color: controller.verificationCode.value.length == 6 && !controller.isLoading.value
+                  ? const Color(0xFF1B6FFF)
+                  : const Color(0xFF1B6FFF).withOpacity(0.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: controller.verificationCode.value.length == 6 && !controller.isLoading.value
+                    ? () => controller.verifyCode()
+                    : null,
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: Center(
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Text(
+                      'Verificar código',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFEFEFF0),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        height: 1.50,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )),
+
+          // Bottom padding
+          const SizedBox(height: FinSizes.spaceBtwSections),
+        ],
+      ),
+    );
+  }
+}
