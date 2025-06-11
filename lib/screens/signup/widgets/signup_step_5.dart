@@ -18,7 +18,7 @@ class SignupStep5 extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
+          // Title - full width up to progress bars
           const Text(
             'Digite seu código de verificação',
             style: TextStyle(
@@ -31,17 +31,33 @@ class SignupStep5 extends StatelessWidget {
           ),
           const SizedBox(height: FinSizes.spaceBtwSections),
 
-          // Subtitle based on verification method
-          Obx(() => Text(
-            controller.selectedVerificationMethod.value == VerificationMethod.email
-                ? 'Enviamos um Email com um código de verificação para o email ${controller.step1Form.control('email').value}.'
-                : 'Enviamos um SMS com um código de verificação para o número ${controller.step3Form.control('phone').value}.',
-            style: const TextStyle(
-              color: Color(0xFFDFDFE0), // Neutral-gray-200
-              fontSize: FinSizes.fontSizeMd,
-              fontWeight: FontWeight.w400,
-              height: 1.50,
-              letterSpacing: -0.16,
+          // Subtitle with bold text - full width
+          Obx(() => SizedBox(
+            width: double.infinity, // Force full width
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  color: Color(0xFFDFDFE0), // Neutral-gray-200
+                  fontSize: FinSizes.fontSizeSm,
+                  fontWeight: FontWeight.w400,
+                  height: 1.50,
+                  letterSpacing: -0.16,
+                ),
+                children: [
+                  const TextSpan(text: 'Enviamos', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
+                  TextSpan(
+                    text: controller.selectedVerificationMethod.value == VerificationMethod.email
+                        ? ' um Email com um '
+                        : ' um SMS com um ',
+                  ),
+                  const TextSpan(text: 'código de verificação', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
+                  TextSpan(
+                    text: controller.selectedVerificationMethod.value == VerificationMethod.email
+                        ? ' para o email ${controller.step1Form.control('email').value}.'
+                        : ' para o número ${controller.step3Form.control('phone').value}.',
+                  ),
+                ],
+              ),
             ),
           )),
           const SizedBox(height: FinSizes.spaceBtwSections),
@@ -115,7 +131,7 @@ class SignupStep5 extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: const TextStyle(
-                  color: Color(0xFFDFDFE0),
+                  color: Color(0xFFDFDFE0), // Regular text color
                   fontSize: FinSizes.fontSizeSm,
                   fontWeight: FontWeight.w400,
                   height: 1.29,
@@ -128,7 +144,7 @@ class SignupStep5 extends StatelessWidget {
                     text: controller.formattedTimer,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: FinColors.primary,
+                      color: Color(0xFFBADBC1), // Only the timer numbers in green
                     ),
                   ),
                 ],
@@ -143,12 +159,12 @@ class SignupStep5 extends StatelessWidget {
                 ? TextButton(
               onPressed: () {
                 // Resend code logic
-                controller.startResendTimer();
+                controller.resendCode();
               },
               child: const Text(
                 'Reenviar código',
                 style: TextStyle(
-                  color: FinColors.primary,
+                  color: FinColors.white,
                   fontSize: FinSizes.fontSizeMd,
                   fontWeight: FontWeight.w600,
                 ),
@@ -195,7 +211,7 @@ class SignupStep5 extends StatelessWidget {
                       'Verificar código',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Color(0xFFEFEFF0),
+                        color: FinColors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         height: 1.50,

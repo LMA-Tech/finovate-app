@@ -1,5 +1,7 @@
 import 'package:finovate_app/screens/signup/widgets/signup_step_3.dart';
 import 'package:finovate_app/screens/signup/widgets/signup_step_4.dart';
+import 'package:finovate_app/screens/signup/widgets/signup_step_5.dart';
+import 'package:finovate_app/screens/signup/widgets/signup_step_6.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -36,6 +38,8 @@ class SignupScreen extends StatelessWidget {
                 SignupStep2(),
                 SignupStep3(),
                 SignupStep4(),
+                SignupStep5(),
+                SignupStep6(),
               ],
             ),
           ),

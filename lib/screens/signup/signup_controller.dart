@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../services/auth_service.dart';
+import '../../services/session_manager.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for managing the multi-step signup process
@@ -48,13 +49,18 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   Animation<double>? shakeAnimation;
 
   // Constants
-  static const int totalSteps = 5;
+  static const int totalSteps = 6;
+  /// Total progress levels (different from total steps)
+  static const int totalProgressLevels = 5;
   static const Duration pageTransitionDuration = Duration(milliseconds: 300);
   static const Curve transitionCurve = Curves.easeInOut;
 
   @override
   void onInit() {
     super.onInit();
+
+    // Set signup flag to prevent auto-navigation
+    Get.find<SessionManager>().isInSignupFlow.value = true;
 
     // Initialize reactive forms with validation rules
     _initializeReactiveForms();
@@ -363,8 +369,9 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       );
 
       if (response.user != null) {
-        // Success - user is now verified and logged in
-        Get.offAllNamed('/home');
+        // Success - go to step 6 (account created screen)
+        currentStep.value = 5; // Step 6 (index 5)
+        _animateToPage(5);
       }
     } catch (e) {
       Get.snackbar('Erro', 'Código inválido ou expirado');
@@ -461,10 +468,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  /// Total progress levels (different from total steps)
-  static const int totalProgressLevels = 4;
-
-
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // AUTHENTICATION LOGIC
   // Methods for user registration and account creation
@@ -529,16 +532,20 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   /// Handle successful signup response
   void _handleSignUpResponse(response) {
+    print('=== HANDLE SIGNUP RESPONSE ===');
+    print('User exists: ${response.user != null}');
+    print('User email: ${response.user?.email}');
+    print('Email confirmed at: ${response.user?.emailConfirmedAt}');
+    print('Session exists: ${response.session != null}');
+
     if (response.user != null) {
-      if (response.user!.emailConfirmedAt == null) {
-        // User created but needs OTP verification - go to step 5
-        currentStep.value = 4; // Go to verification code step
-        _animateToPage(4);
-        startResendTimer(); // Start the timer for resend functionality
-      } else {
-        // User already confirmed (shouldn't happen with OTP flow)
-        Get.offAllNamed('/home');
-      }
+      // Always go to step 5 for OTP verification, regardless of session
+      print('Going to step 5 for OTP verification');
+      currentStep.value = 4; // Step 5 (index 4)
+      _animateToPage(4);
+      startResendTimer();
+    } else {
+      _showSignUpError('Erro ao criar conta');
     }
   }
 
@@ -560,6 +567,9 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   @override
   void onClose() {
+    // Clear signup flag
+    Get.find<SessionManager>().isInSignupFlow.value = false;
+
     // Dispose animation controller
     shakeController?.dispose();
 
