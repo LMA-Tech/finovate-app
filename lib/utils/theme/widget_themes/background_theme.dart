@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../../../services/asset_cache_manager.dart';
+import '../../constants/colors.dart';
 import '../../constants/image_strings.dart';
-import '../../helpers/helper_functions.dart';
-import '/../../utils/constants/colors.dart';
+import '../../helpers/helper_functions.dart'; // Add this import
 
 class FinThemeBackground extends StatelessWidget {
   final Widget child;
@@ -17,37 +19,17 @@ class FinThemeBackground extends StatelessWidget {
 
     if (dark) {
       return Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(FinImages.darkAppBg2), // Use your dark background image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetCacheManager.getCachedAssetImage(FinImages.darkAppBg2), // Use cached version
+            fit: BoxFit.cover,
           ),
         ),
         child: child,
       );
-    }
-      // Dark theme gradient
-    //   return Container(
-    //     decoration: const BoxDecoration(
-    //       gradient: LinearGradient(
-    //         begin: Alignment.topCenter,
-    //         end: Alignment.bottomCenter,
-    //         colors: [
-    //           FinColors.navy,             // Start with blue at the top
-    //           FinColors.darkNavy,         // Transition
-    //           FinColors.darkNavy,        // Transition
-    //           FinColors.darkNavy,        // End
-    //         ],
-    //         stops: [0.0, 0.3, 0.7, 1.0], // Control the position of each color
-    //       ),
-    //     ),
-    //     child: child,
-    //   );
-    // }
-    else {
-      // Light theme background (add a light gradient here later)
+    } else {
       return Container(
-        color: FinColors.white, // Or whatever light background you want
+        color: FinColors.white,
         child: child,
       );
     }

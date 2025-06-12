@@ -1,4 +1,5 @@
 import 'package:finovate_app/screens/signup/signup_screen.dart';
+import 'package:finovate_app/services/asset_cache_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finovate_app/utils/theme/theme.dart';
@@ -40,6 +41,8 @@ void main() async {
       ),
     );
 
+    await AssetCacheManager.preloadCriticalAssets();
+
     runApp(const FinovateApp());
   } catch (e) {
     if (kDebugMode) {
@@ -60,9 +63,6 @@ class FinovateApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: FinAppTheme.lightTheme,
       darkTheme: FinAppTheme.darkTheme,
-      builder: (context, child) {
-        return FinThemeBackground(child: child!);
-      },
       home: const SplashScreen(),
       initialBinding: BindingsBuilder(() {
         // Initialize SessionManager once for the entire app

@@ -1,3 +1,4 @@
+import 'package:finovate_app/common/widgets/app_background.dart';
 import 'package:finovate_app/screens/signup/widgets/signup_step_3.dart';
 import 'package:finovate_app/screens/signup/widgets/signup_step_4.dart';
 import 'package:finovate_app/screens/signup/widgets/signup_step_5.dart';
@@ -20,31 +21,33 @@ class SignupScreen extends StatelessWidget {
     final controller = Get.put(SignupController());
     final dark = FinHelperFunctions.isDarkMode(context);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // Prevent screen resizing when keyboard appears
-      appBar: _buildAppBar(controller, dark, context),
-      body: Column(
-        children: [
-          // Progress indicator (only show from step 2 onwards)
-          _buildProgressIndicator(controller),
+    return AppBackground(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false, // Prevent screen resizing when keyboard appears
+          appBar: _buildAppBar(controller, dark, context),
+          body: Column(
+            children: [
+              // Progress indicator (only show from step 2 onwards)
+              _buildProgressIndicator(controller),
 
-          // Main content - swiping disabled
-          Expanded(
-            child: PageView(
-              controller: controller.pageController,
-              physics: const NeverScrollableScrollPhysics(), // Disable swiping
-              children: const [
-                SignupStep1(),
-                SignupStep2(),
-                SignupStep3(),
-                SignupStep4(),
-                SignupStep5(),
-                SignupStep6(),
-              ],
-            ),
+              // Main content - swiping disabled
+              Expanded(
+                child: PageView(
+                  controller: controller.pageController,
+                  physics: const NeverScrollableScrollPhysics(), // Disable swiping
+                  children: const [
+                    SignupStep1(),
+                    SignupStep2(),
+                    SignupStep3(),
+                    SignupStep4(),
+                    SignupStep5(),
+                    SignupStep6(),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
     );
   }
 

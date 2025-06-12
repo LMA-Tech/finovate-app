@@ -21,7 +21,7 @@ class FinAppTheme {
     primaryColor: FinColors.primary,
     textTheme: FinTextTheme.lightTextTheme,
     chipTheme: FinChipTheme.lightChipTheme,
-    scaffoldBackgroundColor: FinColors.white,
+    scaffoldBackgroundColor: Colors.transparent,
     appBarTheme: FinAppBarTheme.lightAppBarTheme,
     checkboxTheme: FinCheckboxTheme.lightCheckboxTheme,
     bottomSheetTheme: FinBottomSheetTheme.lightBottomSheetTheme,

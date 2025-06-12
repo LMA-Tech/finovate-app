@@ -1,3 +1,4 @@
+import 'package:finovate_app/common/widgets/app_background.dart';
 import 'package:finovate_app/screens/get_started/widgets/get_started_buttons.dart';
 import 'package:finovate_app/screens/get_started/widgets/get_started_logo.dart';
 import 'package:finovate_app/screens/get_started/widgets/get_started_message.dart';
@@ -15,39 +16,40 @@ class GetStartedScreen extends StatelessWidget {
     final controller = Get.put(GetStartedController());
 
     return const Scaffold(
-      body: Stack(
-        children: [
-          // Main content
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(FinSizes.defaultSpace),
-              child: Column(
-                children: [
-                  // Logo section (pushed to top with SizedBox)
-                  SizedBox(height: FinSizes.pushToTop),
-                  Center(child: GetStartedLogo()),
+        body: AppBackground(
+        child: const Stack(
+          children: [
+            // Main content
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(FinSizes.defaultSpace),
+                child: Column(
+                  children: [
+                    // Logo section (pushed to top with SizedBox)
+                    SizedBox(height: FinSizes.pushToTop),
+                    Center(child: GetStartedLogo()),
 
-                  // Spacer to push content to bottom
-                  Spacer(),
+                    // Spacer to push content to bottom
+                    Spacer(),
 
-                  // Bottom section with text and buttons
-                  Column(
-                    children: [
-                      // Welcome message
-                      GetStartedMessage(),
+                    // Bottom section with text and buttons
+                    Column(
+                      children: [
+                        // Welcome message
+                        GetStartedMessage(),
 
-                      SizedBox(height: FinSizes.largeSpaceBtwSections),
+                        SizedBox(height: FinSizes.largeSpaceBtwSections),
 
-                      // Action buttons
-                      GetStartedButtons(),
-                    ],
-                  ),
-                ],
+                        // Action buttons
+                        GetStartedButtons(),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+    ));
   }
 }
