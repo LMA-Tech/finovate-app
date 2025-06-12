@@ -5,8 +5,6 @@ class FinTexts {
   // -- GLOBAL Texts
   static const String and = "and";
   static const String skip = "Pular";
-  static const String done = "Done";
-  static const String submit = "Submit";
   static const String appName = "Finovate";
   static const String fContinue = "Começar";
 
@@ -22,13 +20,10 @@ class FinTexts {
   // -- Get Started Screen
   static const String signIn = "Entrar";
   static const String createAccount = "Criar Conta";
-  static const String orSignInWith = "ou faça login com";
-  static const String orSignUpWith = "or sign up with";
 
   // -- Login Screen
   static const String loginTitle = "Seja bem vindo!";
   static const String loginSubTitle = "Investimento sem ruído.";
-  static const String username = "Username";
   static const String rememberMe = "Lembre de mim";
   static const String forgetPassword = "Esqueceu a senha?";
 

@@ -3,7 +3,6 @@ import 'package:finovate_app/services/asset_cache_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:finovate_app/utils/theme/theme.dart';
-import 'package:finovate_app/utils/theme/widget_themes/background_theme.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/env_config.dart';
