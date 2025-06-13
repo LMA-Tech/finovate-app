@@ -62,6 +62,10 @@ class FinTexts {
   static const String resendEmail = "Resend Email";
   static const String resendEmailIn = "Resend email in";
 
+  // -- Sign Up Final Screen
+  static const String signupFinalSubtitle = "Se você trocar seu número ou email no futuro, ajudaremos você a verificar sua conta novamente.";
+  static const String signupFinalbutton = "Tudo certo!";
+
   // -- Signup Process Texts
   static const String signupContinueButton = "Continuar";
   static const String signupFinalizeButton = "Finalizar Cadastro";

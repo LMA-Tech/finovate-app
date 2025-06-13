@@ -6,6 +6,7 @@ import '../../../services/session_manager.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../../utils/constants/sizes.dart';
+import '../../../utils/constants/text_strings.dart';
 import '../../../utils/helpers/helper_functions.dart';
 import '../signup_controller.dart';
 
@@ -16,7 +17,6 @@ class SignupStep6 extends StatelessWidget {
   Widget build(BuildContext context) {
     final signupController = Get.find<SignupController>();
     final sessionManager = Get.find<SessionManager>();
-    final dark = FinHelperFunctions.isDarkMode(context);
 
     // Get the user's first name once at build time (no need for Obx)
     final firstName = signupController.step2Form.control('firstName').value ?? 'Usuário';
@@ -24,7 +24,12 @@ class SignupStep6 extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(FinSizes.defaultSpace),
+          padding: const EdgeInsets.only(
+            top: FinSizes.sm,
+            left: FinSizes.defaultSpace,
+            right: FinSizes.defaultSpace,
+            bottom: FinSizes.defaultSpace,
+          ),
           child: Column(
             children: [
               // Small logo at the top
@@ -32,19 +37,15 @@ class SignupStep6 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SvgPicture.asset(
-                    dark ? FinImages.lightAppLogo : FinImages.lightAppLogo,
+                    FinImages.tealStripWhite,
                     width: 40, // Small logo size
                     height: 40,
                     fit: BoxFit.contain,
-                    colorFilter: const ColorFilter.mode(
-                      FinColors.cyan, // Use your brand color
-                      BlendMode.srcIn,
-                    ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: FinSizes.spaceBtwSections),
+              const SizedBox(height: FinSizes.spaceBtwItems),
 
               // Flexible content section
               Expanded(
@@ -53,44 +54,37 @@ class SignupStep6 extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Success illustration placeholder
-                    Container(
-                      width: 150, // Reduced size to fit better
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: FinColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(75),
-                      ),
-                      child: const Icon(
-                        Icons.celebration,
-                        size: 75, // Reduced icon size
-                        color: FinColors.primary,
-                      ),
+                    // Success image
+                    SvgPicture.asset(
+                      FinImages.trophySuccess,
+                      height: FinHelperFunctions.screenHeight() * 0.35,
+                      fit: BoxFit.contain,
                     ),
-
                     const SizedBox(height: FinSizes.spaceBtwSections),
 
                     // Success message - using the firstName directly (no Obx needed)
-                    Text(
-                      'Conta criada com sucesso, $firstName!',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        height: 1.33,
-                        letterSpacing: -0.48,
-                        color: Colors.white,
+                    SizedBox(
+                      width: double.infinity, // Force full width
+                      child: Text(
+                        'Conta criada com sucesso, $firstName!',
+                        style: const TextStyle(
+                          fontSize: FinSizes.fontSizeXLg,
+                          fontWeight: FontWeight.w600,
+                          height: 1.33,
+                          letterSpacing: -0.48,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.left,
                       ),
-                      textAlign: TextAlign.left,
                     ),
-
                     const SizedBox(height: FinSizes.spaceBtwItems),
 
                     // Subtitle message
                     const Text(
-                      'Se você trocar seu número no futuro, ajudaremos você a verificar sua conta novamente.',
+                      FinTexts.signupFinalSubtitle,
                       style: TextStyle(
                         color: Color(0xFFDFDFE0), // Neutral-gray-200
-                        fontSize: 16,
+                        fontSize: FinSizes.fontSizeLg,
                         fontWeight: FontWeight.w400,
                         height: 1.50,
                         letterSpacing: -0.32,
@@ -100,6 +94,7 @@ class SignupStep6 extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: FinSizes.spaceBtwItems),
 
               // Fixed bottom section with button
               Column(
@@ -136,7 +131,7 @@ class SignupStep6 extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 56, vertical: 12),
                           child: Center(
                             child: Text(
-                              'Tudo certo!',
+                              FinTexts.signupFinalbutton,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,

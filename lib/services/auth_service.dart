@@ -6,6 +6,45 @@ import 'package:flutter/foundation.dart';
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  /// Check if email already exists by querying the users table
+  Future<bool> checkEmailExists(String email) async {
+    try {
+      final response = await _supabase
+          .from('users')
+          .select('email')
+          .eq('email', email.trim().toLowerCase())
+          .maybeSingle();
+
+      return response != null;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error checking email: $e');
+      }
+      return false;
+    }
+  }
+
+  /// Check if CPF already exists by querying the users table
+  Future<bool> checkCpfExists(String cpf) async {
+    try {
+      // Remove formatting from CPF (keep only numbers)
+      final cleanCpf = cpf.replaceAll(RegExp(r'[^\d]'), '');
+
+      final response = await _supabase
+          .from('users')
+          .select('cpf')
+          .eq('cpf', cleanCpf)
+          .maybeSingle();
+
+      return response != null;
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error checking CPF: $e');
+      }
+      return false;
+    }
+  }
+
   /// Sign up with complete user data
   Future<AuthResponse> signUp({
     required String email,

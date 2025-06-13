@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../services/auth_service.dart';
 import '../../services/session_manager.dart';
@@ -12,12 +10,12 @@ import '../../utils/constants/text_strings.dart';
 /// Controller for managing the multi-step signup process
 ///
 /// This controller handles:
-/// - Multi-step form navigation (4 steps total)
+/// - Multi-step form navigation (6 steps total)
 /// - Reactive form validation using reactive_forms package
 /// - Real-time validation feedback
 /// - User authentication via AuthService
 /// - UI state management for buttons, loading states, etc.
-class SignupController extends GetxController with GetSingleTickerProviderStateMixin {
+class SignupController extends GetxController {
   // Services
   final AuthService _auth = AuthService();
 
@@ -26,16 +24,15 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   // Reactive forms for each signup step
   // These handle validation automatically and provide real-time feedback
-  late FormGroup step1Form;  // Email, password, confirm password
-  late FormGroup step2Form;  // First name, last name, middle name
-  late FormGroup step3Form;  // CPF, phone, birthdate (all optional)
+  late FormGroup step1Form; // Email, password, confirm password
+  late FormGroup step2Form; // First name, last name, middle name
+  late FormGroup step3Form; // CPF, phone, birthdate (all required)
 
   // Reactive state variables for UI updates
-  final RxInt currentStep = 0.obs;                    // Current step index (0-3)
-  final RxBool isLoading = false.obs;                 // Loading state for signup process
-  final RxBool hidePassword = true.obs;               // Password visibility toggle
-  final RxBool hideConfirmPassword = true.obs;        // Confirm password visibility toggle
-  final RxBool acceptTerms = false.obs;               // Terms and conditions acceptance
+  final RxInt currentStep = 0.obs; // Current step index (0-5)
+  final RxBool isLoading = false.obs; // Loading state for signup process
+  final RxBool hidePassword = true.obs; // Password visibility toggle
+  final RxBool hideConfirmPassword = true.obs; // Confirm password visibility toggle
   final Rx<VerificationMethod> selectedVerificationMethod = VerificationMethod.email.obs; // Verification Method
   final RxString verificationCode = ''.obs;
   final RxInt resendTimer = 300.obs;
@@ -43,10 +40,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
 
   // Reactive variable to track if user can proceed to next step
   final RxBool canProceedReactive = false.obs;
-
-  // Animation controller for shake effect on validation errors
-  AnimationController? shakeController;
-  Animation<double>? shakeAnimation;
 
   // Constants
   static const int totalSteps = 6;
@@ -65,9 +58,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     // Initialize reactive forms with validation rules
     _initializeReactiveForms();
 
-    // Initialize shake animation for validation error feedback
-    _initializeShakeAnimation();
-
     // Set up listeners for real-time validation updates
     _setupValidationListeners();
 
@@ -75,27 +65,10 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     _updateCanProceed();
   }
 
-  /// Initialize shake animation controller for validation error feedback
-  void _initializeShakeAnimation() {
-    shakeController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    shakeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 10.0,
-    ).animate(CurvedAnimation(
-      parent: shakeController!,
-      curve: Curves.elasticIn,
-    ));
-  }
-
   /// Set up listeners for real-time validation state updates
   void _setupValidationListeners() {
-    // Listen to step and terms changes
+    // Listen to step changes
     ever(currentStep, (_) => _updateCanProceed());
-    ever(acceptTerms, (_) => _updateCanProceed());
 
     // Listen to form validation changes
     step1Form.statusChanged.listen((_) => _updateCanProceed());
@@ -109,14 +82,14 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     step1Form = FormGroup({
       'email': FormControl<String>(
         validators: [
-          Validators.required,  // Email is required
-          Validators.email,     // Must be valid email format
+          Validators.required, // Email is required
+          Validators.email, // Must be valid email format
         ],
       ),
       'password': FormControl<String>(
         validators: [
-          Validators.required,        // Password is required
-          Validators.minLength(6),    // Minimum 6 characters
+          Validators.required, // Password is required
+          Validators.minLength(6), // Minimum 6 characters
         ],
       ),
       'confirmPassword': FormControl<String>(
@@ -131,14 +104,14 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     step2Form = FormGroup({
       'firstName': FormControl<String>(
         validators: [
-          Validators.required,        // First name is required
-          Validators.minLength(2),    // Minimum 2 characters
+          Validators.required, // First name is required
+          Validators.minLength(2), // Minimum 2 characters
         ],
       ),
       'lastName': FormControl<String>(
         validators: [
-          Validators.required,        // Last name is required
-          Validators.minLength(2),    // Minimum 2 characters
+          Validators.required, // Last name is required
+          Validators.minLength(2), // Minimum 2 characters
         ],
       ),
       'middleName': FormControl<String>(), // Optional field
@@ -178,8 +151,8 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   // These methods control the visual state and behavior of the signup UI
   // ═══════════════════════════════════════════════════════════════════════════════════════
 
-  /// Whether to show the progress indicator (hidden on first step)
-  bool shouldShowProgressIndicator() => currentStep.value > 0;
+  /// Whether to show the progress indicator (hidden on first step and final step)
+  bool shouldShowProgressIndicator() => currentStep.value > 0 && currentStep.value != 5;
 
   /// Get the appropriate button text based on current step
   String getButtonText() {
@@ -211,67 +184,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  /// Update current step index (used by UI components)
-  void updateCurrentStep(int index) => currentStep.value = index;
-
-  /// Handle page changes (validates when swiping forward)
-  void handlePageChange(int newIndex) {
-    // If trying to go forward, validate current step
-    if (newIndex > currentStep.value) {
-      if (!_validateCurrentStep()) {
-        // Trigger shake animation
-        _triggerShakeAndShowError();
-        // Force return to current step without animation
-        pageController.jumpToPage(currentStep.value);
-        return;
-      }
-    }
-
-    // Update current step if validation passed or going backward
-    currentStep.value = newIndex;
-  }
-
-  /// Trigger shake animation and show error
-  void _triggerShakeAndShowError() {
-    // Reset and start shake animation
-    shakeController?.reset();
-    shakeController?.forward();
-
-    // Show error message as a brief overlay
-    Get.rawSnackbar(
-      message: _getValidationMessage(),
-      backgroundColor: Colors.red.withOpacity(0.9),
-      borderRadius: 8,
-      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-      duration: const Duration(seconds: 2),
-      animationDuration: const Duration(milliseconds: 300),
-      snackPosition: SnackPosition.TOP,
-      shouldIconPulse: false,
-      icon: const Icon(Icons.error_outline, color: Colors.white, size: 20),
-    );
-  }
-
-  /// Get appropriate validation error message for current step
-  String _getValidationMessage() {
-    switch (currentStep.value) {
-      case 0:
-        if (!step1Form.control('email').valid) return FinTexts.signupValidationEmailRequired;
-        if (!step1Form.control('password').valid) return FinTexts.signupValidationPasswordRequired;
-        if (!step1Form.control('confirmPassword').valid) return FinTexts.signupValidationConfirmPasswordRequired;
-        return 'Por favor, preencha todos os campos obrigatórios';
-      case 1:
-        if (!step2Form.control('firstName').valid) return FinTexts.signupValidationFirstNameRequired;
-        if (!step2Form.control('lastName').valid) return FinTexts.signupValidationLastNameRequired;
-        return 'Por favor, preencha todos os campos obrigatórios';
-      case 2:
-        return 'Por favor, verifique as informações inseridas';
-      case 3:
-        return 'Por favor, aceite os termos e condições';
-      default:
-        return 'Por favor, complete este passo antes de continuar';
-    }
-  }
-
   /// Select verification method (Email or SMS)
   void selectVerificationMethod(VerificationMethod method) {
     if (method == VerificationMethod.email) {
@@ -296,11 +208,31 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   /// Toggle password visibility for confirm password field
   void toggleConfirmPassword() => hideConfirmPassword.toggle();
 
-  /// Toggle terms and conditions acceptance
-  void toggleTerms(bool? value) => acceptTerms.value = value ?? false;
-
   /// Proceed to next step or complete signup if on final step
-  void nextStep() {
+  Future<void> nextStep() async {
+    /// Check if user email exists on step 1
+    if (currentStep.value == 0) {
+      final email = step1Form.control('email').value;
+      final emailExists = await _auth.checkEmailExists(email);
+      if (emailExists) {
+        Get.snackbar('Erro', 'Este email já está cadastrado');
+        return;
+      }
+    }
+
+    /// Check if CPF exists on step 3 (before moving to step 4)
+    if (currentStep.value == 2) {
+      final cpf = step3Form.control('cpf').value;
+      if (cpf != null && cpf.isNotEmpty) {
+        final cpfExists = await _auth.checkCpfExists(cpf);
+        if (cpfExists) {
+          Get.snackbar('Erro', 'Este CPF já está cadastrado');
+          return;
+        }
+      }
+    }
+
+    /// Validate current step and proceed
     if (currentStep.value < totalSteps - 1) {
       if (_validateCurrentStep()) {
         currentStep.value++;
@@ -316,14 +248,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     if (currentStep.value > 0) {
       currentStep.value--;
       _animateToPage(currentStep.value);
-    }
-  }
-
-  /// Jump directly to a specific step (used by progress indicator)
-  void goToStep(int step) {
-    if (step >= 0 && step < totalSteps) {
-      currentStep.value = step;
-      _animateToPage(step);
     }
   }
 
@@ -438,7 +362,7 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
         step3Form.markAllAsTouched(); // Show validation errors
         return step3Form.valid;
       case 3:
-        return acceptTerms.value;
+        return selectedVerificationMethod.value == VerificationMethod.email;
       case 4:
         return verificationCode.value.length == 6;
       default:
@@ -457,12 +381,11 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
       case 0:
         return step1Form.valid;
       case 1:
-        return step2Form.controls['firstName']!.valid &&
-            step2Form.controls['lastName']!.valid;
+        return step2Form.controls['firstName']!.valid && step2Form.controls['lastName']!.valid;
       case 2:
         return step3Form.valid;
       case 3:
-        return selectedVerificationMethod.value == VerificationMethod.email; // CHANGE THIS LINE
+        return selectedVerificationMethod.value == VerificationMethod.email;
       case 4:
         return verificationCode.value.length == 6; // 6-digit code required
       default:
@@ -470,19 +393,21 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
     }
   }
 
-  /// Calculate progress percentage for progress indicator
-  double get stepProgress => (currentStep.value + 1) / totalSteps;
-
   /// Get the progress level for the progress indicator
   /// Steps 1 and 2 are both considered "personal info" so same progress level
   int get progressLevel {
     switch (currentStep.value) {
-      case 0: return 0;  // Email/password step
+      case 0:
+        return 0; // Email/password step
       case 1:
-      case 2: return 1;  // Personal info steps
-      case 3: return 2;  // Verification method
-      case 4: return 3;  // Code verification
-      default: return 0;
+      case 2:
+        return 1; // Personal info steps
+      case 3:
+        return 2; // Verification method
+      case 4:
+        return 3; // Code verification
+      default:
+        return 0;
     }
   }
 
@@ -587,9 +512,6 @@ class SignupController extends GetxController with GetSingleTickerProviderStateM
   void onClose() {
     // Clear signup flag
     Get.find<SessionManager>().isInSignupFlow.value = false;
-
-    // Dispose animation controller
-    shakeController?.dispose();
 
     // Dispose page controller
     pageController.dispose();

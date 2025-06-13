@@ -57,6 +57,7 @@ flutter:
     - .env
     - .env.production
     - assets/images/onboarding/
+    - assets/images/signup/
     - assets/logos/
     - assets/backgrounds/
     - assets/finovate/logotipo/svg/

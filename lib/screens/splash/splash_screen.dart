@@ -1,3 +1,4 @@
+import 'package:finovate_app/common/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:finovate_app/utils/constants/image_strings.dart';
 import 'package:flutter_svg/svg.dart';
@@ -32,41 +33,43 @@ class _SplashScreen extends SplashController {
     final indicatorColor = dark ? FinColors.white : FinColors.primary;
 
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Logo centered in screen
-          Center(
-            child: SvgPicture.asset(
-              FinImages.darkLogoTipo ,
-              width: logoWidth,
-              fit: BoxFit.contain,
+        body: AppBackground(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Logo centered in screen
+            Center(
+              child: SvgPicture.asset(
+                FinImages.darkLogoTipo,
+                width: logoWidth,
+                fit: BoxFit.contain,
                 colorFilter: const ColorFilter.mode(
                   Colors.white,
                   BlendMode.srcIn,
                 ),
+              ),
             ),
-          ),
 
-          // Loading indicator positioned at bottom
-          Positioned(
-            bottom: 60.0,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: SizedBox(
-                width: 50, // Control the size of the indicator
-                height: 50,
-                child: LoadingIndicator(
-                  indicatorType: Indicator.ballClipRotatePulse, // Using ballClipRotatePulse animation
-                  colors: [indicatorColor],
-                  strokeWidth: 3,
+            // Loading indicator positioned at bottom
+            Positioned(
+              bottom: 60.0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: SizedBox(
+                  width: 50, // Control the size of the indicator
+                  height: 50,
+                  child: LoadingIndicator(
+                    indicatorType: Indicator.ballClipRotatePulse,
+                    // Using ballClipRotatePulse animation
+                    colors: [indicatorColor],
+                    strokeWidth: 3,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+    ));
   }
 }

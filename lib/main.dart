@@ -72,7 +72,7 @@ class FinovateApp extends StatelessWidget {
         GetPage(name: '/onboarding', page: () => const OnBoardingScreen()),
         GetPage(name: '/getStarted', page: () => const GetStartedScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
-        GetPage(name: '/signup', page: () => const SignupScreen()), // Add this
+        GetPage(name: '/signup', page: () => const SignupScreen()),
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/auth', page: () => const AuthGate()),
       ],
