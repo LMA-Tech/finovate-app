@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:finovate_app/utils/constants/image_strings.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

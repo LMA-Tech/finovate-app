@@ -86,6 +86,19 @@ class FinTexts {
   static const String signupSuccessMessage = "Conta criada com sucesso!";
   static const String signupErrorTitle = "Erro no Cadastro";
 
+  // -- Biometric Authentication
+  static const String biometricPromptTitle = "Desbloqueie o Finovate";
+  static const String biometricPromptMessage = "Por favor, autentique-se para continuar";
+  static const String biometricPromptUse = "Usar Face ID / Digital";
+  static const String biometricPromptSignOut = "Sair";
+  static const String biometricAuthReason = "Desbloqueie o Finovate";
+
+  // -- Session Timeout Messages
+  static const String sessionExpiredTitle = "Sessão Expirada";
+  static const String sessionExpiredMessage = "Sua sessão expirou por inatividade";
+  static const String sessionTimeoutWarning = "Sua sessão expirará em breve";
+  static const String extendSession = "Estender Sessão";
+  static const String sessionExtended = "Sessão estendida com sucesso";
 
 
   // -- Authentication Headings

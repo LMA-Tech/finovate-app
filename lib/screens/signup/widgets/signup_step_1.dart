@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../../../common/widgets/custom_text_field.dart';
-import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../signup_controller.dart';

@@ -1,4 +1,5 @@
 import 'package:finovate_app/screens/signup/signup_screen.dart';
+import 'package:finovate_app/services/activity_tracker.dart';
 import 'package:finovate_app/services/asset_cache_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +67,7 @@ class FinovateApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         // Initialize SessionManager once for the entire app
         Get.put(SessionManager(), permanent: true);
+        Get.put(ActivityTracker(), permanent: true);
       }),
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),

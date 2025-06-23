@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import '../login/login_screen.dart';
-import '../signup/signup_screen.dart';
 
 class GetStartedController extends GetxController {
   static GetStartedController get instance => Get.find();

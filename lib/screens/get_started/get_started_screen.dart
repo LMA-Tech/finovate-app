@@ -5,6 +5,7 @@ import 'package:finovate_app/screens/get_started/widgets/get_started_message.dar
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:finovate_app/utils/constants/sizes.dart';
+import '../../services/activity_tracker.dart';
 import 'get_started_controller.dart';
 
 class GetStartedScreen extends StatelessWidget {
@@ -12,44 +13,45 @@ class GetStartedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controller
-    final controller = Get.put(GetStartedController());
+    Get.put(GetStartedController());
+    final activityTracker = Get.find<ActivityTracker>();
 
-    return const Scaffold(
-        body: AppBackground(
-        child: const Stack(
-          children: [
-            // Main content
-            SafeArea(
-              child: Padding(
-                padding: EdgeInsets.all(FinSizes.defaultSpace),
-                child: Column(
-                  children: [
-                    // Logo section (pushed to top with SizedBox)
-                    SizedBox(height: FinSizes.pushToTop),
-                    Center(child: GetStartedLogo()),
+    return GestureDetector(
+        onTap: () => activityTracker.recordActivity(),
+        child: const AppBackground(
+      child: Stack(
+        children: [
+          // Main content
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(FinSizes.defaultSpace),
+              child: Column(
+                children: [
+                  // Logo section (pushed to top with SizedBox)
+                  SizedBox(height: FinSizes.pushToTop),
+                  Center(child: GetStartedLogo()),
 
-                    // Spacer to push content to bottom
-                    Spacer(),
+                  // Spacer to push content to bottom
+                  Spacer(),
 
-                    // Bottom section with text and buttons
-                    Column(
-                      children: [
-                        // Welcome message
-                        GetStartedMessage(),
+                  // Bottom section with text and buttons
+                  Column(
+                    children: [
+                      // Welcome message
+                      GetStartedMessage(),
 
-                        SizedBox(height: FinSizes.largeSpaceBtwSections),
+                      SizedBox(height: FinSizes.largeSpaceBtwSections),
 
-                        // Action buttons
-                        GetStartedButtons(),
-                      ],
-                    ),
-                  ],
-                ),
+                      // Action buttons
+                      GetStartedButtons(),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     ));
   }
 }

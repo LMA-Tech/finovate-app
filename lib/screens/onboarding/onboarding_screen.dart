@@ -1,6 +1,7 @@
 import 'package:finovate_app/common/widgets/app_background.dart';
 import 'package:finovate_app/utils/helpers/helper_functions.dart';
 import 'package:flutter/material.dart';
+import '../../services/activity_tracker.dart';
 import 'onboarding_controller.dart';
 import 'package:get/get.dart';
 import 'package:finovate_app/screens/onboarding/widgets/onboarding_dot_navigation.dart';
@@ -18,13 +19,16 @@ class OnBoardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialize controller using GetX
     final controller = Get.put(OnBoardingController());
+    final activityTracker = Get.find<ActivityTracker>();
 
     // Calculate responsive image dimensions
     final double screenHeight = FinHelperFunctions.screenHeight();
     final double imageHeight = screenHeight * 0.4;
     final double imageWidth = screenHeight * 0.8;
 
-    return AppBackground(
+    return GestureDetector(
+        onTap: () => activityTracker.recordActivity(),
+        child: AppBackground(
       child: Scaffold(
           body: Stack(
         children: [
@@ -64,6 +68,6 @@ class OnBoardingScreen extends StatelessWidget {
           const OnboardingNextButton(),
         ],
       )),
-    );
+    ));
   }
 }

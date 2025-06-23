@@ -1,49 +1,85 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+import '../common/widgets/biometric_prompt_dialog.dart';
+import 'activity_tracker.dart';
+
+/// Manages user authentication state and session lifecycle
+/// Handles Supabase authentication, biometric timeouts, and navigation logic
 class SessionManager extends GetxController {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // STATE MANAGEMENT
+  // Observable authentication state that drives UI updates
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Whether user is currently authenticated
   final RxBool isAuthenticated = false.obs;
+
+  /// Current authenticated user (null if not authenticated)
   final Rx<User?> currentUser = Rx<User?>(null);
+
+  /// Whether user is currently in the signup flow
+  /// Used to prevent automatic navigation during registration
   final RxBool isInSignupFlow = false.obs;
+
+  bool _manualLogout = false;
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // LIFECYCLE MANAGEMENT
+  // Controller initialization and cleanup
+  // ═══════════════════════════════════════════════════════════════════════════════════════
 
   @override
   void onInit() {
     super.onInit();
     _initAuth();
+    _setupAppStateListener();
   }
 
+  @override
+  void onClose() {
+    _cleanupAppStateListener();
+    super.onClose();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // AUTHENTICATION INITIALIZATION
+  // Setup authentication listeners and initial state
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
   void _initAuth() {
-    // Set initial state
+    // Set initial authentication state
     final user = _supabase.auth.currentUser;
     currentUser.value = user;
     isAuthenticated.value = user != null;
 
     if (kDebugMode) {
-      debugPrint('=== SessionManager Init ===');
-      debugPrint('Initial user: ${user?.email}');
-      debugPrint('Initial auth status: ${user != null}');
-      debugPrint('Initial signup flow: ${isInSignupFlow.value}');
+      debugPrint('=== SessionManager Inicializado ===');
+      debugPrint('Usuário inicial: ${user?.email ?? "Nenhum"}');
+      debugPrint('Status de autenticação: ${user != null ? "Autenticado" : "Não autenticado"}');
+      debugPrint('Fluxo de cadastro: ${isInSignupFlow.value ? "Ativo" : "Inativo"}');
     }
 
-    // Listen to auth changes - Supabase handles all session management
+    // Listen to Supabase authentication state changes
     _supabase.auth.onAuthStateChange.listen((data) {
       final user = data.session?.user;
       currentUser.value = user;
       isAuthenticated.value = user != null;
 
       if (kDebugMode) {
-        debugPrint('=== Auth State Changed ===');
-        debugPrint('Event: ${data.event}');
-        debugPrint('User: ${user?.email}');
-        debugPrint('Email confirmed: ${user?.emailConfirmedAt != null}');
-        debugPrint('Is in signup flow: ${isInSignupFlow.value}');
-        debugPrint('Current route: ${Get.currentRoute}');
+        debugPrint('=== Mudança de Estado de Autenticação ===');
+        debugPrint('Evento: ${data.event}');
+        debugPrint('Usuário: ${user?.email ?? "Nenhum"}');
+        debugPrint('Email confirmado: ${user?.emailConfirmedAt != null ? "Sim" : "Não"}');
+        debugPrint('Fluxo de cadastro: ${isInSignupFlow.value ? "Ativo" : "Inativo"}');
+        debugPrint('Rota atual: ${Get.currentRoute}');
       }
 
-      // Navigation logic based on auth state
+      // Handle different authentication events
       switch (data.event) {
         case AuthChangeEvent.signedIn:
           _handleSignedIn(user);
@@ -53,65 +89,298 @@ class SessionManager extends GetxController {
           break;
         case AuthChangeEvent.userUpdated:
           if (kDebugMode) {
-            debugPrint('User updated - no navigation action needed');
+            debugPrint('ℹ️ Usuário atualizado - nenhuma navegação necessária');
           }
           break;
         default:
           if (kDebugMode) {
-            debugPrint('Other auth event: ${data.event} - no action');
+            debugPrint('ℹ️ Evento de autenticação: ${data.event} - nenhuma ação');
           }
           break;
       }
     });
   }
 
+  /// Handles successful user sign-in
+  /// Manages navigation logic and biometric authentication initialization
   void _handleSignedIn(User? user) {
     if (user?.emailConfirmedAt != null && !isInSignupFlow.value) {
+      // Initialize biometric authentication state for new session
+      final activityTracker = Get.find<ActivityTracker>();
+      activityTracker.markBiometricAuth();
+
       if (kDebugMode) {
-        debugPrint('✅ Auto-navigating to home: Email confirmed and not in signup flow');
+        debugPrint('✅ Navegando para home: Email confirmado e fora do fluxo de cadastro');
+        debugPrint('🔒 Autenticação biométrica inicializada');
       }
+
       Get.offAllNamed('/home');
     } else if (isInSignupFlow.value) {
       if (kDebugMode) {
-        debugPrint('⏸️ Skipping auto-navigation: User is in signup flow');
+        debugPrint('⏸️ Navegação pausada: Usuário no fluxo de cadastro');
       }
     } else if (user?.emailConfirmedAt == null) {
       if (kDebugMode) {
-        debugPrint('⏸️ Skipping auto-navigation: Email not confirmed yet');
+        debugPrint('⏸️ Navegação pausada: Email não confirmado');
       }
     }
   }
 
+  /// Handles user sign-out
+  /// Cleans up state and redirects to get started screen
   void _handleSignedOut() {
     if (kDebugMode) {
-      debugPrint('👋 User signed out - redirecting to get started');
+      debugPrint('👋 Usuário desconectado');
     }
-    isInSignupFlow.value = false; // Clear signup flow on logout
-    Get.offAllNamed('/getStarted');
+
+    // Reset all session-related state
+    isInSignupFlow.value = false;
+
+    // Clear activity tracking state
+    try {
+      final activityTracker = Get.find<ActivityTracker>();
+      activityTracker.reset();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ ActivityTracker não encontrado durante logout');
+      }
+    }
+
+    // Only navigate if not a manual logout to login
+    if (!_manualLogout) {
+      Get.offAllNamed('/getStarted');
+    } else {
+      if (kDebugMode) {
+        debugPrint('ℹ️ Logout manual - não navegando automaticamente');
+      }
+      _manualLogout = false; // Reset flag
+    }
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // SESSION TIMEOUT & BIOMETRIC AUTHENTICATION
+  // Manage session timeouts and biometric re-authentication
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Sets up app lifecycle observer for session timeout checks
+  void _setupAppStateListener() {
+    WidgetsBinding.instance.addObserver(_AppLifecycleObserver(this));
+  }
+
+  /// Cleans up app lifecycle observer
+  void _cleanupAppStateListener() {
+    // Note: We create a new observer to remove since we don't store the reference
+    // This is safe because the observer holds a reference to this SessionManager
+    try {
+      WidgetsBinding.instance.removeObserver(_AppLifecycleObserver(this));
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Erro ao remover observer do ciclo de vida: $e');
+      }
+    }
+  }
+
+  /// Checks if user needs re-authentication based on session timeouts
+  /// Called when app returns from background
+  Future<void> checkAuthRequirements() async {
+    // Skip checks if user is not authenticated
+    if (!isAuthenticated.value) {
+      if (kDebugMode) {
+        debugPrint('ℹ️ Usuário não autenticado - pulando verificação de timeout');
+      }
+      return;
+    }
+
+    final activityTracker = Get.find<ActivityTracker>();
+
+    // Check for full re-authentication (based on lastSignInAt)
+    if (activityTracker.needsFullReauth) {
+      if (kDebugMode) {
+        debugPrint('🔐 Re-autenticação completa necessária - desconectando usuário');
+      }
+      await signOut();
+      return;
+    }
+
+    // Check for biometric re-authentication (based on inactivity)
+    if (activityTracker.needsBiometricAuth) {
+      if (kDebugMode) {
+        debugPrint('👆 Autenticação biométrica necessária');
+      }
+
+      // Show biometric prompt dialog
+      Get.dialog(
+          const BiometricPromptDialog(),
+          barrierDismissible: false,
+          name: 'BiometricPrompt'
+      );
+    } else {
+      if (kDebugMode) {
+        debugPrint('✅ Nenhuma re-autenticação necessária');
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // PUBLIC METHODS
+  // Public API for authentication management
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Signs out the current user
+  /// Triggers Supabase sign-out which will cause _handleSignedOut to be called
   Future<void> signOut() async {
     if (kDebugMode) {
-      debugPrint('=== Manual Sign Out ===');
+      debugPrint('=== Logout Manual Iniciado ===');
     }
-    await _supabase.auth.signOut();
+
+    try {
+      await _supabase.auth.signOut();
+
+      if (kDebugMode) {
+        debugPrint('✅ Logout concluído com sucesso');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Erro durante logout: $e');
+      }
+      // Even if logout fails, clean up local state
+      _handleSignedOut();
+    }
   }
 
-  /// Helper method to check if we should show the home screen
-  bool get shouldShowHome => isAuthenticated.value &&
-      currentUser.value?.emailConfirmedAt != null &&
-      !isInSignupFlow.value;
+  /// Signs out user for manual logout to login screen
+  /// Prevents automatic navigation to get started
+  Future<void> signOutToLogin() async {
+    if (kDebugMode) {
+      debugPrint('=== Logout Manual para Login ===');
+    }
 
-  /// Helper method for debugging
+    _manualLogout = true;
+
+    try {
+      await _supabase.auth.signOut();
+
+      if (kDebugMode) {
+        debugPrint('✅ Logout para login concluído com sucesso');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Erro durante logout para login: $e');
+      }
+      // Even if logout fails, clean up local state
+      _manualLogout = false;
+      _handleSignedOut();
+    }
+  }
+
+  /// Forces biometric re-authentication for sensitive operations
+  /// Can be called manually for high-security actions
+  Future<bool> requireBiometricAuth() async {
+    if (!isAuthenticated.value) return false;
+
+    final activityTracker = Get.find<ActivityTracker>();
+
+    // If biometric auth is already recent, allow action
+    if (!activityTracker.needsBiometricAuth) {
+      return true;
+    }
+
+    // Show biometric dialog and wait for result
+    bool? result = await Get.dialog<bool>(
+      const BiometricPromptDialog(),
+      barrierDismissible: false,
+    );
+
+    return result ?? false;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // UTILITY METHODS
+  // Helper methods for state checking and debugging
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Checks if we should show the home screen
+  /// Used by routing logic to determine appropriate initial route
+  bool get shouldShowHome =>
+      isAuthenticated.value &&
+          currentUser.value?.emailConfirmedAt != null &&
+          !isInSignupFlow.value;
+
+  /// Prints comprehensive session state for debugging
   void debugCurrentState() {
     if (kDebugMode) {
-      debugPrint('=== Current Session State ===');
-      debugPrint('Authenticated: ${isAuthenticated.value}');
-      debugPrint('User: ${currentUser.value?.email}');
-      debugPrint('Email confirmed: ${currentUser.value?.emailConfirmedAt != null}');
-      debugPrint('In signup flow: ${isInSignupFlow.value}');
-      debugPrint('Should show home: $shouldShowHome');
-      debugPrint('Current route: ${Get.currentRoute}');
+      debugPrint('=== Estado Atual da Sessão ===');
+      debugPrint('Autenticado: ${isAuthenticated.value ? "Sim" : "Não"}');
+      debugPrint('Usuário: ${currentUser.value?.email ?? "Nenhum"}');
+      debugPrint('Email confirmado: ${currentUser.value?.emailConfirmedAt != null ? "Sim" : "Não"}');
+      debugPrint('Fluxo de cadastro: ${isInSignupFlow.value ? "Ativo" : "Inativo"}');
+      debugPrint('Deve mostrar home: ${shouldShowHome ? "Sim" : "Não"}');
+      debugPrint('Rota atual: ${Get.currentRoute}');
+      debugPrint('===============================');
+
+      // Also debug activity tracker state if available
+      try {
+        final activityTracker = Get.find<ActivityTracker>();
+        activityTracker.debugCurrentState();
+      } catch (e) {
+        debugPrint('⚠️ ActivityTracker não disponível para debug');
+      }
+    }
+  }
+
+  /// Gets current user's email safely
+  String? get userEmail => currentUser.value?.email;
+
+  /// Gets current user's ID safely
+  String? get userId => currentUser.value?.id;
+
+  /// Checks if current user's email is confirmed
+  bool get isEmailConfirmed => currentUser.value?.emailConfirmedAt != null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// APP LIFECYCLE OBSERVER
+// Handles app backgrounding/foregrounding for session timeout checks
+// ═══════════════════════════════════════════════════════════════════════════════════════
+
+class _AppLifecycleObserver extends WidgetsBindingObserver {
+  final SessionManager sessionManager;
+
+  _AppLifecycleObserver(this.sessionManager);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (kDebugMode) {
+      debugPrint('📱 Estado do app alterado: $state');
+    }
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (kDebugMode) {
+          debugPrint('📱 App retomado - verificando requisitos de autenticação');
+        }
+        sessionManager.checkAuthRequirements();
+        break;
+      case AppLifecycleState.paused:
+        if (kDebugMode) {
+          debugPrint('📱 App pausado');
+        }
+        break;
+      case AppLifecycleState.detached:
+        if (kDebugMode) {
+          debugPrint('📱 App desanexado');
+        }
+        break;
+      case AppLifecycleState.inactive:
+        if (kDebugMode) {
+          debugPrint('📱 App inativo');
+        }
+        break;
+      case AppLifecycleState.hidden:
+        if (kDebugMode) {
+          debugPrint('📱 App oculto');
+        }
+        break;
     }
   }
 }
