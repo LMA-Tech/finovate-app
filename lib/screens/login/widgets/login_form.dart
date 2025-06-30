@@ -61,7 +61,7 @@ class FinLoginForm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: controller.isLoading.value ? null : controller.resetPassword,
+                  onPressed: controller.isLoading.value ? null : () => Get.toNamed('/forgotPassword'),
                   style: TextButton.styleFrom(
                     foregroundColor: FinColors.white,
                   ),

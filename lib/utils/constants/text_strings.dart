@@ -49,6 +49,11 @@ class FinTexts {
   static const String resetPasswordEmailError = "Digite um email válido primeiro";
   static const String resetPasswordEmailSentTitle = "Email Enviado";
   static const String resetPasswordEmailSentMessage = "Instruções de redefinição de senha enviadas para seu email";
+  // Forgot Password Screen
+  static const String forgotPasswordTitle = "Esqueceu a senha?";
+  static const String forgotPasswordSubtitle = "Digite seu email para redefinir sua senha";
+  static const String resetPassword = "Redefinir senha";
+  static const String backToLogin = "Voltar ao login";
 
 
   // -- Sign Up Screen 1

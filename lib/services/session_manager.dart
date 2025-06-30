@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
-import '../common/widgets/biometric_prompt_dialog.dart';
 import 'activity_tracker.dart';
+import 'biometric_service.dart';
 
 /// Manages user authentication state and session lifecycle
 /// Handles Supabase authentication, biometric timeouts, and navigation logic
@@ -26,6 +26,12 @@ class SessionManager extends GetxController {
   /// Used to prevent automatic navigation during registration
   final RxBool isInSignupFlow = false.obs;
 
+  /// Whether biometric authentication is available and set up on this device
+  final RxBool isBiometricAvailable = false.obs;
+
+  /// The type of biometric authentication available (e.g., "Face ID", "Impressão Digital")
+  final RxString biometricType = "Biometria".obs;
+
   bool _manualLogout = false;
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -37,6 +43,7 @@ class SessionManager extends GetxController {
   void onInit() {
     super.onInit();
     _initAuth();
+    _initBiometric();
     _setupAppStateListener();
   }
 
@@ -44,6 +51,34 @@ class SessionManager extends GetxController {
   void onClose() {
     _cleanupAppStateListener();
     super.onClose();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // BIOMETRIC INITIALIZATION
+  // Setup biometric capabilities detection
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Initialize biometric authentication capabilities
+  Future<void> _initBiometric() async {
+    try {
+      final isSetup = await BiometricService.isBiometricSetup();
+      final type = await BiometricService.getBiometricType();
+
+      isBiometricAvailable.value = isSetup;
+      biometricType.value = type;
+
+      if (kDebugMode) {
+        debugPrint('🔒 Biometric Setup Complete:');
+        debugPrint('  - Available: $isSetup');
+        debugPrint('  - Type: $type');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Error initializing biometric: $e');
+      }
+      isBiometricAvailable.value = false;
+      biometricType.value = "Biometria";
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -202,21 +237,59 @@ class SessionManager extends GetxController {
       return;
     }
 
-    // Check for biometric re-authentication (based on inactivity)
     if (activityTracker.needsBiometricAuth) {
       if (kDebugMode) {
         debugPrint('👆 Autenticação biométrica necessária');
       }
 
-      // Show biometric prompt dialog
-      Get.dialog(
-          const BiometricPromptDialog(),
-          barrierDismissible: false,
-          name: 'BiometricPrompt'
-      );
+      await _performBiometricReauth();
+    }
+  }
+
+  /// Performs biometric re-authentication with enhanced error handling
+  Future<void> _performBiometricReauth() async {
+    // Check if biometric is available before attempting
+    if (!isBiometricAvailable.value) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Biometric not available - signing out user');
+      }
+      await signOut();
+      return;
+    }
+
+    final result = await BiometricService.authenticateWithContext(
+      context: BiometricContext.appUnlock,
+    );
+
+    if (result.success) {
+      Get.find<ActivityTracker>().markBiometricAuth();
+      if (kDebugMode) {
+        debugPrint('✅ Biometric re-authentication successful');
+      }
     } else {
       if (kDebugMode) {
-        debugPrint('✅ Nenhuma re-autenticação necessária');
+        debugPrint('❌ Biometric re-authentication failed: ${result.errorMessage}');
+      }
+
+      // Handle different error types appropriately
+      switch (result.errorType) {
+        case BiometricErrorType.userCanceled:
+        // User cancelled - sign them out
+          await signOut();
+          break;
+        case BiometricErrorType.lockedOut:
+        case BiometricErrorType.permanentlyLockedOut:
+        // Biometric locked - sign out for security
+          await signOut();
+          break;
+        case BiometricErrorType.notAvailable:
+        case BiometricErrorType.notEnrolled:
+        // Biometric not available - sign out
+          await signOut();
+          break;
+        default:
+        // Other errors - sign out for safety
+          await signOut();
       }
     }
   }
@@ -275,8 +348,16 @@ class SessionManager extends GetxController {
 
   /// Forces biometric re-authentication for sensitive operations
   /// Can be called manually for high-security actions
-  Future<bool> requireBiometricAuth() async {
+  Future<bool> requireBiometricAuth({BiometricContext context = BiometricContext.sensitiveAction}) async {
     if (!isAuthenticated.value) return false;
+
+    // Check if biometric is available
+    if (!isBiometricAvailable.value) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Biometric not available for sensitive action');
+      }
+      return false;
+    }
 
     final activityTracker = Get.find<ActivityTracker>();
 
@@ -285,13 +366,24 @@ class SessionManager extends GetxController {
       return true;
     }
 
-    // Show biometric dialog and wait for result
-    bool? result = await Get.dialog<bool>(
-      const BiometricPromptDialog(),
-      barrierDismissible: false,
-    );
+    // Perform biometric authentication with enhanced result handling
+    final result = await BiometricService.authenticateWithContext(context: context);
 
-    return result ?? false;
+    if (result.success) {
+      activityTracker.markBiometricAuth();
+      return true;
+    } else {
+      if (kDebugMode) {
+        debugPrint('❌ Biometric auth failed for sensitive action: ${result.errorMessage}');
+      }
+      return false;
+    }
+  }
+
+  /// Refreshes biometric availability status
+  /// Useful to call after user might have changed biometric settings
+  Future<void> refreshBiometricStatus() async {
+    await _initBiometric();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -306,6 +398,36 @@ class SessionManager extends GetxController {
           currentUser.value?.emailConfirmedAt != null &&
           !isInSignupFlow.value;
 
+  /// Gets user-friendly biometric status for UI display
+  String get biometricStatusMessage {
+    if (!isBiometricAvailable.value) {
+      return "Biometria não disponível";
+    }
+    return "${biometricType.value} disponível";
+  }
+
+  /// Checks if biometric login should be offered to user
+  bool get shouldOfferBiometricLogin =>
+      isBiometricAvailable.value && !isInSignupFlow.value;
+
+  /// Gets comprehensive authentication capabilities for debugging
+  Future<Map<String, dynamic>> getAuthCapabilities() async {
+    final biometricCaps = await BiometricService.getBiometricCapabilities();
+
+    return {
+      'isAuthenticated': isAuthenticated.value,
+      'isInSignupFlow': isInSignupFlow.value,
+      'userEmail': currentUser.value?.email,
+      'emailConfirmed': currentUser.value?.emailConfirmedAt != null,
+      'shouldShowHome': shouldShowHome,
+      'biometric': {
+        'available': isBiometricAvailable.value,
+        'type': biometricType.value,
+        'capabilities': biometricCaps,
+      },
+    };
+  }
+
   /// Prints comprehensive session state for debugging
   void debugCurrentState() {
     if (kDebugMode) {
@@ -314,6 +436,8 @@ class SessionManager extends GetxController {
       debugPrint('Usuário: ${currentUser.value?.email ?? "Nenhum"}');
       debugPrint('Email confirmado: ${currentUser.value?.emailConfirmedAt != null ? "Sim" : "Não"}');
       debugPrint('Fluxo de cadastro: ${isInSignupFlow.value ? "Ativo" : "Inativo"}');
+      debugPrint('Biometria disponível: ${isBiometricAvailable.value ? "Sim" : "Não"}');
+      debugPrint('Tipo de biometria: ${biometricType.value}');
       debugPrint('Deve mostrar home: ${shouldShowHome ? "Sim" : "Não"}');
       debugPrint('Rota atual: ${Get.currentRoute}');
       debugPrint('===============================');

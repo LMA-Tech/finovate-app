@@ -1,3 +1,4 @@
+import 'package:finovate_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:finovate_app/screens/signup/signup_screen.dart';
 import 'package:finovate_app/services/activity_tracker.dart';
 import 'package:finovate_app/services/asset_cache_manager.dart';
@@ -75,6 +76,7 @@ class FinovateApp extends StatelessWidget {
         GetPage(name: '/getStarted', page: () => const GetStartedScreen()),
         GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(name: '/signup', page: () => const SignupScreen()),
+        GetPage(name: '/forgotPassword', page: () => const ForgotPasswordScreen()),
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/auth', page: () => const AuthGate()),
       ],
