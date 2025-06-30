@@ -7,6 +7,7 @@ class FinTexts {
   static const String skip = "Pular";
   static const String appName = "Finovate";
   static const String fContinue = "Começar";
+  static const String error = "Erro";
 
   // -- Onboarding Texts
   static const String onboardingTitle1 = "Acompanhe seus investimentos";
@@ -26,6 +27,29 @@ class FinTexts {
   static const String loginSubTitle = "Investimento sem ruído.";
   static const String rememberMe = "Lembre de mim";
   static const String forgetPassword = "Esqueceu a senha?";
+  static const String useBiometric = "Usar biometria";
+  //Login validation
+  static const String loginValidationEmailRequired = "Email é obrigatório";
+  static const String loginValidationEmailInvalid = "Digite um email válido";
+  static const String loginValidationPasswordRequired = "Senha é obrigatória";
+  static const String loginValidationPasswordMinLength = "Senha deve ter pelo menos 6 caracteres";
+  //Login messages
+  static const String loginSuccessTitle = "Sucesso";
+  static const String loginSuccessMessage = "Bem-vindo de volta!";
+  static const String loginErrorTitle = "Erro no Login";
+  static const String emailHint = "exemplo@email.com";
+  //Biometric enrollment
+  static const String notNow = "Agora não";
+  static const String activate = "Ativar";
+  static const String biometricActivatedTitle = "Biometria ativada!";
+  static const String biometricActivatedMessage = "Você pode usar";
+  static const String biometricActivatedMessageEnd = "no próximo login.";
+
+  // -- Reset password
+  static const String resetPasswordEmailError = "Digite um email válido primeiro";
+  static const String resetPasswordEmailSentTitle = "Email Enviado";
+  static const String resetPasswordEmailSentMessage = "Instruções de redefinição de senha enviadas para seu email";
+
 
   // -- Sign Up Screen 1
   static const String signupTitle = "Vamos criar a sua conta";

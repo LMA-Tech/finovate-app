@@ -1,65 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 import '../../services/auth_service.dart';
+import '../../services/biometric_service.dart';
+import '../../utils/constants/text_strings.dart';
+import '../../utils/constants/colors.dart';
 
 class LoginController extends GetxController {
   final AuthService _auth = AuthService();
-  final formKey = GlobalKey<FormState>();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  late FormGroup loginForm;
 
   final RxBool isLoading = false.obs;
   final RxBool hidePassword = true.obs;
-  final RxBool rememberMe = false.obs;
+  final RxBool canLoginReactive = false.obs;
+  final RxString biometricType = "Biometria".obs;
+  final RxBool biometricAvailable = false.obs;
 
-  // Simple email validation
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email is required';
-    }
-    if (!GetUtils.isEmail(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeForm();
+    _setupFormListener();
+    _checkBiometricAvailability();
   }
 
-  // Simple password validation
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
+  void _initializeForm() {
+    loginForm = FormGroup({
+      'email': FormControl<String>(
+        validators: [
+          Validators.required,
+          Validators.email,
+        ],
+      ),
+      'password': FormControl<String>(
+        validators: [
+          Validators.required,
+          Validators.minLength(6),
+        ],
+      ),
+    });
+  }
+
+  void _setupFormListener() {
+    loginForm.statusChanged.listen((_) {
+      canLoginReactive.value = loginForm.valid;
+    });
+  }
+
+  Future<void> _checkBiometricAvailability() async {
+    biometricAvailable.value = await BiometricService.isAvailable();
+    if (biometricAvailable.value) {
+      biometricType.value = await BiometricService.getBiometricType();
     }
-    return null;
   }
 
   void togglePassword() => hidePassword.toggle();
-  void toggleRememberMe(bool? value) => rememberMe.value = value ?? false;
 
-  // Fixed login method - using the correct method name
   Future<void> login() async {
-    if (!formKey.currentState!.validate()) return;
+    if (!loginForm.valid) {
+      loginForm.markAllAsTouched();
+      return;
+    }
 
     try {
       isLoading.value = true;
 
-      await _auth.login(  // Changed from loginWithEmailPassword to login
-        emailController.text.trim(),
-        passwordController.text,
+      await _auth.login(
+        loginForm.control('email').value,
+        loginForm.control('password').value,
       );
 
-      // SessionManager will handle navigation automatically
+      // Offer biometric enrollment after successful login
+      await _offerBiometricEnrollment();
+
       Get.snackbar(
-        'Success',
-        'Welcome back!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        FinTexts.loginSuccessTitle,
+        FinTexts.loginSuccessMessage,
+        backgroundColor: FinColors.success,
+        colorText: FinColors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Login Failed',
+        FinTexts.loginErrorTitle,
         e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        backgroundColor: FinColors.error,
+        colorText: FinColors.white,
         duration: const Duration(seconds: 4),
       );
     } finally {
@@ -67,31 +93,73 @@ class LoginController extends GetxController {
     }
   }
 
-  // Fixed password reset method
-  Future<void> resetPassword() async {
-    final email = emailController.text.trim();
+  Future<void> _offerBiometricEnrollment() async {
+    // Only offer if biometrics are available
+    if (!biometricAvailable.value) return;
 
-    if (email.isEmpty || !GetUtils.isEmail(email)) {
-      Get.snackbar('Error', 'Please enter a valid email first');
+    // TODO: Check if user already has biometric login enabled
+    // For now, always offer
+
+    final shouldEnroll = await Get.dialog<bool>(
+      AlertDialog(
+        title: Text('Ativar ${biometricType.value}?'),
+        content: Text('Use ${biometricType.value} para fazer login mais rapidamente nas próximas vezes.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            style: TextButton.styleFrom(foregroundColor: FinColors.darkGrey),
+            child: const Text(FinTexts.notNow),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(backgroundColor: FinColors.primary),
+            child: const Text(FinTexts.activate),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+
+    if (shouldEnroll == true) {
+      // TODO: Save biometric preference to secure storage
+      Get.snackbar(
+        FinTexts.biometricActivatedTitle,
+        '${FinTexts.biometricActivatedMessage} ${biometricType.value} ${FinTexts.biometricActivatedMessageEnd}',
+        backgroundColor: FinColors.success,
+        colorText: FinColors.white,
+      );
+    }
+  }
+
+  Future<void> resetPassword() async {
+    final email = loginForm.control('email').value;
+
+    if (email == null || email.isEmpty || !GetUtils.isEmail(email)) {
+      Get.snackbar(
+        FinTexts.error,
+        FinTexts.resetPasswordEmailError,
+        backgroundColor: FinColors.error,
+        colorText: FinColors.white,
+      );
       return;
     }
 
     try {
       isLoading.value = true;
-      await _auth.resetPassword(email);  // This method name is correct
+      await _auth.resetPassword(email);
 
       Get.snackbar(
-        'Email Sent',
-        'Password reset instructions sent to your email',
-        backgroundColor: Colors.blue,
-        colorText: Colors.white,
+        FinTexts.resetPasswordEmailSentTitle,
+        FinTexts.resetPasswordEmailSentMessage,
+        backgroundColor: FinColors.info,
+        colorText: FinColors.white,
       );
     } catch (e) {
       Get.snackbar(
-        'Error',
+        FinTexts.error,
         e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        backgroundColor: FinColors.error,
+        colorText: FinColors.white,
       );
     } finally {
       isLoading.value = false;
@@ -100,8 +168,6 @@ class LoginController extends GetxController {
 
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
     super.onClose();
   }
 }

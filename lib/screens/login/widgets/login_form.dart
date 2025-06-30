@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+import '../../../common/widgets/custom_text_field.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
+import '../../../utils/constants/colors.dart';
 import '../login_controller.dart';
 
 class FinLoginForm extends StatelessWidget {
@@ -12,89 +15,106 @@ class FinLoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(LoginController());
 
-    return Obx(() => Form(
-      key: controller.formKey,
-      child: Padding(
+    return ReactiveForm(
+      formGroup: controller.loginForm,
+      child: Obx(() => Padding(
         padding: const EdgeInsets.symmetric(vertical: FinSizes.spaceBtwSections),
         child: Column(
           children: [
             // Email Field
-            TextFormField(
-              controller: controller.emailController,
-              validator: controller.validateEmail,
+            CustomTextFieldReactive(
+              formControlName: 'email',
+              label: FinTexts.email,
+              hintText: FinTexts.emailHint,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Iconsax.direct_right),
-                labelText: FinTexts.email,
-              ),
+              validationMessages: {
+                ValidationMessage.required: (_) => FinTexts.loginValidationEmailRequired,
+                ValidationMessage.email: (_) => FinTexts.loginValidationEmailInvalid,
+              },
             ),
             const SizedBox(height: FinSizes.spaceBtwInputFields),
 
             // Password Field
-            TextFormField(
-              controller: controller.passwordController,
-              validator: controller.validatePassword,
+            CustomTextFieldReactive(
+              formControlName: 'password',
+              label: FinTexts.password,
               obscureText: controller.hidePassword.value,
               textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => controller.login(),
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Iconsax.password_check),
-                labelText: FinTexts.password,
-                suffixIcon: IconButton(
-                  onPressed: controller.togglePassword,
-                  icon: Icon(
-                    controller.hidePassword.value ? Iconsax.eye_slash : Iconsax.eye,
-                  ),
+              validationMessages: {
+                ValidationMessage.required: (_) => FinTexts.loginValidationPasswordRequired,
+                ValidationMessage.minLength: (_) => FinTexts.loginValidationPasswordMinLength,
+              },
+              suffixIcon: IconButton(
+                onPressed: controller.togglePassword,
+                icon: Icon(
+                  controller.hidePassword.value ? Iconsax.eye_slash : Iconsax.eye,
+                  color: FinColors.white,
+                  size: FinSizes.iconSm,
                 ),
               ),
             ),
             const SizedBox(height: FinSizes.spaceBtwInputFields / 2),
 
-            // Remember Me & Forget Password
+            // Forget Password (right-aligned)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // Remember Me
-                Row(
-                  children: [
-                    Checkbox(
-                      value: controller.rememberMe.value,
-                      onChanged: controller.toggleRememberMe,
-                    ),
-                    const Text(FinTexts.rememberMe),
-                  ],
-                ),
-
-                // Forget Password
                 TextButton(
                   onPressed: controller.isLoading.value ? null : controller.resetPassword,
+                  style: TextButton.styleFrom(
+                    foregroundColor: FinColors.white,
+                  ),
                   child: const Text(FinTexts.forgetPassword),
                 ),
               ],
             ),
             const SizedBox(height: FinSizes.spaceBtwSections),
 
-            // Sign In Button
-            SizedBox(
+            // Sign In Button with reactive validation
+            Container(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: controller.isLoading.value ? null : controller.login,
-                child: controller.isLoading.value
-                    ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              height: FinSizes.buttonHeight * 2.7, // Use constant from sizes
+              decoration: ShapeDecoration(
+                color: controller.canLoginReactive.value && !controller.isLoading.value
+                    ? FinColors.primary
+                    : FinColors.primary.withOpacity(0.4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(FinSizes.buttonRadius / 2), // Use constant
+                ),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: controller.canLoginReactive.value && !controller.isLoading.value
+                      ? () => controller.login()
+                      : null,
+                  borderRadius: BorderRadius.circular(FinSizes.buttonRadius / 2),
+                  child: Center(
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                      height: FinSizes.iconSm,
+                      width: FinSizes.iconSm,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(FinColors.white),
+                      ),
+                    )
+                        : const Text(
+                      FinTexts.signIn,
+                      style: TextStyle(
+                        color: FinColors.white,
+                        fontSize: FinSizes.fontSizeMd,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
-                )
-                    : const Text(FinTexts.signIn),
+                ),
               ),
             ),
           ],
         ),
-      ),
-    ));
+      )),
+    );
   }
 }

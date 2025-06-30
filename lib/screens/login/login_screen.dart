@@ -45,7 +45,6 @@ class LoginScreen extends StatelessWidget {
             ),
 
             body: const SingleChildScrollView(
-              // REMOVE: AppBackground from here
               child: Padding(
                 padding: FinSpacingStyle.paddingWithAppBarHeight,
                 child: Column(

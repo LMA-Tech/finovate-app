@@ -117,3 +117,119 @@ class CustomTextFieldReactive extends StatelessWidget {
     );
   }
 }
+
+/// Non-reactive version for standard TextFormField
+class CustomTextField extends StatelessWidget {
+  final TextEditingController? controller;
+  final String label;
+  final String? hintText;
+  final bool obscureText;
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+  final Widget? suffixIcon;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? validator;
+
+  const CustomTextField({
+    super.key,
+    this.controller,
+    required this.label,
+    this.hintText,
+    this.obscureText = false,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
+    this.suffixIcon,
+    this.inputFormatters,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label
+        Text(
+          label,
+          style: const TextStyle(
+            color: FinColors.lightGray,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            height: 1.50,
+            letterSpacing: -0.13,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // TextFormField with same styling as reactive version
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          inputFormatters: inputFormatters,
+          validator: validator,
+          style: const TextStyle(
+            color: FinColors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            height: 1.38,
+            letterSpacing: -0.16,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFF2D3245),
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: FinColors.white.withOpacity(0.4),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            // Copy all the decoration from CustomTextFieldReactive
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: Color(0xFFE3EBFF),
+                width: 1,
+              ),
+            ),
+            errorBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: FinColors.error,
+                width: 1,
+              ),
+            ),
+            focusedErrorBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: FinColors.error,
+                width: 1,
+              ),
+            ),
+            contentPadding: const EdgeInsets.all(16),
+            suffixIcon: suffixIcon,
+            errorStyle: const TextStyle(
+              color: FinColors.error,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
