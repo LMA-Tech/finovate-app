@@ -168,6 +168,9 @@ class AuthService {
     try {
       await _supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
     } on AuthException catch (e) {
+      if (e.message.contains('Email rate limit exceeded')) {
+        throw 'Muitas tentativas de redefinição. Tente novamente em alguns minutos.';
+      }
       throw _getErrorMessage(e.message);
     }
   }

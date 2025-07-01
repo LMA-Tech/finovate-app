@@ -6,8 +6,9 @@ class FinTexts {
   static const String and = "and";
   static const String skip = "Pular";
   static const String appName = "Finovate";
-  static const String fContinue = "Começar";
+  static const String continueText = "Continuar";
   static const String error = "Erro";
+  static const String resendCode = "Caso não tenha recebido o código, você poderá solicitá-lo novamente em ";
 
   // -- Onboarding Texts
   static const String onboardingTitle1 = "Acompanhe seus investimentos";
@@ -54,6 +55,9 @@ class FinTexts {
   static const String forgotPasswordSubtitle = "Digite seu email para redefinir sua senha";
   static const String resetPassword = "Redefinir senha";
   static const String backToLogin = "Voltar ao login";
+  static const String forgotPasswordCheckEmailTitle = "Verifique seu email";
+  static const String forgotPasswordContinueButton = "Continuar";
+  static const String forgotPasswordResendCode = "Reenviar código";
 
 
   // -- Sign Up Screen 1
@@ -67,7 +71,6 @@ class FinTexts {
   static const String privacyPolicy = "Política de Privacidade";
   static const String termsOfUse = "Termos de Serviço";
   static const String privacyAgreementEnd = " da Finovate.";
-  static const String continueText = "Continuar";
 
   // -- Sign Up Screen 2
   static const String signupTitle2 = "Informações pessoais";

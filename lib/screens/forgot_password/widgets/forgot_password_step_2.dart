@@ -5,23 +5,24 @@ import 'package:pinput/pinput.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
-import '../signup_controller.dart';
+import '../forgot_password_controller.dart';
+import 'forgot_password_button.dart';
 
-class SignupStep5 extends StatelessWidget {
-  const SignupStep5({super.key});
+class ForgotPasswordStep2 extends StatelessWidget {
+  const ForgotPasswordStep2({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<SignupController>();
+    final controller = Get.find<ForgotPasswordController>();
 
     return Padding(
       padding: const EdgeInsets.all(FinSizes.defaultSpace),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title - full width up to progress bars
+          // Title
           const Text(
-            'Digite seu código de verificação',
+            FinTexts.forgotPasswordCheckEmailTitle,
             style: TextStyle(
               fontSize: FinSizes.fontSizeLg + 6, // 24px
               fontWeight: FontWeight.w600,
@@ -32,7 +33,7 @@ class SignupStep5 extends StatelessWidget {
           ),
           const SizedBox(height: FinSizes.spaceBtwSections),
 
-          // Subtitle with bold text - full width
+          // Subtitle with masked email
           Obx(() => SizedBox(
             width: double.infinity, // Force full width
             child: RichText(
@@ -46,17 +47,12 @@ class SignupStep5 extends StatelessWidget {
                 ),
                 children: [
                   const TextSpan(text: 'Enviamos', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
+                  const TextSpan(text: ' um código de redefinição para '),
                   TextSpan(
-                    text: controller.selectedVerificationMethod.value == VerificationMethod.email
-                        ? ' um Email com um '
-                        : ' um SMS com um ',
+                    text: controller.getMaskedEmail(),
+                    style: const TextStyle(fontWeight: FontWeight.w600), // Bold email
                   ),
-                  const TextSpan(text: 'código de verificação', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
-                  TextSpan(
-                    text: controller.selectedVerificationMethod.value == VerificationMethod.email
-                        ? ' para o email ${controller.step1Form.control('email').value}.'
-                        : ' para o número ${controller.step3Form.control('phone').value}.',
-                  ),
+                  const TextSpan(text: '. Digite o código de 5 dígitos para redefinir sua senha.'),
                 ],
               ),
             ),
@@ -66,9 +62,9 @@ class SignupStep5 extends StatelessWidget {
           // PIN Input
           Center(
             child: Pinput(
-              length: 6,
+              length: 5, // 5 digits for reset code
               onChanged: controller.onCodeChanged,
-              onCompleted: (code) => controller.verifyCode(),
+              onCompleted: (code) => controller.verifyResetCode(),
               defaultPinTheme: PinTheme(
                 width: 48,
                 height: 56,
@@ -145,7 +141,7 @@ class SignupStep5 extends StatelessWidget {
                     text: controller.formattedTimer,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBADBC1), // Only the timer numbers in green
+                      color: Color(0xFFBADBC1), // Green timer color
                     ),
                   ),
                 ],
@@ -160,10 +156,10 @@ class SignupStep5 extends StatelessWidget {
                 ? TextButton(
               onPressed: () {
                 // Resend code logic
-                controller.resendCode();
+                controller.resendResetCode();
               },
               child: const Text(
-                'Reenviar código',
+                FinTexts.forgotPasswordResendCode,
                 style: TextStyle(
                   color: FinColors.white,
                   fontSize: FinSizes.fontSizeMd,
@@ -177,52 +173,10 @@ class SignupStep5 extends StatelessWidget {
           // Spacer to push button to bottom
           const Spacer(),
 
-          // Verify button
-          Obx(() => Container(
-            width: double.infinity,
-            height: 48,
-            decoration: ShapeDecoration(
-              color: controller.verificationCode.value.length == 6 && !controller.isLoading.value
-                  ? const Color(0xFF1B6FFF)
-                  : const Color(0xFF1B6FFF).withOpacity(0.4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: controller.verificationCode.value.length == 6 && !controller.isLoading.value
-                    ? () => controller.verifyCode()
-                    : null,
-                borderRadius: BorderRadius.circular(6),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Center(
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                        : const Text(
-                      'Verificar código',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: FinColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )),
+          // Continue Button
+          const ForgotPasswordButton(
+            buttonText: FinTexts.forgotPasswordContinueButton,
+          ),
 
           // Bottom padding
           const SizedBox(height: FinSizes.spaceBtwSections),

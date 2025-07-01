@@ -43,7 +43,7 @@ class OnboardingNextButton extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                FinTexts.fContinue,
+                FinTexts.continueText,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white, // Neutral-gray-00

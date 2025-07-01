@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../services/auth_service.dart';
+import '../../services/centralized_email_service.dart';
 import '../../services/session_manager.dart';
 import '../../utils/constants/text_strings.dart';
 
@@ -325,14 +326,13 @@ class SignupController extends GetxController {
 
   /// Resend OTP code
   Future<void> resendCode() async {
-    try {
-      final email = step1Form.control('email').value;
-      await _auth.resendOTP(email);
+    final email = step1Form.control('email').value;
+    final success = await EmailService.resendSignupVerification(email);
+
+    if (success) {
       startResendTimer();
-      Get.snackbar('Sucesso', 'Código reenviado!');
-    } catch (e) {
-      Get.snackbar('Erro', 'Erro ao reenviar código');
     }
+    // EmailService handles all user feedback
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -420,11 +420,13 @@ class SignupController extends GetxController {
   Future<void> signUp() async {
     try {
       isLoading.value = true;
+      final email = step1Form.control('email').value;
+      final password = step1Form.control('password').value;
       final userData = _buildUserData();
 
       final response = await _auth.signUp(
-        email: step1Form.control('email').value,
-        password: step1Form.control('password').value,
+        email: email,
+        password: password,
         userData: userData,
       );
 
@@ -487,6 +489,9 @@ class SignupController extends GetxController {
       currentStep.value = 4; // Step 5 (index 4)
       _animateToPage(4);
       startResendTimer();
+
+      // Remove this line - EmailService will handle success messages for resends only
+      // EmailService._showSuccessMessage('verificação de cadastro');
     } else {
       _showSignUpError('Erro ao criar conta');
     }
