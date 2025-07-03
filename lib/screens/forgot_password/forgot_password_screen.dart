@@ -22,9 +22,9 @@ class ForgotPasswordScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => activityTracker.recordActivity(),
       child: AppBackground(
-        child: Scaffold(
+        child: Obx(() => Scaffold(
           resizeToAvoidBottomInset: false,
-          // Prevent screen resizing when keyboard appears
+          // Always show app bar, but conditionally show back button
           appBar: _buildAppBar(controller, dark, context),
           body: Column(
             children: [
@@ -33,18 +33,17 @@ class ForgotPasswordScreen extends StatelessWidget {
                 child: PageView(
                   controller: controller.pageController,
                   physics: const NeverScrollableScrollPhysics(),
-                  // Disable swiping
                   children: const [
                     ForgotPasswordStep1(),
                     ForgotPasswordStep2(),
-                    // ForgotPasswordStep3(),
-                    // ForgotPasswordStep4(),
+                    ForgotPasswordStep3(),
+                    ForgotPasswordStep4(),
                   ],
                 ),
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }
@@ -52,13 +51,17 @@ class ForgotPasswordScreen extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(
       ForgotPasswordController controller, bool dark, BuildContext context) {
     return AppBar(
-      leading: IconButton(
+      // Conditionally show back button - hide on success screen (step 4)
+      leading: controller.currentStep.value == 3
+          ? null // No back button on success screen
+          : IconButton(
         icon: Icon(
           Icons.chevron_left,
           color: dark ? Colors.white : Colors.black,
         ),
         onPressed: () => controller.handleBackNavigation(context),
       ),
+      automaticallyImplyLeading: false, // Prevents default back button when leading is null
       backgroundColor: Colors.transparent,
       elevation: 0,
     );

@@ -17,6 +17,9 @@ class OnBoardingController extends GetxController {
   final pageController = PageController();
   final Rx<int> currentPageIndex = 0.obs;
 
+  // Animation state tracking - prevents UI flickering during transitions
+  final RxBool isAnimating = false.obs;
+
   // Service for tracking onboarding completion
   final OnboardingService _onboardingService = OnboardingService();
 
@@ -40,55 +43,59 @@ class OnBoardingController extends GetxController {
     super.onClose();
   }
 
-  // Update page indicator
+  // Update page indicator - called by PageView onPageChanged
   void updatePageIndicator(int index) {
-    currentPageIndex.value = index;
+    // Only update if not currently animating programmatically
+    if (!isAnimating.value) {
+      currentPageIndex.value = index;
+    }
   }
 
   // Navigate to specific page when dot is clicked
   void dotNavigationClick(int index) {
-    currentPageIndex.value = index;
-
-    pageController.animateToPage(
-      index,
-      duration: pageTransitionDuration,
-      curve: transitionCurve,
-    );
+    _animateToPageSafely(index);
   }
 
-  // Navigate to next page or login screen
+  // Navigate to next page or complete onboarding
   void nextPage() {
     final bool isLastPage = currentPageIndex.value == pageCount - 1;
 
     if (isLastPage) {
-      _completeOnboarding();
-      Get.offAll(() => const GetStartedScreen());
+      // Complete onboarding and navigate away
+      _completeOnboardingAndNavigate();
     } else {
+      // Go to next page
       final int nextPage = currentPageIndex.value + 1;
-
-      pageController.animateToPage(
-        nextPage,
-        duration: pageTransitionDuration,
-        curve: transitionCurve,
-      );
+      _animateToPageSafely(nextPage);
     }
   }
 
-  // Skip to last page
+  // Skip to last page - fixed to prevent button flickering
   void skipPage() {
-    _completeOnboarding();
-
-    currentPageIndex.value = pageCount - 1;
-
-    pageController.animateToPage(
-      pageCount - 1,
-      duration: pageTransitionDuration,
-      curve: transitionCurve,
-    );
+    // Don't complete onboarding yet, just go to last page
+    _animateToPageSafely(pageCount - 1);
   }
 
-  // Mark onboarding as complete
-  void _completeOnboarding() {
+  // Safe animation method - prevents UI flickering
+  void _animateToPageSafely(int targetPage) {
+    if (isAnimating.value) return; // Prevent multiple simultaneous animations
+
+    isAnimating.value = true;
+
+    pageController.animateToPage(
+      targetPage,
+      duration: pageTransitionDuration,
+      curve: transitionCurve,
+    ).then((_) {
+      // Update index only after animation completes
+      currentPageIndex.value = targetPage;
+      isAnimating.value = false;
+    });
+  }
+
+  // Complete onboarding and navigate - single responsibility
+  void _completeOnboardingAndNavigate() {
     _onboardingService.completeOnboarding();
+    Get.offAll(() => const GetStartedScreen());
   }
 }

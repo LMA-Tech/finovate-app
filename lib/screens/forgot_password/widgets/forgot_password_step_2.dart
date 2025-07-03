@@ -5,6 +5,7 @@ import 'package:pinput/pinput.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
+import '../../../utils/helpers/helper_functions.dart';
 import '../forgot_password_controller.dart';
 import 'forgot_password_button.dart';
 
@@ -52,7 +53,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
                     text: controller.getMaskedEmail(),
                     style: const TextStyle(fontWeight: FontWeight.w600), // Bold email
                   ),
-                  const TextSpan(text: '. Digite o código de 5 dígitos para redefinir sua senha.'),
+                  const TextSpan(text: '. Digite o código de 6 dígitos para redefinir sua senha.'),
                 ],
               ),
             ),
@@ -62,7 +63,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
           // PIN Input
           Center(
             child: Pinput(
-              length: 5, // 5 digits for reset code
+              length: 6, // 6 digits for reset code
               onChanged: controller.onCodeChanged,
               onCompleted: (code) => controller.verifyResetCode(),
               defaultPinTheme: PinTheme(
@@ -170,16 +171,14 @@ class ForgotPasswordStep2 extends StatelessWidget {
                 : const SizedBox.shrink()),
           ),
 
-          // Spacer to push button to bottom
-          const Spacer(),
+          // Dynamic spacer - takes up all remaining space
+          const Expanded(child: SizedBox()),
 
-          // Continue Button
-          const ForgotPasswordButton(
-            buttonText: FinTexts.forgotPasswordContinueButton,
+          // Bottom section - button always at bottom
+          FinHelperFunctions.getBottomSafeArea(
+            child: const ForgotPasswordButton( buttonText: FinTexts.forgotPasswordContinueButton),
+            minimumPadding: FinSizes.spaceBtwSections,
           ),
-
-          // Bottom padding
-          const SizedBox(height: FinSizes.spaceBtwSections),
         ],
       ),
     );

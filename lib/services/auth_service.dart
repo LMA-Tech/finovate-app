@@ -83,6 +83,25 @@ class AuthService {
     }
   }
 
+  /// Verify OTP code for password reset
+  Future<AuthResponse> verifyResetOTP({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      final response = await _supabase.auth.verifyOTP(
+        type: OtpType.recovery, // Use recovery type for password reset
+        token: token,
+        email: email,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Invalid or expired code';
+    }
+  }
+
   /// Resend OTP
   Future<void> resendOTP(String email) async {
     try {
@@ -94,6 +113,19 @@ class AuthService {
       throw _getErrorMessage(e.message);
     } catch (e) {
       throw 'Failed to resend code';
+    }
+  }
+
+  /// Update user password after successful OTP verification
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      await _supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Failed to update password. Please try again.';
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../utils/constants/sizes.dart';
 
 class OnBoardingPage extends StatelessWidget {
@@ -17,47 +16,93 @@ class OnBoardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.all(FinSizes.defaultSpace),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        // Centers content vertically
         crossAxisAlignment: CrossAxisAlignment.start,
-        // Centers content horizontally
         children: [
+          // Image section
           Image.asset(
             imagePath,
             width: imageWidth,
             height: imageHeight,
-            fit: BoxFit.contain, // Ensure it scales proportionally
+            fit: BoxFit.contain,
           ),
-          const SizedBox(height: FinSizes.spaceBtwSections),
-          // Spacing between image and title
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white /* Neutral-gray-00 */,
-              fontSize: 30,
-              fontWeight: FontWeight.w500,
-              height: 1.33,
-              letterSpacing: -0.60,
-            ),
-            textAlign: TextAlign.left, // Left-align the title
+
+          SizedBox(height: screenHeight * 0.05), // Responsive spacing
+
+          // Title with responsive sizing
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Calculate max height for title (15% of screen)
+              final maxTitleHeight = screenHeight * 0.15;
+
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: maxTitleHeight,
+                  maxWidth: constraints.maxWidth,
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenWidth < 360 ? 26 : 30, // Responsive base size
+                        fontWeight: FontWeight.w500,
+                        height: 1.33,
+                        letterSpacing: -0.60,
+                      ),
+                      textAlign: TextAlign.left,
+                      maxLines: 3,
+                      softWrap: true,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          const SizedBox(height: FinSizes.spaceBtwSections),
-          // Spacing between title and subtitle
-          Text(
-            subTitle,
-            style: const TextStyle(
-              color: Colors.white /* Neutral-gray-00 */,
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              height: 1.50,
-              letterSpacing: -0.32,
-            ),
-            textAlign: TextAlign.left, // Left-align the subtitle
+
+          SizedBox(height: screenHeight * 0.03), // Responsive spacing
+
+          // Subtitle with responsive sizing
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Calculate max height for subtitle (20% of screen)
+              final maxSubtitleHeight = screenHeight * 0.2;
+
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: maxSubtitleHeight,
+                  maxWidth: constraints.maxWidth,
+                ),
+                child: Text(
+                  subTitle,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth < 360 ? 14 : 16, // Responsive base size
+                    fontWeight: FontWeight.w400,
+                    height: 1.50,
+                    letterSpacing: -0.32,
+                  ),
+                  textAlign: TextAlign.left,
+                  maxLines: 8, // Allow more lines
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+              );
+            },
           ),
-          const SizedBox(height: FinSizes.spaceBtwSections),
+
+          // Bottom spacer to prevent overlap with navigation
+          SizedBox(height: screenHeight * 0.12), // Reserve space for buttons
         ],
       ),
     );

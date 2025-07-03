@@ -23,51 +23,55 @@ class OnBoardingScreen extends StatelessWidget {
 
     // Calculate responsive image dimensions
     final double screenHeight = FinHelperFunctions.screenHeight();
+    final double screenWidth = FinHelperFunctions.screenWidth();
+
+    // Keep original image sizing but adjust layout
     final double imageHeight = screenHeight * 0.4;
-    final double imageWidth = screenHeight * 0.8;
+    final double imageWidth = screenWidth * 0.8;
 
     return GestureDetector(
-        onTap: () => activityTracker.recordActivity(),
-        child: AppBackground(
-      child: Scaffold(
+      onTap: () => activityTracker.recordActivity(),
+      child: AppBackground(
+        child: Scaffold(
           body: Stack(
-        children: [
-          // Page content
-          PageView(
-            controller: controller.pageController,
-            onPageChanged: controller.updatePageIndicator,
             children: [
-              OnBoardingPage(
-                imagePath: FinImages.onboardingImage1,
-                title: FinTexts.onboardingTitle1,
-                subTitle: FinTexts.onboardingSubTitle1,
-                imageWidth: imageWidth,
-                imageHeight: imageHeight,
+              // Page content - remove SafeArea wrapper and height constraints
+              PageView(
+                controller: controller.pageController,
+                onPageChanged: controller.updatePageIndicator,
+                children: [
+                  OnBoardingPage(
+                    imagePath: FinImages.onboardingImage1,
+                    title: FinTexts.onboardingTitle1,
+                    subTitle: FinTexts.onboardingSubTitle1,
+                    imageWidth: imageWidth,
+                    imageHeight: imageHeight,
+                  ),
+                  OnBoardingPage(
+                    imagePath: FinImages.onboardingImage2,
+                    title: FinTexts.onboardingTitle2,
+                    subTitle: FinTexts.onboardingSubTitle2,
+                    imageWidth: imageWidth * 1.1, // Slightly wider image
+                    imageHeight: imageHeight,
+                  ),
+                  OnBoardingPage(
+                    imagePath: FinImages.onboardingImage3,
+                    title: FinTexts.onboardingTitle3,
+                    subTitle: FinTexts.onboardingSubTitle3,
+                    imageWidth: imageWidth,
+                    imageHeight: imageHeight,
+                  ),
+                ],
               ),
-              OnBoardingPage(
-                imagePath: FinImages.onboardingImage2,
-                title: FinTexts.onboardingTitle2,
-                subTitle: FinTexts.onboardingSubTitle2,
-                imageWidth: imageWidth * 1.1,
-                // Slightly wider image
-                imageHeight: imageHeight,
-              ),
-              OnBoardingPage(
-                imagePath: FinImages.onboardingImage3,
-                title: FinTexts.onboardingTitle3,
-                subTitle: FinTexts.onboardingSubTitle3,
-                imageWidth: imageWidth,
-                imageHeight: imageHeight,
-              ),
+
+              // Navigation controls - positioned absolutely
+              const OnboardingSkip(),
+              const OnboardingDotNavigation(),
+              const OnboardingNextButton(),
             ],
           ),
-
-          // Navigation controls
-          const OnboardingSkip(),
-          const OnboardingDotNavigation(),
-          const OnboardingNextButton(),
-        ],
-      )),
-    ));
+        ),
+      ),
+    );
   }
 }

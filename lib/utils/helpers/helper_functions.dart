@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../constants/sizes.dart';
 
 class FinHelperFunctions {
   static Color? getColor(String value) {
@@ -109,5 +110,62 @@ class FinHelperFunctions {
       wrappedList.add(Row(children: rowChildren));
     }
     return wrappedList;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // RESPONSIVE SAFE AREA HELPERS
+  // Methods for handling bottom safe areas and responsive padding
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Returns a SafeArea widget with intelligent bottom padding
+  /// Automatically handles device safe areas (home indicators, gesture bars)
+  /// while ensuring minimum padding for visual comfort
+  static Widget getBottomSafeArea({
+    required Widget child,
+    double minimumPadding = FinSizes.spaceBtwSections,
+  }) {
+    return SafeArea(
+      minimum: EdgeInsets.only(bottom: minimumPadding),
+      child: child,
+    );
+  }
+
+  /// Get bottom safe padding value for manual control
+  /// Automatically detects device safe areas and provides appropriate padding
+  static double getBottomSafePadding(BuildContext context, {
+    double minimumPadding = FinSizes.spaceBtwSections,
+  }) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    return bottomPadding > 0
+        ? bottomPadding + minimumPadding
+        : minimumPadding * 1.5; // Slightly more padding for devices without safe area
+  }
+
+  /// Get responsive font size based on screen width
+  /// Helps prevent text overflow on smaller devices
+  static double getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Scale font size based on screen width
+    if (screenWidth < 360) {
+      return baseFontSize * 0.85; // Smaller screens
+    } else if (screenWidth > 414) {
+      return baseFontSize * 1.1; // Larger screens
+    }
+    return baseFontSize; // Standard screens
+  }
+
+  /// Get responsive padding based on screen size
+  /// Provides consistent spacing across different devices
+  static EdgeInsets getResponsivePadding(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    const basePadding = FinSizes.defaultSpace;
+
+    if (screenWidth < 360) {
+      return const EdgeInsets.all(basePadding * 0.75);
+    } else if (screenWidth > 414) {
+      return const EdgeInsets.all(basePadding * 1.25);
+    }
+    return const EdgeInsets.all(basePadding);
   }
 }

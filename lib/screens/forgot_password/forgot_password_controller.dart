@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -90,7 +91,7 @@ class ForgotPasswordController extends GetxController {
       }
     });
 
-    // Step 3: New password setup
+// Step 3: New password setup
     step3Form = FormGroup({
       'password': FormControl<String>(
         validators: [
@@ -105,6 +106,19 @@ class ForgotPasswordController extends GetxController {
       // Cross-field validation: passwords must match
       Validators.mustMatch('password', 'confirmPassword')
     ]);
+
+    // Add listeners to mark fields as touched only when user starts typing
+    step3Form.control('password').valueChanges.listen((value) {
+      if (value != null && value.isNotEmpty) {
+        step3Form.control('password').markAsTouched();
+      }
+    });
+
+    step3Form.control('confirmPassword').valueChanges.listen((value) {
+      if (value != null && value.isNotEmpty) {
+        step3Form.control('confirmPassword').markAsTouched();
+      }
+    });
   }
 
   /// Update the reactive canProceed state based on current step validation
@@ -120,6 +134,9 @@ class ForgotPasswordController extends GetxController {
 
   /// Handle back navigation - either go to previous step or exit flow
   void handleBackNavigation(BuildContext context) {
+    // Don't allow back navigation from success screen (step 4)
+    if (currentStep.value == 3) return;
+
     if (currentStep.value > 0) {
       previousStep();
     } else {
@@ -172,11 +189,33 @@ class ForgotPasswordController extends GetxController {
     resetCode.value = code;
   }
 
-  /// Verify the reset code (placeholder for now)
+  /// Verify the reset code with Supabase via AuthService
   Future<void> verifyResetCode() async {
-    if (resetCode.value.length != 5) return;
-    // TODO: Add actual verification logic
-    nextStep();
+    if (resetCode.value.length != 6) return;
+
+    try {
+      isLoading.value = true;
+
+      final email = userEmail.value;
+
+      // Use your existing AuthService verifyOTP method (or new verifyResetOTP)
+      final response = await _auth.verifyResetOTP(
+        email: email,
+        token: resetCode.value,
+      );
+
+      if (response.user != null) {
+        // Success: Code is valid, proceed to next step (new password)
+        nextStep();
+      }
+
+    } catch (e) {
+      // Error is already logged in AuthService and user gets graceful message
+      // Clearing the code so user can try again
+      resetCode.value = '';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Start countdown timer for resend code
@@ -262,32 +301,36 @@ class ForgotPasswordController extends GetxController {
     // Service handles all feedback
   }
 
-  /// Set new password (placeholder for future implementation)
+  /// Set new password using AuthService
   Future<void> _setNewPassword() async {
     try {
       isLoading.value = true;
-      // final newPassword = step3Form.control('password').value;
+      final newPassword = step3Form.control('password').value;
 
-      // TODO: Implement password update with reset token
-      // This depends on how you want to handle the reset flow
-      // For now, just simulate success
-      await Future.delayed(const Duration(seconds: 1));
+      // Update password via AuthService
+      await _auth.updatePassword(newPassword);
 
-      Get.snackbar(
-        'Sucesso',
-        'Senha alterada com sucesso!',
-        backgroundColor: FinColors.success,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 3),
-      );
+      if (kDebugMode) {
+        debugPrint('✅ Password updated successfully');
+      }
+
+      // Don't show snackbar here - let the success screen handle the messaging
+
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Password update failed: $e');
+      }
+
+      // Show error and don't proceed to next step
       Get.snackbar(
         FinTexts.error,
-        'Erro ao alterar senha: ${e.toString()}',
+        e.toString(),
         backgroundColor: FinColors.error,
         colorText: FinColors.white,
         duration: const Duration(seconds: 4),
       );
+
+      // Re-throw to prevent navigation to success screen
       throw e;
     } finally {
       isLoading.value = false;
@@ -308,15 +351,15 @@ class ForgotPasswordController extends GetxController {
     );
   }
 
-  /// Validate current step using reactive forms
+// Update the _validateCurrentStep method:
   bool _validateCurrentStep() {
     switch (currentStep.value) {
       case 0:
         step1Form.markAllAsTouched(); // Show validation errors
         return step1Form.valid;
       case 1:
-      // Step 2 has no validation (just informational)
-        return true;
+      // Step 2 validation for 6-digit code
+        return resetCode.value.length == 6;
       case 2:
         step3Form.markAllAsTouched(); // Show validation errors
         return step3Form.valid;
@@ -339,11 +382,11 @@ class ForgotPasswordController extends GetxController {
       case 0:
         return step1Form.valid;
       case 1:
-        return true; // Step 2 is informational, always can proceed
+        return resetCode.value.length == 6; // Step 2: code validation
       case 2:
-        return step3Form.valid;
+        return step3Form.valid; // Step 3: password validation
       case 3:
-        return true; // Step 4 is success screen, always can proceed
+        return true; // Step 4: success screen, always can proceed
       default:
         return false;
     }
