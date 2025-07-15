@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../screens/home_screen.dart';
+import '../screens/home/home_screen.dart';
 import '../utils/constants/colors.dart';
 import '../utils/helpers/helper_functions.dart';
 

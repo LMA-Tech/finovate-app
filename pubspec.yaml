@@ -75,6 +75,7 @@ flutter:
     - assets/images/signup/
     - assets/logos/
     - assets/icons/
+    - assets/icons/bottom_nav/
     - assets/backgrounds/
     - assets/finovate/logotipo/svg/
     - assets/finovate/simbolo/svg/

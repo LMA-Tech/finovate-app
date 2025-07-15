@@ -1,3 +1,6 @@
+// lib/main.dart
+
+import 'package:finovate_app/screens/carteira/carteria_screen.dart';
 import 'package:finovate_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:finovate_app/screens/signup/signup_screen.dart';
 import 'package:finovate_app/services/activity_tracker.dart';
@@ -13,8 +16,12 @@ import 'screens/splash/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/get_started/get_started_screen.dart';
 import 'screens/login/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/home/home_screen.dart';
 import 'services/auth_gate.dart';
+import 'controllers/bottom_navigation_controller.dart';
+import 'screens/sofia/sofia_screen.dart';
+import 'screens/conjuntura/conjuntura_screen.dart';
+import 'screens/perfil/perfil_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +76,8 @@ class FinovateApp extends StatelessWidget {
         // Initialize SessionManager once for the entire app
         Get.put(SessionManager(), permanent: true);
         Get.put(ActivityTracker(), permanent: true);
+        // Initialize BottomNavigationController for bottom navigation state
+        Get.put(BottomNavigationController(), permanent: true);
       }),
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),
@@ -79,6 +88,12 @@ class FinovateApp extends StatelessWidget {
         GetPage(name: '/forgotPassword', page: () => const ForgotPasswordScreen()),
         GetPage(name: '/home', page: () => const HomeScreen()),
         GetPage(name: '/auth', page: () => const AuthGate()),
+
+        // Bottom Navigation Routes
+        GetPage(name: '/conjuntura', page: () => const ConjunturaScreen()),
+        GetPage(name: '/sofia', page: () => const SofiaScreen()),
+        GetPage(name: '/carteira', page: () => const CarteiraScreen()),
+        GetPage(name: '/perfil', page: () => const PerfilScreen()),
       ],
       // Security: Disable debug banner and overlays in production
       showPerformanceOverlay: false,
