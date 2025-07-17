@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../../utils/constants/colors.dart';
 import '../../controllers/bottom_navigation_controller.dart';
+import '../../utils/constants/image_strings.dart';
 
 /// Custom bottom navigation bar following Figma design
 ///
@@ -43,7 +44,7 @@ class FinBottomNavigation extends StatelessWidget {
               _buildTabItem(
                 controller: controller,
                 index: 0,
-                iconPath: 'assets/icons/bottom_nav/home_icon.svg',
+                iconPath: FinImages.bottomNavHome,
                 label: 'Home',
               ),
 
@@ -51,7 +52,7 @@ class FinBottomNavigation extends StatelessWidget {
               _buildTabItem(
                 controller: controller,
                 index: 1,
-                iconPath: 'assets/icons/bottom_nav/chart_icon.svg',
+                iconPath: FinImages.bottomNavChart,
                 label: 'Conjuntura',
               ),
 
@@ -62,7 +63,7 @@ class FinBottomNavigation extends StatelessWidget {
               _buildTabItem(
                 controller: controller,
                 index: 3,
-                iconPath: 'assets/icons/bottom_nav/waller_icon.svg',
+                iconPath: FinImages.bottomNavSofia,
                 label: 'Carteira',
               ),
 
@@ -70,7 +71,7 @@ class FinBottomNavigation extends StatelessWidget {
               _buildTabItem(
                 controller: controller,
                 index: 4,
-                iconPath: 'assets/icons/bottom_nav/my_profile.svg',
+                iconPath: FinImages.bottomNavProfile,
                 label: 'Perfil',
               ),
             ],
@@ -172,8 +173,8 @@ class FinBottomNavigation extends StatelessWidget {
                   gradient: controller.isSelected(2)
                       ? LinearGradient(
                     colors: [
-                      FinColors.primary.withOpacity(0.2),
-                      FinColors.primary.withOpacity(0.1),
+                      FinColors.primary.withValues(alpha: 0.2),
+                      FinColors.primary.withValues(alpha: 0.1),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -182,7 +183,7 @@ class FinBottomNavigation extends StatelessWidget {
                 ),
                 child: Center(
                   child: SvgPicture.asset(
-                    'assets/icons/bottom_nav/sofia_icon.svg',
+                    FinImages.bottomNavSofia,
                     height: 20,
                     width: 20,
                     colorFilter: ColorFilter.mode(

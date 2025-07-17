@@ -50,8 +50,8 @@ class SignupStep4 extends StatelessWidget {
                 label: '', // No label since we have the title above
                 title: 'SMS',
                 isSelected: controller.selectedVerificationMethod.value == VerificationMethod.sms,
-                isEnabled: false, // Disabled as per requirement
-                onTap: () {}, // No action for SMS
+                isEnabled: true,
+                onTap: () => controller.selectVerificationMethod(VerificationMethod.sms),
               )),
             ],
           ),

@@ -43,7 +43,7 @@ class OnboardingDotNavigation extends StatelessWidget {
             dotDecoration: DotDecoration(
               width: barWidth,
               height: barHeight,
-              color: FinColors.accent.withOpacity(0.6), // Inactive bar color
+              color: FinColors.accent.withValues(alpha: 0.6), // Inactive bar color
               borderRadius: BorderRadius.circular(barRadius),
             ),
             spacing: spacing,

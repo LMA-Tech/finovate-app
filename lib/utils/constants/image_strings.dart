@@ -28,6 +28,13 @@ class FinImages {
   // -- Signup Images
   static const String trophySuccess = "assets/images/signup/trophy_success.svg";
 
+  // -- Bottom Navigation Icons
+  static const String bottomNavHome = "assets/icons/bottom_nav/home_icon.svg";
+  static const String bottomNavChart = "assets/icons/bottom_nav/chart_icon.svg";
+  static const String bottomNavSofia = "assets/icons/bottom_nav/sofia_icon.svg";
+  static const String bottomNavWallet = "assets/icons/bottom_nav/waller_icon.svg";
+  static const String bottomNavProfile = "assets/icons/bottom_nav/my_profile.svg";
+
 
 
 

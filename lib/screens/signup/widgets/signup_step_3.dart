@@ -106,25 +106,17 @@ class SignupStep3 extends StatelessWidget {
                         ),
                         const SizedBox(height: FinSizes.spaceBtwInputFields),
 
-                        // Phone Number Field with formatting
+                        // Phone Number Field with international format
                         CustomTextFieldReactive(
                           formControlName: 'phone',
                           label: FinTexts.phoneNo,
-                          hintText: '(11) 99999-9999',
+                          hintText: '+55 (11) 99999-9999',
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.done,
-                          inputFormatters: [
-                            MaskTextInputFormatter(
-                              mask: '(##) #####-####',
-                              filter: {"#": RegExp(r'[0-9]')},
-                              type: MaskAutoCompletionType.lazy,
-                            ),
-                          ],
+                          inputFormatters: [controller.intelligentPhoneFormatter],
                           validationMessages: {
-                            ValidationMessage.required: (_) =>
-                            'Telefone é obrigatório',
-                            ValidationMessage.pattern: (_) =>
-                            FinTexts.signupValidationPhoneInvalid,
+                            ValidationMessage.required: (_) => 'Telefone é obrigatório',
+                            ValidationMessage.pattern: (_) => 'Digite um número válido com código do país',
                           },
                         ),
                         const SizedBox(height: FinSizes.spaceBtwSections),

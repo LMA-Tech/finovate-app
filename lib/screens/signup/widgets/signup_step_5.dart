@@ -45,13 +45,13 @@ class SignupStep5 extends StatelessWidget {
                   letterSpacing: -0.16,
                 ),
                 children: [
-                  const TextSpan(text: 'Enviamos', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
+                  const TextSpan(text: 'Enviamos'),
                   TextSpan(
                     text: controller.selectedVerificationMethod.value == VerificationMethod.email
                         ? ' um Email com um '
                         : ' um SMS com um ',
                   ),
-                  const TextSpan(text: 'código de verificação', style: TextStyle(fontWeight: FontWeight.w600)), // Bold
+                  const TextSpan(text: 'código de verificação', style: TextStyle(fontWeight: FontWeight.w600)),
                   TextSpan(
                     text: controller.selectedVerificationMethod.value == VerificationMethod.email
                         ? ' para o email ${controller.step1Form.control('email').value}.'

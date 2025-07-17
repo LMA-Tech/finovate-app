@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/session_manager.dart';
+import '../../utils/constants/colors.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for managing the multi-step signup process
@@ -49,6 +52,13 @@ class SignupController extends GetxController {
   static const Duration pageTransitionDuration = Duration(milliseconds: 300);
   static const Curve transitionCurve = Curves.easeInOut;
 
+  /// Intelligent phone formatter that detects country code and formats appropriately
+  final intelligentPhoneFormatter = MaskTextInputFormatter(
+    mask: null, // Dynamic mask
+    filter: {"#": RegExp(r'[0-9+]')},
+    type: MaskAutoCompletionType.lazy,
+  );
+
   @override
   void onInit() {
     super.onInit();
@@ -58,6 +68,9 @@ class SignupController extends GetxController {
 
     // Initialize reactive forms with validation rules
     _initializeReactiveForms();
+
+    // Set up intelligent phone formatting
+    _setupIntelligentPhoneFormatting();
 
     // Set up listeners for real-time validation updates
     _setupValidationListeners();
@@ -129,7 +142,7 @@ class SignupController extends GetxController {
       'phone': FormControl<String>(
         validators: [
           Validators.required,
-          Validators.pattern(r'^\(\d{2}\) \d{5}-\d{4}$'), // Phone with formatting
+          Validators.pattern(r'^\+55 \(\d{2}\) \d{5}-\d{4}$|^\+1 \(\d{3}\) \d{3}-\d{4}$'), // Brazil or US format
         ],
       ),
       'birthdate': FormControl<String>(
@@ -139,6 +152,66 @@ class SignupController extends GetxController {
         ],
       ),
     });
+  }
+
+  /// Setup intelligent phone formatting that detects country codes
+  void _setupIntelligentPhoneFormatting() {
+    step3Form.control('phone').valueChanges.listen((value) {
+      if (value != null && value.isNotEmpty) {
+        final formatted = _formatPhoneIntelligently(value);
+        if (formatted != value) {
+          // Use a slight delay to avoid infinite loop
+          Future.microtask(() {
+            step3Form.control('phone').updateValue(formatted);
+          });
+        }
+      }
+    });
+  }
+
+  /// Format phone number based on detected country code
+  String _formatPhoneIntelligently(String input) {
+    // Remove all non-digits except +
+    String cleaned = input.replaceAll(RegExp(r'[^\d+]'), '');
+
+    // Don't auto-add + if user is still typing numbers
+    if (cleaned.isEmpty) return input;
+
+    // Only format if we have enough digits
+    if (cleaned.startsWith('+55') && cleaned.length >= 5) {
+      // Brazil format: +55 (11) 99999-9999
+      final digits = cleaned.substring(3);
+      if (digits.length >= 2) {
+        String formatted = '+55 (${digits.substring(0, 2)})';
+        if (digits.length > 2) {
+          final remaining = digits.substring(2);
+          if (remaining.length <= 5) {
+            formatted += ' $remaining';
+          } else {
+            formatted += ' ${remaining.substring(0, 5)}-${remaining.substring(5, remaining.length > 9 ? 9 : remaining.length)}';
+          }
+        }
+        return formatted;
+      }
+    } else if (cleaned.startsWith('+1') && cleaned.length >= 4) {
+      // US format: +1 (555) 123-4567
+      final digits = cleaned.substring(2);
+      if (digits.length >= 3) {
+        String formatted = '+1 (${digits.substring(0, 3)})';
+        if (digits.length > 3) {
+          final remaining = digits.substring(3);
+          if (remaining.length <= 3) {
+            formatted += ' $remaining';
+          } else {
+            formatted += ' ${remaining.substring(0, 3)}-${remaining.substring(3, remaining.length > 7 ? 7 : remaining.length)}';
+          }
+        }
+        return formatted;
+      }
+    }
+
+    // Return cleaned version for partial inputs
+    return cleaned.startsWith('+') ? cleaned : '+$cleaned';
   }
 
   /// Update the reactive canProceed state based on current step validation
@@ -167,7 +240,7 @@ class SignupController extends GetxController {
     if (canProceedReactive.value && !isLoading.value) {
       return const Color(0xFF1B6FFF); // Full blue when enabled
     }
-    return const Color(0xFF1B6FFF).withOpacity(0.4); // 40% opacity when disabled
+    return const Color(0xFF1B6FFF).withValues(alpha: 0.4); // 40% opacity when disabled
   }
 
   /// Get button action callback - null when disabled, nextStep when enabled
@@ -187,15 +260,12 @@ class SignupController extends GetxController {
 
   /// Select verification method (Email or SMS)
   void selectVerificationMethod(VerificationMethod method) {
-    if (method == VerificationMethod.email) {
-      selectedVerificationMethod.value = method;
-    }
-    // SMS is disabled, so no action for SMS selection
+    selectedVerificationMethod.value = method;
   }
 
   /// Check if verification can be sent
   bool canSendVerification() {
-    return selectedVerificationMethod.value == VerificationMethod.email && !isLoading.value;
+    return !isLoading.value;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -279,60 +349,128 @@ class SignupController extends GetxController {
     verificationCode.value = code;
   }
 
-  /// Verify the OTP code using Supabase
+  /// Verify the OTP code using selected method
   Future<void> verifyCode() async {
     if (verificationCode.value.length != 6) return;
 
     try {
       isLoading.value = true;
-      final email = step1Form.control('email').value;
 
-      // Use Supabase's built-in OTP verification
-      final response = await _auth.verifyOTP(
-        email: email,
-        token: verificationCode.value,
-      );
+      AuthResponse response;
+
+      if (selectedVerificationMethod.value == VerificationMethod.email) {
+        final email = step1Form.control('email').value;
+        response = await _auth.verifyOTP(
+          email: email,
+          token: verificationCode.value,
+        );
+      } else {
+        final phoneNumber = step3Form.control('phone').value;
+        response = await _auth.verifySmsOTP(
+          phoneNumber: phoneNumber,
+          token: verificationCode.value,
+        );
+      }
 
       if (response.user != null) {
-        // SUCCESS: Email is now verified
-        print('Email verification successful! User: ${response.user?.email}');
-        print('Email confirmed at: ${response.user?.emailConfirmedAt}');
+        // SUCCESS: Verification completed
+        print('${selectedVerificationMethod.value.name} verification successful!');
 
-        // IMPORTANT: Keep signup flow active to prevent auto-navigation to home
-        // The SessionManager will detect the auth change but won't navigate because isInSignupFlow = true
+        // Create user profile in custom users table
+        final userData = _buildUserData();
 
-        // Go to step 6 (account created success screen)
-        print('Going to step 6 for success screen');
-        currentStep.value = 5; // Step 6 (index 5)
-        _animateToPage(5);
+        try {
+          await _auth.updateUserProfile(
+            firstName: userData['first_name'],
+            lastName: userData['last_name'],
+            middleName: userData['middle_name'],
+            birthdate: userData['birthdate'] != null
+                ? DateTime.parse(userData['birthdate'])
+                : null,
+            cpf: userData['cpf'],
+            phoneNumber: userData['phone_number'],
+          );
 
-        // Note: Don't clear isInSignupFlow here - let Step 6 handle it when user clicks "Continue"
+          print('User profile created successfully');
+
+          // Clear signup flag
+          Get.find<SessionManager>().isInSignupFlow.value = false;
+
+          // SUCCESS: Navigate to home
+          Get.offAllNamed('/home');
+
+          // Show success message
+          Get.snackbar(
+            'Sucesso!',
+            selectedVerificationMethod.value == VerificationMethod.email
+                ? 'Email verificado com sucesso!'
+                : 'SMS verificado com sucesso!',
+            backgroundColor: FinColors.success,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 3),
+          );
+
+        } catch (profileError) {
+          print('Error creating user profile: $profileError');
+          _showSignUpError('Erro ao criar perfil do usuário');
+        }
       } else {
-        _showSignUpError('Erro ao verificar código');
+        _showSignUpError('Código de verificação inválido');
       }
     } catch (e) {
-      print('OTP verification error: $e');
-      Get.snackbar(
-        'Erro',
-        'Código inválido ou expirado',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      verificationCode.value = ''; // Clear the code
+      print('Verification error: $e');
+      _showSignUpError(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Resend OTP code
-  Future<void> resendCode() async {
-    final email = step1Form.control('email').value;
-    final success = await EmailService.resendSignupVerification(email);
+  /// Send verification based on selected method
+  Future<void> sendVerification() async {
+    try {
+      isLoading.value = true;
 
-    if (success) {
-      startResendTimer();
+      if (selectedVerificationMethod.value == VerificationMethod.email) {
+        final email = step1Form.control('email').value;
+        await EmailService.sendSignupVerification(email);
+      } else if (selectedVerificationMethod.value == VerificationMethod.sms) {
+        final phoneNumber = step3Form.control('phone').value;
+        await _auth.sendSmsOTP(phoneNumber: phoneNumber);
+      }
+
+    } catch (e) {
+      _showSignUpError(e.toString());
+    } finally {
+      isLoading.value = false;
     }
-    // EmailService handles all user feedback
+  }
+
+  /// Resend verification code based on selected method
+  Future<void> resendVerification() async {
+    try {
+      isLoading.value = true;
+
+      if (selectedVerificationMethod.value == VerificationMethod.email) {
+        final email = step1Form.control('email').value;
+        await EmailService.resendSignupVerification(email);
+      } else if (selectedVerificationMethod.value == VerificationMethod.sms) {
+        final phoneNumber = step3Form.control('phone').value;
+        await _auth.resendSmsOTP(phoneNumber);
+      }
+
+      // Restart timer
+      startResendTimer();
+
+    } catch (e) {
+      _showSignUpError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Resend OTP code (for backward compatibility)
+  Future<void> resendCode() async {
+    await resendVerification();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -362,7 +500,7 @@ class SignupController extends GetxController {
         step3Form.markAllAsTouched(); // Show validation errors
         return step3Form.valid;
       case 3:
-        return selectedVerificationMethod.value == VerificationMethod.email;
+        return selectedVerificationMethod.value != null;
       case 4:
         return verificationCode.value.length == 6;
       default:
@@ -385,7 +523,7 @@ class SignupController extends GetxController {
       case 2:
         return step3Form.valid;
       case 3:
-        return selectedVerificationMethod.value == VerificationMethod.email;
+        return selectedVerificationMethod.value != null;
       case 4:
         return verificationCode.value.length == 6; // 6-digit code required
       default:
@@ -452,7 +590,8 @@ class SignupController extends GetxController {
 
     final phone = step3Form.control('phone').value;
     if (phone != null && phone.isNotEmpty) {
-      userData['phone_number'] = phone.replaceAll(RegExp(r'[^\d]'), '');
+      // Clean and store the number (keep + and digits only)
+      userData['phone_number'] = phone.replaceAll(RegExp(r'[^\d+]'), '');
     }
 
     final birthdate = step3Form.control('birthdate').value;
@@ -489,9 +628,6 @@ class SignupController extends GetxController {
       currentStep.value = 4; // Step 5 (index 4)
       _animateToPage(4);
       startResendTimer();
-
-      // Remove this line - EmailService will handle success messages for resends only
-      // EmailService._showSuccessMessage('verificação de cadastro');
     } else {
       _showSignUpError('Erro ao criar conta');
     }

@@ -119,7 +119,7 @@ class PortfolioSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: isSelected ? [
               BoxShadow(
-                color: const Color(0xFF1A2F5C).withOpacity(0.24),
+                color: const Color(0xFF1A2F5C).withValues(alpha: 0.24),
                 blurRadius: 4,
                 offset: const Offset(2, 2),
               ),

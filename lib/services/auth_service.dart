@@ -83,6 +83,52 @@ class AuthService {
     }
   }
 
+  /// Send SMS OTP for signup verification
+  Future<void> sendSmsOTP({required String phoneNumber}) async {
+    try {
+      await _supabase.auth.signInWithOtp(
+        phone: phoneNumber,
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Failed to send SMS verification code';
+    }
+  }
+
+  /// Verify SMS OTP
+  Future<AuthResponse> verifySmsOTP({
+    required String phoneNumber,
+    required String token,
+  }) async {
+    try {
+      final response = await _supabase.auth.verifyOTP(
+        type: OtpType.sms,
+        token: token,
+        phone: phoneNumber,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Invalid or expired SMS code';
+    }
+  }
+
+  /// Resend SMS OTP
+  Future<void> resendSmsOTP(String phoneNumber) async {
+    try {
+      await _supabase.auth.resend(
+        type: OtpType.sms,
+        phone: phoneNumber,
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Failed to resend SMS code';
+    }
+  }
+
   /// Verify OTP code for password reset
   Future<AuthResponse> verifyResetOTP({
     required String email,

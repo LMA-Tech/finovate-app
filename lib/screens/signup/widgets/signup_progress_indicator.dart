@@ -31,7 +31,7 @@ class SignupProgressIndicator extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
                 color: isActive
                     ? FinColors.primary
-                    : FinColors.accent.withOpacity(0.3),
+                    : FinColors.accent.withValues(alpha: 0.3),
               ),
             ),
           );
