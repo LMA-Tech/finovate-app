@@ -425,26 +425,6 @@ class SignupController extends GetxController {
     }
   }
 
-  /// Send verification based on selected method
-  Future<void> sendVerification() async {
-    try {
-      isLoading.value = true;
-
-      if (selectedVerificationMethod.value == VerificationMethod.email) {
-        final email = step1Form.control('email').value;
-        await EmailService.sendSignupVerification(email);
-      } else if (selectedVerificationMethod.value == VerificationMethod.sms) {
-        final phoneNumber = step3Form.control('phone').value;
-        await _auth.sendSmsOTP(phoneNumber: phoneNumber);
-      }
-
-    } catch (e) {
-      _showSignUpError(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   /// Resend verification code based on selected method
   Future<void> resendVerification() async {
     try {
@@ -455,7 +435,8 @@ class SignupController extends GetxController {
         await EmailService.resendSignupVerification(email);
       } else if (selectedVerificationMethod.value == VerificationMethod.sms) {
         final phoneNumber = step3Form.control('phone').value;
-        await _auth.resendSmsOTP(phoneNumber);
+        final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+        await _auth.resendSmsOTP(cleanPhoneNumber);
       }
 
       // Restart timer
@@ -555,18 +536,36 @@ class SignupController extends GetxController {
   // ═══════════════════════════════════════════════════════════════════════════════════════
 
   /// Attempt to sign up user with provided information
+  /// Attempt to sign up user with provided information
   Future<void> signUp() async {
     try {
       isLoading.value = true;
-      final email = step1Form.control('email').value;
-      final password = step1Form.control('password').value;
       final userData = _buildUserData();
 
-      final response = await _auth.signUp(
-        email: email,
-        password: password,
-        userData: userData,
-      );
+      AuthResponse response;
+
+      if (selectedVerificationMethod.value == VerificationMethod.email) {
+        final email = step1Form.control('email').value;
+        final password = step1Form.control('password').value;
+
+        response = await _auth.signUp(
+          email: email,
+          password: password,
+          userData: userData,
+        );
+      } else {
+        // SMS signup flow
+        final phoneNumber = step3Form.control('phone').value;
+        final password = step1Form.control('password').value;
+        final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+        print("phone_number:" + cleanPhoneNumber);
+
+        response = await _auth.signUpWithPhone(
+          phoneNumber: cleanPhoneNumber,
+          password: password,
+          userData: userData,
+        );
+      }
 
       _handleSignUpResponse(response);
     } catch (e) {

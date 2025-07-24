@@ -44,7 +44,7 @@ class AuthService {
     }
   }
 
-  /// Sign up with complete user data
+  /// Sign up with complete user data and provider email
   Future<AuthResponse> signUp({
     required String email,
     required String password,
@@ -53,6 +53,26 @@ class AuthService {
     try {
       final response = await _supabase.auth.signUp(
         email: email.trim().toLowerCase(),
+        password: password,
+        data: userData,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Connection error. Please check your internet and try again.';
+    }
+  }
+
+  /// Sign up with complete user data and provider phone
+  Future<AuthResponse> signUpWithPhone({
+    required String phoneNumber,
+    required String password,
+    required Map<String, dynamic> userData,
+  }) async {
+    try {
+      final response = await _supabase.auth.signUp(
+        phone: phoneNumber,
         password: password,
         data: userData,
       );
@@ -80,19 +100,6 @@ class AuthService {
       throw _getErrorMessage(e.message);
     } catch (e) {
       throw 'Invalid or expired code';
-    }
-  }
-
-  /// Send SMS OTP for signup verification
-  Future<void> sendSmsOTP({required String phoneNumber}) async {
-    try {
-      await _supabase.auth.signInWithOtp(
-        phone: phoneNumber,
-      );
-    } on AuthException catch (e) {
-      throw _getErrorMessage(e.message);
-    } catch (e) {
-      throw 'Failed to send SMS verification code';
     }
   }
 
