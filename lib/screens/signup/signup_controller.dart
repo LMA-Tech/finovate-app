@@ -580,6 +580,7 @@ class SignupController extends GetxController {
     final userData = <String, dynamic>{
       'first_name': step2Form.control('firstName').value,
       'last_name': step2Form.control('lastName').value,
+      'email': step1Form.control('email').value.trim().toLowerCase(),
     };
 
     final cpf = step3Form.control('cpf').value;
@@ -589,7 +590,6 @@ class SignupController extends GetxController {
 
     final phone = step3Form.control('phone').value;
     if (phone != null && phone.isNotEmpty) {
-      // Clean and store the number (keep + and digits only)
       userData['phone_number'] = phone.replaceAll(RegExp(r'[^\d+]'), '');
     }
 

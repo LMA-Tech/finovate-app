@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -73,21 +74,10 @@ class LoginController extends GetxController {
 
       // Offer biometric enrollment after successful login
       await _offerBiometricEnrollment();
-
-      Get.snackbar(
-        FinTexts.loginSuccessTitle,
-        FinTexts.loginSuccessMessage,
-        backgroundColor: FinColors.success,
-        colorText: FinColors.white,
-      );
     } catch (e) {
-      Get.snackbar(
-        FinTexts.loginErrorTitle,
-        e.toString(),
-        backgroundColor: FinColors.error,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 4),
-      );
+      if (kDebugMode) {
+        print(e.toString());
+      }
     } finally {
       isLoading.value = false;
     }

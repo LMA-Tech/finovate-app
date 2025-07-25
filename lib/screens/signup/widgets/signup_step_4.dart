@@ -45,13 +45,13 @@ class SignupStep4 extends StatelessWidget {
               )),
               const SizedBox(height: FinSizes.defaultSpace),
 
-              // SMS option (disabled)
+              // SMS option (disabled temporarily)
               Obx(() => CustomSelectionField(
                 label: '', // No label since we have the title above
-                title: 'SMS',
+                title: 'SMS (Em breve)',
                 isSelected: controller.selectedVerificationMethod.value == VerificationMethod.sms,
-                isEnabled: true,
-                onTap: () => controller.selectVerificationMethod(VerificationMethod.sms),
+                isEnabled: false,
+                onTap: () {}, // Later can point to => controller.selectVerificationMethod(VerificationMethod.sms)
               )),
             ],
           ),

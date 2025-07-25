@@ -71,6 +71,7 @@ class AuthService {
     required Map<String, dynamic> userData,
   }) async {
     try {
+      print('🔍 userData being sent: $userData');
       final response = await _supabase.auth.signUp(
         phone: phoneNumber,
         password: password,
