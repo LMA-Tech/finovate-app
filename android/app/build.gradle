@@ -8,7 +8,6 @@ plugins {
 android {
     namespace = "com.example.finovate_app"
     compileSdk = 35
-    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

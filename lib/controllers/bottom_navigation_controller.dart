@@ -19,7 +19,7 @@ class BottomNavigationController extends GetxController {
   final List<String> routes = [
     '/home',        // 0 - Home
     '/conjuntura',  // 1 - Conjuntura (Analysis)
-    '/sofia',       // 2 - SofIA (AI Chat)
+    '/sofia/home',       // 2 - SofIA (AI Chat)
     '/carteira',    // 3 - Carteira (Wallet)
     '/perfil',      // 4 - Perfil (Profile)
   ];

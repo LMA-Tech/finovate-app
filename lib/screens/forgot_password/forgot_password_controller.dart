@@ -331,7 +331,7 @@ class ForgotPasswordController extends GetxController {
       );
 
       // Re-throw to prevent navigation to success screen
-      throw e;
+      rethrow;
     } finally {
       isLoading.value = false;
     }

@@ -143,4 +143,65 @@ class FinTexts {
   static const String yourAccountCreatedTitle = "Your account successfully created!";
   static const String yourAccountCreatedSubTitle = "Welcome to Your Ultimate Shopping Destination: Your Account is Created, Unleash the Joy of Seamless Online Shopping!";
 
+  // -- SofIA AI Assistant
+  static const String sofiaScreenTitle = "SofIA";
+  static const String sofiaGreetingHello = "Olá";
+  static const String sofiaGreetingQuestion = "como posso ajudar?";
+  static const String sofiaDefaultUserName = "Usuário";
+  static const String sofiaChatInputHint = "Converse com SofIA";
+  static const String sofiaChatInputHintActive = "Digite sua mensagem...";
+
+  // -- SofIA Chat History
+  static const String sofiaChatHistory = "Histórico de Chat";
+  static const String sofiaViewAllChats = "Ver todos";
+  static const String sofiaChatWithSofia = "Conversa com SofIA";
+
+  // SofIA Suggestions
+  static const String sofiaSuggestion1 = "Quais ativos apresentaram maior rentabilidade";
+  static const String sofiaSuggestion2 = "Quais são as opções com menos risco";
+  static const String sofiaSuggestion3 = "Quais ações estão mais descontadas";
+  static const String sofiaSuggestion4 = "Perguntas frequentes";
+
+  // SofIA Chat Interface
+  static const String sofiaChatEmpty = "Sua conversa aparecerá aqui";
+  static const String sofiaErrorRetry = "Tentar novamente";
+  static const String sofiaErrorMessage = "Erro ao enviar mensagem. Tente novamente.";
+  static const String sofiaChatOptionsTitle = "Opções do Chat";
+  static const String sofiaClearChat = "Limpar conversa";
+  static const String sofiaClearChatTitle = "Limpar conversa";
+  static const String sofiaClearChatMessage = "Tem certeza que deseja limpar toda a conversa? Esta ação não pode ser desfeita.";
+  static const String sofiaCancel = "Cancelar";
+  static const String sofiaClear = "Limpar";
+  static const String sofiaClose = "Fechar";
+  static const String sofiaTimeNow = "Agora";
+
+  // SofIA AI Avatar and Interface
+  static const String sofiaAIAssistant = "SofIA - Assistente IA";
+  static const String sofiaAIDescription = "Converse com nossa IA especializada em investimentos e finanças.";
+  static const String sofiaImplementationBadge = "Interface de chat será implementada aqui";
+  static const String sofiaMessagePlaceholder = "Digite sua mensagem...";
+  static const String sofiaSettingsTooltip = "Configurações do chat";
+
+  // Time formatting
+  static const String sofiaTimeMinutesAgo = "m";
+  static const String sofiaTimeDaysFormat = "/";
+  static const String sofiaTimeHourMinuteSeparator = ":";
+
+  // SofIA AI Mock Responses (for simulation)
+  static const String sofiaResponseRentabilidade = "Com base nos dados mais recentes, os ativos com maior rentabilidade incluem REITs imobiliários (+12.5%), ações de tecnologia (+8.3%) e fundos de commodities (+7.8%). Gostaria de mais detalhes sobre algum destes?";
+  static const String sofiaResponseRisco = "Para opções com menor risco, recomendo: Tesouro Direto (risco muito baixo), CDBs de grandes bancos (baixo risco) e fundos DI (risco baixo). Estes produtos oferecem segurança com retornos consistentes.";
+  static const String sofiaResponseDescontadas = "Analisando o P/L e outros indicadores, algumas ações que estão trading com desconto incluem: VALE3 (P/L 4.2), BBDC4 (P/L 5.1) e PETR4 (P/L 3.8). Importante fazer sua própria análise antes de investir.";
+  static const String sofiaResponseFrequentes = "Aqui estão algumas perguntas frequentes:\n\n• Como diversificar minha carteira?\n• Qual a diferença entre ações e FIIs?\n• Como calcular o risco de um investimento?\n• Quando devo rebalancear minha carteira?";
+  static const String sofiaResponseDefault = "Entendi sua pergunta sobre investimentos. Como assistente especializada em finanças, posso ajudar com análises de ativos, gestão de risco, e estratégias de investimento. Pode me dar mais detalhes sobre o que você gostaria de saber?";
+
+  // Debug and logging messages
+  static const String sofiaDebugControllerInit = "SofiaController initialized";
+  static const String sofiaDebugControllerDisposed = "SofiaController disposed";
+  static const String sofiaDebugUserInit = "User initialized";
+  static const String sofiaDebugErrorInit = "Error initializing user";
+  static const String sofiaDebugUserMessageAdded = "User message added";
+  static const String sofiaDebugErrorSending = "Error sending message";
+  static const String sofiaDebugSuggestionTapped = "Suggestion tapped";
+  static const String sofiaDebugAIResponseAdded = "AI response added";
+  static const String sofiaDebugChatCleared = "Chat cleared";
 }
