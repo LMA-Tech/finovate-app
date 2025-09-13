@@ -1,6 +1,4 @@
 // lib/screens/sofia/sofia_home_screen.dart
-
-import 'package:finovate_app/screens/sofia/widgets/chat_history.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
