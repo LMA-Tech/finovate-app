@@ -386,6 +386,30 @@ class SessionManager extends GetxController {
     await _initBiometric();
   }
 
+  /// Get current auth token, refreshing if needed
+  Future<String?> getAuthToken() async {
+    try {
+      final session = _supabase.auth.currentSession;
+
+      // Check if token is expired or about to expire
+      if (session?.expiresAt != null) {
+        final expiresAt = DateTime.fromMillisecondsSinceEpoch(session!.expiresAt! * 1000);
+        final now = DateTime.now();
+
+        // If expires within 60 seconds, refresh
+        if (expiresAt.difference(now).inSeconds < 60) {
+          final refreshed = await _supabase.auth.refreshSession();
+          return refreshed.session?.accessToken;
+        }
+      }
+
+      return session?.accessToken;
+    } catch (e) {
+      debugPrint('Error getting auth token: $e');
+      return null;
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // UTILITY METHODS
   // Helper methods for state checking and debugging

@@ -4,6 +4,7 @@ import 'package:finovate_app/screens/carteira/carteria_screen.dart';
 import 'package:finovate_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:finovate_app/screens/signup/signup_screen.dart';
 import 'package:finovate_app/screens/sofia/sofia_chat_screen.dart';
+import 'package:finovate_app/screens/sofia/sofia_test_screen.dart';
 import 'package:finovate_app/services/activity_tracker.dart';
 import 'package:finovate_app/services/asset_cache_manager.dart';
 import 'package:flutter/foundation.dart';
@@ -93,6 +94,7 @@ class FinovateApp extends StatelessWidget {
         // Bottom Navigation Routes
         GetPage(name: '/conjuntura', page: () => const ConjunturaScreen()),
         GetPage(name: '/sofia/home', page: () => const SofiaHomeScreen()),
+        GetPage(name: '/sofia/test', page: () => const SofiaTestScreen()),
         GetPage(name: '/sofia/chat', page: () => const SofiaChatScreen()),
         GetPage(name: '/carteira', page: () => const CarteiraScreen()),
         GetPage(name: '/perfil', page: () => const PerfilScreen()),
