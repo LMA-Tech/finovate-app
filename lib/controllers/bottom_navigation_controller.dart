@@ -2,6 +2,8 @@
 
 import 'package:get/get.dart';
 
+import '../utils/constants/routes.dart';
+
 /// Controller for managing bottom navigation state and tab switching
 /// Handles navigation logic and maintains current tab state across the app
 class BottomNavigationController extends GetxController {
@@ -16,12 +18,13 @@ class BottomNavigationController extends GetxController {
   final RxInt currentIndex = 0.obs;
 
   /// List of navigation routes corresponding to each tab
+  /// MUST match the order of bottom navigation bar icons
   final List<String> routes = [
-    '/home',        // 0 - Home
-    '/conjuntura',  // 1 - Conjuntura (Analysis)
-    '/sofia/test',       // 2 - SofIA (AI Chat)
-    '/carteira',    // 3 - Carteira (Wallet)
-    '/perfil',      // 4 - Perfil (Profile)
+    AppRoutes.home,        // 0 - Home
+    AppRoutes.conjuntura,  // 1 - Conjuntura (Market Analysis)
+    AppRoutes.sofiaHome,   // 2 - SofIA (AI Assistant)
+    AppRoutes.carteira,    // 3 - Carteira (Portfolio)
+    AppRoutes.perfil,      // 4 - Perfil (Profile)
   ];
 
   /// Tab labels for accessibility and display

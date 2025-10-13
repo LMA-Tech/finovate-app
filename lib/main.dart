@@ -1,48 +1,47 @@
 // lib/main.dart
 
 import 'package:finovate_app/screens/carteira/carteria_screen.dart';
+import 'package:finovate_app/screens/conjuntura/conjuntura_screen.dart';
 import 'package:finovate_app/screens/forgot_password/forgot_password_screen.dart';
+import 'package:finovate_app/screens/get_started/get_started_screen.dart';
+import 'package:finovate_app/screens/home/home_screen.dart';
+import 'package:finovate_app/screens/login/login_screen.dart';
+import 'package:finovate_app/screens/onboarding/onboarding_screen.dart';
+import 'package:finovate_app/screens/perfil/perfil_screen.dart';
 import 'package:finovate_app/screens/signup/signup_screen.dart';
 import 'package:finovate_app/screens/sofia/sofia_chat_screen.dart';
-import 'package:finovate_app/screens/sofia/sofia_test_screen.dart';
+import 'package:finovate_app/screens/sofia/sofia_home_screen.dart';
+import 'package:finovate_app/screens/splash/splash_screen.dart';
 import 'package:finovate_app/services/activity_tracker.dart';
 import 'package:finovate_app/services/asset_cache_manager.dart';
+import 'package:finovate_app/services/session_manager.dart';
+import 'package:finovate_app/controllers/bottom_navigation_controller.dart';
+import 'package:finovate_app/utils/constants/routes.dart';
+import 'package:finovate_app/utils/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:finovate_app/utils/theme/theme.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/env_config.dart';
-import 'services/session_manager.dart';
-import 'screens/splash/splash_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/get_started/get_started_screen.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/home/home_screen.dart';
-import 'services/auth_gate.dart';
-import 'controllers/bottom_navigation_controller.dart';
-import 'screens/sofia/sofia_home_screen.dart';
-import 'screens/conjuntura/conjuntura_screen.dart';
-import 'screens/perfil/perfil_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Load environment variables first
+    // Load environment variables
     await EnvConfig.load();
 
-    // Debug config in development
+    // Debug configuration in development
     if (kDebugMode) {
       EnvConfig.debugPrintConfig();
     }
 
-    // Validate configuration
+    // Validate required configuration
     if (!EnvConfig.isConfigValid) {
-      throw Exception('Invalid environment configuration');
+      throw Exception('Invalid environment configuration - check .env file');
     }
 
-    // Initialize Supabase with loaded config
+    // Initialize Supabase
     await Supabase.initialize(
       url: EnvConfig.supabaseUrl,
       anonKey: EnvConfig.supabaseAnonKey,
@@ -51,17 +50,19 @@ void main() async {
       ),
     );
 
+    // Preload critical assets for better UX
     await AssetCacheManager.preloadCriticalAssets();
 
     runApp(const FinovateApp());
   } catch (e) {
     if (kDebugMode) {
-      debugPrint('Initialization error: $e');
+      debugPrint('❌ Initialization error: $e');
     }
     runApp(const ErrorApp());
   }
 }
 
+/// Main application widget
 class FinovateApp extends StatelessWidget {
   const FinovateApp({super.key});
 
@@ -73,40 +74,95 @@ class FinovateApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: FinAppTheme.lightTheme,
       darkTheme: FinAppTheme.darkTheme,
-      home: const SplashScreen(),
+
+      // Initial route
+      initialRoute: AppRoutes.splash,
+
+      // Route definitions using AppRoutes constants
+      getPages: [
+        // ═══════════════════════════════════════════════════════════════
+        // AUTHENTICATION FLOW
+        // ═══════════════════════════════════════════════════════════════
+        GetPage(
+          name: AppRoutes.splash,
+          page: () => const SplashScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.onboarding,
+          page: () => const OnBoardingScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.getStarted,
+          page: () => const GetStartedScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.login,
+          page: () => const LoginScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.signup,
+          page: () => const SignupScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.forgotPassword,
+          page: () => const ForgotPasswordScreen(),
+        ),
+
+        // ═══════════════════════════════════════════════════════════════
+        // MAIN APPLICATION
+        // ═══════════════════════════════════════════════════════════════
+        GetPage(
+          name: AppRoutes.home,
+          page: () => const HomeScreen(),
+        ),
+
+        // ═══════════════════════════════════════════════════════════════
+        // BOTTOM NAVIGATION SCREENS
+        // Accessible via HomeScreen's bottom navigation bar
+        // ═══════════════════════════════════════════════════════════════
+        GetPage(
+          name: AppRoutes.carteira,
+          page: () => const CarteiraScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.conjuntura,
+          page: () => const ConjunturaScreen(),
+        ),
+        GetPage(
+          name: AppRoutes.perfil,
+          page: () => const PerfilScreen(),
+        ),
+
+        // ═══════════════════════════════════════════════════════════════
+        // SOFIA AI ASSISTANT SCREENS
+        // Multiple screens for different Sofia interaction modes
+        // ═══════════════════════════════════════════════════════════════
+
+        // Sofia Home - Welcome screen (accessed via bottom nav)
+        GetPage(
+          name: AppRoutes.sofiaHome,
+          page: () => const SofiaHomeScreen(),
+        ),
+
+        // Sofia Chat - Mock UI for testing chat interface
+        GetPage(
+          name: AppRoutes.sofiaChat,
+          page: () => const SofiaChatScreen(),
+        ),
+      ],
+
+      // Initialize global controllers
       initialBinding: BindingsBuilder(() {
-        // Initialize SessionManager once for the entire app
+        // Core services that persist throughout app lifecycle
         Get.put(SessionManager(), permanent: true);
         Get.put(ActivityTracker(), permanent: true);
-        // Initialize BottomNavigationController for bottom navigation state
         Get.put(BottomNavigationController(), permanent: true);
       }),
-      getPages: [
-        GetPage(name: '/', page: () => const SplashScreen()),
-        GetPage(name: '/onboarding', page: () => const OnBoardingScreen()),
-        GetPage(name: '/getStarted', page: () => const GetStartedScreen()),
-        GetPage(name: '/login', page: () => const LoginScreen()),
-        GetPage(name: '/signup', page: () => const SignupScreen()),
-        GetPage(name: '/forgotPassword', page: () => const ForgotPasswordScreen()),
-        GetPage(name: '/home', page: () => const HomeScreen()),
-        GetPage(name: '/auth', page: () => const AuthGate()),
-
-        // Bottom Navigation Routes
-        GetPage(name: '/conjuntura', page: () => const ConjunturaScreen()),
-        GetPage(name: '/sofia/home', page: () => const SofiaHomeScreen()),
-        GetPage(name: '/sofia/test', page: () => const SofiaTestScreen()),
-        GetPage(name: '/sofia/chat', page: () => const SofiaChatScreen()),
-        GetPage(name: '/carteira', page: () => const CarteiraScreen()),
-        GetPage(name: '/perfil', page: () => const PerfilScreen()),
-      ],
-      // Security: Disable debug banner and overlays in production
-      showPerformanceOverlay: false,
-      showSemanticsDebugger: false,
     );
   }
 }
 
-// Fallback error app
+/// Error screen displayed when app initialization fails
 class ErrorApp extends StatelessWidget {
   const ErrorApp({super.key});
 
@@ -114,30 +170,47 @@ class ErrorApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: const Color(0xFF1E2332),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text(
-                'Configuration Error',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Please check your app configuration and try again.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // In production, you might want to retry initialization
-                  // or contact support
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 64,
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Failed to Initialize App',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Please check your .env configuration\nand try again',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                if (kDebugMode)
+                  const Text(
+                    'Check console for detailed error message',
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../services/onboarding_service.dart';
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/routes.dart';
 import '../../utils/helpers/helper_functions.dart';
 
 part 'splash_controller.dart';

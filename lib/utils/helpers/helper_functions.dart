@@ -4,40 +4,26 @@ import 'package:intl/intl.dart';
 import '../constants/sizes.dart';
 
 class FinHelperFunctions {
+
+  static const Map<String, Color> _colorMap = {
+    'Green': Colors.green,
+    'Red': Colors.red,
+    'Blue': Colors.blue,
+    'Pink': Colors.pink,
+    'Grey': Colors.grey,
+    'Purple': Colors.purple,
+    'Black': Colors.black,
+    'White': Colors.white,
+    'Yellow': Colors.yellow,
+    'Orange': Colors.deepOrange,
+    'Brown': Colors.brown,
+    'Teal': Colors.teal,
+    'Indigo': Colors.indigo,
+  };
+
   static Color? getColor(String value) {
     /// Color Palette here and it will match the attribute colors and show specific 🟠🟡🟢🔵🟣🟤
-
-    if (value == 'Green') {
-      return Colors.green;
-    } else if (value == 'Green') {
-      return Colors.green;
-    } else if (value == 'Red') {
-      return Colors.red;
-    } else if (value == 'Blue') {
-      return Colors.blue;
-    } else if (value == 'Pink') {
-      return Colors.pink;
-    } else if (value == 'Grey') {
-      return Colors.grey;
-    } else if (value == 'Purple') {
-      return Colors.purple;
-    } else if (value == 'Black') {
-      return Colors.black;
-    } else if (value == 'White') {
-      return Colors.white;
-    } else if (value == 'Yellow') {
-      return Colors.yellow;
-    } else if (value == 'Orange') {
-      return Colors.deepOrange;
-    } else if (value == 'Brown') {
-      return Colors.brown;
-    } else if (value == 'Teal') {
-      return Colors.teal;
-    } else if (value == 'Indigo') {
-      return Colors.indigo;
-    } else {
-      return null;
-    }
+    return _colorMap[value];
   }
 
   static void showSnackBar(String message) {

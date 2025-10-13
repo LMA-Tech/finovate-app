@@ -42,7 +42,7 @@ abstract class SplashController extends State<SplashScreen> {
     if (user != null) {
       // User is authenticated, go to home
       print('User authenticated - going to home');
-      Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.home);
       return;
     }
 
@@ -54,11 +54,11 @@ abstract class SplashController extends State<SplashScreen> {
     if (isFirstLaunch) {
       // First launch, show onboarding
       print('Going to onboarding');
-      Get.offAllNamed('/onboarding');
+      Get.offAllNamed(AppRoutes.onboarding);
     } else {
       // Not first launch, show get started screen
       print('Going to get started');
-      Get.offAllNamed('/getStarted');
+      Get.offAllNamed(AppRoutes.getStarted);
     }
   }
 }

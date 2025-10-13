@@ -7,6 +7,7 @@ import '../../common/styles/spacing_styles.dart';
 import '../../common/widgets/app_background.dart';
 import '../../services/activity_tracker.dart';
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/routes.dart';
 import '../../utils/helpers/helper_functions.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -31,12 +32,11 @@ class LoginScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   // Check if we came from Get Started
-                  if (Get.previousRoute == '/getStarted' ||
-                      Get.previousRoute.isEmpty) {
+                  if (Get.previousRoute == AppRoutes.getStarted || Get.previousRoute.isEmpty) {
                     Get.back();
                   } else {
                     // Fallback to Get Started if navigation stack is unclear
-                    Get.offAllNamed('/getStarted');
+                    Get.offAllNamed(AppRoutes.getStarted);
                   }
                 },
               ),

@@ -8,6 +8,7 @@ import '../../screens/sofia/widgets/chat_input.dart';
 import '../../screens/sofia/sofia_controller.dart';
 import '../../services/activity_tracker.dart';
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/routes.dart';
 import '../../utils/constants/sizes.dart';
 import '../../utils/constants/text_strings.dart';
 
@@ -76,7 +77,7 @@ class SofiaHomeScreen extends StatelessWidget {
       automaticallyImplyLeading: true,
       centerTitle: true,
       leading: IconButton(
-        onPressed: () => Get.back(),
+        onPressed: () => Get.offAllNamed(AppRoutes.home),
         icon: const Icon(
           Icons.arrow_back,
           color: Colors.white,
@@ -99,7 +100,7 @@ class SofiaHomeScreen extends StatelessWidget {
 
   /// Navigate to chat screen with message
   void _navigateToChat(String message, SofiaController controller) {
-    Get.toNamed('/sofia/chat', arguments: {
+    Get.toNamed(AppRoutes.sofiaChat, arguments: { // ← USE CONSTANT
       'initialMessage': message,
       'controller': controller,
     });
@@ -107,7 +108,7 @@ class SofiaHomeScreen extends StatelessWidget {
 
   /// Open recent conversation in chat screen
   void _openRecentConversation(SofiaController controller) {
-    Get.toNamed('/sofia/chat', arguments: {
+    Get.toNamed(AppRoutes.sofiaChat, arguments: { // ← USE CONSTANT
       'controller': controller,
       'resumeChat': true,
     });

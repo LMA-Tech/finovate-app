@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../services/onboarding_service.dart';
+import '../../utils/constants/routes.dart';
 
 class OnBoardingController extends GetxController {
   static OnBoardingController get instance => Get.find();
@@ -96,6 +97,6 @@ class OnBoardingController extends GetxController {
   // Complete onboarding and navigate - single responsibility
   void _completeOnboardingAndNavigate() {
     _onboardingService.completeOnboarding();
-    Get.offAll(() => const GetStartedScreen());
+    Get.offAllNamed(AppRoutes.getStarted);
   }
 }

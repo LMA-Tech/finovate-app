@@ -1,331 +1,408 @@
 // lib/screens/sofia/sofia_chat_screen.dart
 
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-
-import '../../common/widgets/app_background.dart';
-import 'sofia_controller.dart';
-import '../../services/activity_tracker.dart';
+import '../../services/finovate_api_service.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
-import '../../utils/constants/text_strings.dart';
 
-/// SofIA Chat Screen - Simple implementation with flutter_chat_ui
-///
-/// This screen provides professional auto-scrolling chat interface
-/// while maintaining all existing SofIA functionality.
+/// Test screen for backend chat integration with streaming
 class SofiaChatScreen extends StatefulWidget {
   const SofiaChatScreen({super.key});
 
   @override
-  State<SofiaChatScreen> createState() => _SofiaChatScreenState();
+  State<SofiaChatScreen> createState() => _SofiaTestScreenState();
 }
 
-class _SofiaChatScreenState extends State<SofiaChatScreen> {
-  late SofiaController sofiaController;
-  final _chatController = InMemoryChatController();
-  String? initialMessage;
-  bool resumeChat = false;
+class _SofiaTestScreenState extends State<SofiaChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final List<ChatMessage> _messages = [];
+  final ScrollController _scrollController = ScrollController();
+
+  bool _isLoading = false;
+  String _streamingBuffer = '';
+  String? _currentSessionId;
 
   @override
   void initState() {
     super.initState();
-    _initializeChat();
+    _loadSessions();
   }
 
   @override
   void dispose() {
-    _chatController.dispose();
+    _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  /// Initialize chat with arguments from navigation
-  void _initializeChat() {
-    final arguments = Get.arguments as Map<String, dynamic>?;
-
-    // Get controller from arguments or find existing one
-    sofiaController = arguments?['controller'] ?? Get.find<SofiaController>();
-
-    // Check if we should resume existing chat or start with initial message
-    resumeChat = arguments?['resumeChat'] ?? false;
-    initialMessage = arguments?['initialMessage'];
-
-    // Send initial message if provided and not resuming
-    if (initialMessage != null && !resumeChat) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _sendMessage(initialMessage!);
-      });
+  /// Load existing sessions on startup
+  Future<void> _loadSessions() async {
+    try {
+      final sessions = await FinovateApiService.getChatSessions();
+      if (sessions.isNotEmpty) {
+        // Use most recent session
+        _currentSessionId = sessions.first.sessionId;
+        debugPrint('📋 Loaded existing session: $_currentSessionId');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to load sessions: $e');
     }
   }
 
-  /// Send message through both chat UI and Sofia controller
-  void _sendMessage(String text) {
-    // Add user message to chat UI
-    _chatController.insertMessage(
-      TextMessage(
-        id: '${Random().nextInt(1000000) + 1}',
-        authorId: 'user',
-        createdAt: DateTime.now().toUtc(),
-        text: text,
-      ),
-    );
+  /// Send message to backend
+  Future<void> _sendMessage() async {
+    final messageText = _messageController.text.trim();
+    if (messageText.isEmpty || _isLoading) return;
 
-    // Trigger Sofia's AI response
-    _handleSofiaResponse(text);
+    _messageController.clear();
+
+    // Add user message
+    setState(() {
+      _messages.add(ChatMessage(
+        text: messageText,
+        isUser: true,
+        timestamp: DateTime.now(),
+      ));
+      _isLoading = true;
+      _streamingBuffer = '';
+    });
+
+    // Create session if needed
+    if (_currentSessionId == null) {
+      try {
+        final session = await FinovateApiService.createChatSession(
+          title: messageText.substring(0, messageText.length > 30 ? 30 : messageText.length),
+        );
+        _currentSessionId = session.sessionId;
+        debugPrint('✅ Created session: $_currentSessionId');
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+          _messages.add(ChatMessage(
+            text: 'Failed to create session: $e',
+            isUser: false,
+            isError: true,
+            timestamp: DateTime.now(),
+          ));
+        });
+        return;
+      }
+    }
+
+    // Add streaming placeholder
+    setState(() {
+      _messages.add(ChatMessage(
+        text: '',
+        isUser: false,
+        isStreaming: true,
+        timestamp: DateTime.now(),
+      ));
+    });
+
+    _scrollToBottom();
+
+    // Stream response from backend
+    await FinovateApiService.streamChatMessage(
+      message: messageText,
+      sessionId: _currentSessionId,
+      onToken: (token) {
+        if (!mounted) return;
+        setState(() {
+          _streamingBuffer += token;
+          if (_messages.isNotEmpty && _messages.last.isStreaming) {
+            _messages[_messages.length - 1] = ChatMessage(
+              text: _streamingBuffer,
+              isUser: false,
+              isStreaming: true,
+              timestamp: _messages.last.timestamp,
+            );
+          }
+        });
+        _scrollToBottom();
+      },
+      onComplete: () {
+        if (!mounted) return;
+        debugPrint('✅ Stream completed');
+        setState(() {
+          _isLoading = false;
+          if (_messages.isNotEmpty && _messages.last.isStreaming) {
+            _messages[_messages.length - 1] = ChatMessage(
+              text: _streamingBuffer.isEmpty ? '(empty response)' : _streamingBuffer,
+              isUser: false,
+              isStreaming: false,
+              timestamp: _messages.last.timestamp,
+            );
+          }
+          _streamingBuffer = '';
+        });
+        _scrollToBottom();
+      },
+      onError: (error) {
+        if (!mounted) return;
+        debugPrint('❌ Stream error: $error');
+        setState(() {
+          _isLoading = false;
+          if (_messages.isNotEmpty && _messages.last.isStreaming) {
+            _messages.removeLast();
+          }
+          _messages.add(ChatMessage(
+            text: 'Error: $error',
+            isUser: false,
+            isError: true,
+            timestamp: DateTime.now(),
+          ));
+          _streamingBuffer = '';
+        });
+        _scrollToBottom();
+      },
+    );
   }
 
-  /// Handle Sofia's AI response
-  Future<void> _handleSofiaResponse(String userMessage) async {
-    try {
-      // Simulate AI thinking delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Generate Sofia's response using existing logic
-      String responseContent;
-      if (userMessage.toLowerCase().contains('rentabilidade')) {
-        responseContent = FinTexts.sofiaResponseRentabilidade;
-      } else if (userMessage.toLowerCase().contains('risco')) {
-        responseContent = FinTexts.sofiaResponseRisco;
-      } else if (userMessage.toLowerCase().contains('descontadas')) {
-        responseContent = FinTexts.sofiaResponseDescontadas;
-      } else if (userMessage.toLowerCase().contains('frequentes')) {
-        responseContent = FinTexts.sofiaResponseFrequentes;
-      } else {
-        responseContent = FinTexts.sofiaResponseDefault;
-      }
-
-      // Add Sofia's response to chat UI
-      _chatController.insertMessage(
-        TextMessage(
-          id: '${Random().nextInt(1000000) + 1}',
-          authorId: 'sofia',
-          createdAt: DateTime.now().toUtc(),
-          text: responseContent,
-        ),
-      );
-    } catch (e) {
-      // Handle error
-      print('Error generating Sofia response: $e');
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      Future.delayed(const Duration(milliseconds: 50), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final activityTracker = Get.find<ActivityTracker>();
-
-    return GestureDetector(
-      onTap: () => activityTracker.recordActivity(),
-      child: AppBackground(
-        child: Scaffold(
-          // Your existing app bar
-          appBar: _buildChatAppBar(),
-
-          // Simple chat interface
-          body: Chat(
-            chatController: _chatController,
-            currentUserId: 'user',
-            onMessageSend: _sendMessage,
-            resolveUser: (String id) async {
-              if (id == 'sofia') {
-                return const User(id: 'sofia', name: 'SofIA');
-              } else {
-                return const User(id: 'user', name: 'Você');
-              }
-            },
-            // Basic dark theme
-            backgroundColor: const Color(0xFF1E2332),
-          ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E2332),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.back(),
         ),
-      ),
-    );
-  }
-
-  /// Build chat-specific app bar (keeping your existing design)
-  PreferredSizeWidget _buildChatAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      automaticallyImplyLeading: true,
-      centerTitle: true,
-      leading: IconButton(
-        onPressed: () => Get.back(),
-        icon: const Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-        ),
-      ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // AI avatar in title
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: FinColors.primary.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: FinColors.primary.withValues(alpha: 0.3),
-                width: 1,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Backend Chat Test',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: FinSizes.fontSizeLg,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            child: const Icon(
-              Icons.smart_toy,
-              size: 14,
-              color: FinColors.primary,
+            Text(
+              _currentSessionId != null ? 'Session active' : 'No session',
+              style: TextStyle(
+                color: _currentSessionId != null ? FinColors.success : FinColors.warning,
+                fontSize: FinSizes.fontSizeSm,
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            FinTexts.sofiaScreenTitle,
-            style: const TextStyle(
-              fontSize: FinSizes.fontSizeLg,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                _messages.clear();
+                _currentSessionId = null;
+              });
+            },
+            tooltip: 'Clear chat',
           ),
         ],
       ),
-      actions: [
-        // Chat options menu
-        IconButton(
-          onPressed: () => _showChatOptions(),
-          icon: const Icon(
-            Icons.more_vert,
-            color: Colors.white,
+      body: Column(
+        children: [
+          // Messages list
+          Expanded(
+            child: _messages.isEmpty
+                ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.chat_bubble_outline,
+                    size: 64,
+                    color: FinColors.primary.withOpacity(0.3),
+                  ),
+                  const SizedBox(height: FinSizes.md),
+                  Text(
+                    'Send a message to start chatting',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: FinSizes.fontSizeMd,
+                    ),
+                  ),
+                ],
+              ),
+            )
+                : ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(FinSizes.md),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                return _buildMessageBubble(_messages[index]);
+              },
+            ),
           ),
-        ),
-      ],
+
+          // Input area
+          _buildMessageInput(),
+        ],
+      ),
     );
   }
 
-  /// Show chat options menu (keeping your existing functionality)
-  void _showChatOptions() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(FinSizes.defaultSpace),
-        decoration: const BoxDecoration(
-          color: Color(0xFF2D3245),
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(FinSizes.borderRadiusLg),
-          ),
+  Widget _buildMessageBubble(ChatMessage message) {
+    return Align(
+      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: FinSizes.md),
+        padding: const EdgeInsets.all(FinSizes.md),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
+        decoration: BoxDecoration(
+          color: message.isError
+              ? FinColors.error.withOpacity(0.2)
+              : message.isUser
+              ? FinColors.primary
+              : const Color(0xFF2D3245),
+          borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
+          border: message.isError
+              ? Border.all(color: FinColors.error, width: 1)
+              : null,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: FinSizes.lg),
-
-            // Title
-            const Text(
-              FinTexts.sofiaChatOptionsTitle,
+            Text(
+              message.text.isEmpty ? ' ' : message.text,
               style: TextStyle(
-                fontSize: FinSizes.fontSizeLg,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: message.isError ? FinColors.error : Colors.white,
+                fontSize: FinSizes.fontSizeMd,
               ),
             ),
-            const SizedBox(height: FinSizes.lg),
-
-            // Clear chat option
-            ListTile(
-              leading: const Icon(
-                Icons.delete_outline,
-                color: FinColors.error,
-              ),
-              title: const Text(
-                FinTexts.sofiaClearChat,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: FinSizes.fontSizeMd,
+            const SizedBox(height: FinSizes.xs),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _formatTime(message.timestamp),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: FinSizes.fontSizeSm,
+                  ),
                 ),
-              ),
-              onTap: () {
-                Get.back();
-                _showClearChatDialog();
-              },
+                if (message.isStreaming) ...[
+                  const SizedBox(width: FinSizes.xs),
+                  SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withOpacity(0.5),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-
-            // Close option
-            ListTile(
-              leading: Icon(
-                Icons.close,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-              title: Text(
-                FinTexts.sofiaClose,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: FinSizes.fontSizeMd,
-                ),
-              ),
-              onTap: () => Get.back(),
-            ),
-
-            // Safe area padding
-            SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
         ),
       ),
     );
   }
 
-  /// Show clear chat confirmation dialog
-  void _showClearChatDialog() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: const Color(0xFF2D3245),
-        title: const Text(
-          FinTexts.sofiaClearChatTitle,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(FinSizes.md),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D3245),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withOpacity(0.1),
+            width: 1,
           ),
         ),
-        content: const Text(
-          FinTexts.sofiaClearChatMessage,
-          style: TextStyle(
-            color: Colors.white70,
-          ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Type a message...',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFF1E2332),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: FinSizes.md,
+                    vertical: FinSizes.sm,
+                  ),
+                ),
+                maxLines: null,
+                textInputAction: TextInputAction.send,
+                onSubmitted: (_) => _sendMessage(),
+                enabled: !_isLoading,
+              ),
+            ),
+            const SizedBox(width: FinSizes.sm),
+            Container(
+              decoration: BoxDecoration(
+                color: _isLoading
+                    ? FinColors.primary.withOpacity(0.5)
+                    : FinColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: Icon(
+                  _isLoading ? Icons.stop : Icons.arrow_upward,
+                  color: Colors.white,
+                ),
+                onPressed: _isLoading ? null : _sendMessage,
+              ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text(
-              FinTexts.sofiaCancel,
-              style: TextStyle(
-                color: Colors.white70,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              // Use the correct method for flutter_chat_ui 2.9.0
-              // The controller uses set([]) to cle ar all messages
-              _chatController.setMessages([]);
-            },
-            child: const Text(
-              FinTexts.sofiaClear,
-              style: TextStyle(
-                color: FinColors.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
+
+  String _formatTime(DateTime time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// Chat message model
+class ChatMessage {
+  final String text;
+  final bool isUser;
+  final bool isError;
+  final bool isStreaming;
+  final DateTime timestamp;
+
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    this.isError = false,
+    this.isStreaming = false,
+    required this.timestamp,
+  });
 }

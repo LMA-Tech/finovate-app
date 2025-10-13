@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 
+import '../config/env_config.dart';
+
 /// Context for biometric authentication to provide appropriate messaging
 enum BiometricContext {
   login,
@@ -213,11 +215,10 @@ class BiometricService {
     bool allowFallback = true,
   }) async {
     try {
-      // Debug mode: Simulate authentication for development/testing
-      if (kDebugMode) {
+      // Only allow test mode if explicitly enabled via env variable
+      if (kDebugMode && EnvConfig.allowBiometricTestMode) {
         debugPrint('🧪 TEST MODE: Simulating biometric authentication...');
-        debugPrint('🧪 Context: $context');
-        debugPrint('🧪 Custom reason: $customReason');
+        debugPrint('⚠️ WARNING: Test mode should NEVER be enabled in production');
         await Future.delayed(const Duration(seconds: 2));
         return BiometricResult.success();
       }

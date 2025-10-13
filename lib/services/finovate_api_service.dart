@@ -4,12 +4,21 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/env_config.dart';
+
 /// Service for communicating with Finovate backend API
 class FinovateApiService {
   // Base URL for backend API
   static String get _baseUrl {
-    // Android emulator uses 10.0.2.2 to reach host machine
-    // iOS simulator uses localhost
+    // Use configured URL from environment
+    final configuredUrl = EnvConfig.apiBaseUrl;
+
+    // If API_BASE_URL is set in .env, use it
+    if (configuredUrl.isNotEmpty && configuredUrl != 'http://localhost:3000') {
+      return '$configuredUrl/api/v1';
+    }
+
+    // Fallback to localhost for local development
     if (defaultTargetPlatform == TargetPlatform.android) {
       return 'http://10.0.2.2:5001/api/v1';
     } else {

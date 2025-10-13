@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../services/session_manager.dart';
 import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/image_strings.dart';
+import '../../../utils/constants/routes.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../../../utils/helpers/helper_functions.dart';
@@ -123,7 +124,7 @@ class SignupStep6 extends StatelessWidget {
 
                           // Navigate to home - SessionManager should handle this automatically
                           // but we'll be explicit to ensure it works
-                          Get.offAllNamed('/home');
+                          Get.offAllNamed(AppRoutes.home);
                           print('Navigated to home');
                         },
                         borderRadius: BorderRadius.circular(12),

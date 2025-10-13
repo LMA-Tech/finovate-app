@@ -9,6 +9,7 @@ import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/session_manager.dart';
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/routes.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for managing the multi-step signup process
@@ -397,7 +398,7 @@ class SignupController extends GetxController {
           Get.find<SessionManager>().isInSignupFlow.value = false;
 
           // SUCCESS: Navigate to home
-          Get.offAllNamed('/home');
+          Get.offAllNamed(AppRoutes.home);
 
           // Show success message
           Get.snackbar(

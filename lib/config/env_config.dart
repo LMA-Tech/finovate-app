@@ -24,24 +24,12 @@ class EnvConfig {
   static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // LANGFLOW CONFIGURATION
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  /// Langflow API base URL (e.g., http://localhost:7860)
-  static String get langflowUrl => dotenv.env['LANGFLOW_URL'] ?? 'http://localhost:7860';
-
-  /// Langflow flow ID for SofIA assistant
-  static String get langflowFlowId => dotenv.env['LANGFLOW_FLOW_ID'] ?? '';
-
-  /// Langflow API key for authentication
-  static String get langflowApiKey => dotenv.env['LANGFLOW_API_KEY'] ?? '';
-
-  // ═══════════════════════════════════════════════════════════════════════════
   // GENERAL CONFIGURATION
   // ═══════════════════════════════════════════════════════════════════════════
 
   static String get apiBaseUrl => dotenv.env['API_BASE_URL'] ?? 'http://localhost:3000';
   static bool get isProduction => dotenv.env['PRODUCTION']?.toLowerCase() == 'true';
+  static bool get allowBiometricTestMode => dotenv.env['ALLOW_BIOMETRIC_TEST_MODE']?.toLowerCase() == 'true';
 
   // ═══════════════════════════════════════════════════════════════════════════
   // VALIDATION
@@ -50,13 +38,6 @@ class EnvConfig {
   /// Validate that required Supabase configuration is present
   static bool get isConfigValid {
     return supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
-  }
-
-  /// Validate that Langflow configuration is complete
-  static bool get isLangflowConfigured {
-    return langflowUrl.isNotEmpty &&
-        langflowFlowId.isNotEmpty &&
-        langflowApiKey.isNotEmpty;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -82,10 +63,6 @@ class EnvConfig {
       print('║   URL configured: ${supabaseUrl.isNotEmpty ? "✓" : "✗"}');
       print('║   Key configured: ${supabaseAnonKey.isNotEmpty ? "✓" : "✗"}');
       print('║ ');
-      print('║ LANGFLOW:');
-      print('║   URL: $langflowUrl');
-      print('║   Flow ID configured: ${langflowFlowId.isNotEmpty ? "✓" : "✗"}');
-      print('║   API Key configured: ${langflowApiKey.isNotEmpty ? "✓" : "✗"}');
       print('╚════════════════════════════════════════════════════════════╝');
     }
   }
