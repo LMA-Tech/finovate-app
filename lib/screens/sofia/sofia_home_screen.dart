@@ -31,13 +31,13 @@ class SofiaHomeScreen extends StatelessWidget {
               Expanded(
                 child: WelcomeSection(
                   userName: controller.userName.value,
-                  onSuggestionTap: (suggestion) => navigateToChat(),
+                  onSuggestionTap: (suggestion) => navigateToChat(suggestion),
                   isLoading: controller.isLoading.value,
                   useCompactLayout: false,
                 ),
               ),
               Obx(() => ChatInput(
-                onSendMessage: (message) => navigateToChat(),
+                onSendMessage: (message) => navigateToChat(message),
                 hintText: FinTexts.sofiaChatInputHint,
                 isEnabled: !controller.isLoading.value,
                 isLoading: controller.isLoading.value,
@@ -69,8 +69,14 @@ class SofiaHomeScreen extends StatelessWidget {
     );
   }
 
-  void navigateToChat() {
-    Get.toNamed(AppRoutes.sofiaChat);
+  void navigateToChat([String? message]) {
+    if (message != null && message.isNotEmpty) {
+      // Navigate with message as argument
+      Get.toNamed(AppRoutes.sofiaChat, arguments: {'initialMessage': message});
+    } else {
+      // Navigate without message
+      Get.toNamed(AppRoutes.sofiaChat);
+    }
   }
 
   void showHomeOptions() {

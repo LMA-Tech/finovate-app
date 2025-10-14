@@ -31,8 +31,21 @@ class SofiaChatController extends GetxController {
   void onInit() {
     super.onInit();
     loadSessions();
-  }
 
+    // Check if there's an initial message to send
+    final args = Get.arguments;
+    if (args != null && args is Map && args.containsKey('initialMessage')) {
+      final initialMessage = args['initialMessage'] as String?;
+      if (initialMessage != null && initialMessage.isNotEmpty) {
+        debugPrint('Received initial message: $initialMessage');
+        // Wait a moment for UI to build, then send message
+        Future.delayed(const Duration(milliseconds: 500), () {
+          messageController.text = initialMessage;
+          sendMessage();
+        });
+      }
+    }
+  }
   @override
   void onClose() {
     messageController.dispose();
@@ -43,6 +56,7 @@ class SofiaChatController extends GetxController {
   // ═══════════════════════════════════════════════════════════════
   // METHODS
   // ═══════════════════════════════════════════════════════════════
+
 
   /// Load existing sessions on startup
   Future<void> loadSessions() async {
