@@ -3,11 +3,14 @@ import 'package:finovate_app/services/session_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 import '../config/env_config.dart';
 
 /// Service for communicating with Finovate backend API
 class FinovateApiService {
+  static const _uuid = Uuid();
+
   // Base URL for backend API
   static String get _baseUrl {
     // Use configured URL from environment
@@ -32,18 +35,40 @@ class FinovateApiService {
     return await sessionManager.getAuthToken();
   }
 
-  /// Get common headers with auth token
-  static Future<Map<String, String>> _getHeaders() async {
+  /// Get common headers with auth token and correlation ID
+  static Future<Map<String, String>> _getHeaders({String? correlationId}) async {
     final token = await _getAuthToken();
 
     if (token == null) {
       throw Exception('No authentication token available');
     }
 
+    // Generate correlation ID if not provided
+    final corrId = correlationId ?? _uuid.v4();
+
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
+      'X-Correlation-Id': corrId,
     };
+  }
+
+  /// Log request details in debug mode
+  static void _logRequest(String method, String endpoint, String correlationId) {
+    if (kDebugMode) {
+      print('🔗 [$method] $endpoint [correlationId: $correlationId]');
+    }
+  }
+
+  /// Log response details in debug mode
+  static void _logResponse(int statusCode, String correlationId, {String? error}) {
+    if (kDebugMode) {
+      if (error != null) {
+        print('❌ Response $statusCode [correlationId: $correlationId] - Error: $error');
+      } else {
+        print('✅ Response $statusCode [correlationId: $correlationId]');
+      }
+    }
   }
 
   // ========================================
@@ -51,195 +76,136 @@ class FinovateApiService {
   // ========================================
 
   /// Create a new chat session
-  static Future<ChatSession> createChatSession({String? title}) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.post(
-        Uri.parse('$_baseUrl/chat/sessions'),
-        headers: headers,
-        body: jsonEncode({
-          if (title != null) 'title': title,
-        }),
-      );
+  static Future<ChatSession> createChatSession({
+    String? title,
+    String? correlationId,
+  }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        return ChatSession.fromJson(data['data']['session']);
-      } else {
-        throw Exception('Failed to create session: ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error creating session: $e');
-      rethrow;
+    _logRequest('POST', '/chat/sessions', corrId);
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/chat/sessions'),
+      headers: headers,
+      body: jsonEncode({
+        if (title != null) 'title': title,
+      }),
+    );
+
+    // Log response with correlation ID from backend
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+    _logResponse(response.statusCode, responseCorrId);
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return ChatSession.fromJson(data['data']['session']);
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Failed to create session';
+      _logResponse(response.statusCode, responseCorrId, error: error);
+      throw Exception(error);
     }
   }
 
-  /// Get all chat sessions for current user
-  static Future<List<ChatSession>> getChatSessions() async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.get(
-        Uri.parse('$_baseUrl/chat/sessions'),
-        headers: headers,
-      );
+  /// Get all chat sessions
+  static Future<List<ChatSession>> getChatSessions({
+    String? correlationId,
+  }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final sessions = (data['data']['sessions'] as List)
-            .map((json) => ChatSession.fromJson(json))
-            .toList();
-        return sessions;
-      } else {
-        throw Exception('Failed to get sessions: ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error getting sessions: $e');
-      rethrow;
-    }
-  }
+    _logRequest('GET', '/chat/sessions', corrId);
 
-  /// Get a specific chat session
-  static Future<ChatSession> getChatSession(String sessionId) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.get(
-        Uri.parse('$_baseUrl/chat/sessions/$sessionId'),
-        headers: headers,
-      );
+    final response = await http.get(
+      Uri.parse('$_baseUrl/chat/sessions'),
+      headers: headers,
+    );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return ChatSession.fromJson(data['data']['session']);
-      } else {
-        throw Exception('Failed to get session: ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error getting session: $e');
-      rethrow;
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+    _logResponse(response.statusCode, responseCorrId);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final sessions = (data['data']['sessions'] as List)
+          .map((json) => ChatSession.fromJson(json))
+          .toList();
+      return sessions;
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Failed to fetch sessions';
+      _logResponse(response.statusCode, responseCorrId, error: error);
+      throw Exception(error);
     }
   }
 
   /// Delete a chat session
-  static Future<void> deleteChatSession(String sessionId) async {
-    try {
-      final headers = await _getHeaders();
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/chat/sessions/$sessionId'),
-        headers: headers,
-      );
+  static Future<void> deleteChatSession(
+      String sessionId, {
+        String? correlationId,
+      }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete session: ${response.body}');
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error deleting session: $e');
-      rethrow;
+    _logRequest('DELETE', '/chat/sessions/$sessionId', corrId);
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/chat/sessions/$sessionId'),
+      headers: headers,
+    );
+
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+    _logResponse(response.statusCode, responseCorrId);
+
+    if (response.statusCode != 200) {
+      final error = jsonDecode(response.body)['error'] ?? 'Failed to delete session';
+      _logResponse(response.statusCode, responseCorrId, error: error);
+      throw Exception(error);
     }
   }
 
-  /// Stream chat message with real-time response
-  static Future<void> streamChatMessage({
+  /// Stream chat message
+  /// Returns a Stream of chat response chunks
+  static Future<Stream<ChatChunk>> streamChatMessage({
     required String message,
     String? sessionId,
-    required Function(String token) onToken,
-    required Function() onComplete,
-    required Function(String error) onError,
+    String? correlationId,
   }) async {
-    try {
-      final headers = await _getHeaders();
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
 
-      final request = http.Request(
-        'POST',
-        Uri.parse('$_baseUrl/chat/stream'),
-      );
+    _logRequest('POST', '/chat/stream', corrId);
 
-      request.headers.addAll(headers);
-      request.body = jsonEncode({
-        'message': message,
-        if (sessionId != null) 'session_id': sessionId,
-      });
+    final request = http.Request(
+      'POST',
+      Uri.parse('$_baseUrl/chat/stream'),
+    );
 
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 60),
-        onTimeout: () {
-          throw Exception('Request timed out');
-        },
-      );
+    request.headers.addAll(headers);
+    request.body = jsonEncode({
+      'message': message,
+      if (sessionId != null) 'session_id': sessionId,
+    });
 
-      if (streamedResponse.statusCode == 200) {
-        await _processStreamResponse(
-          streamedResponse,
-          onToken: onToken,
-          onComplete: onComplete,
-          onError: onError,
-        );
-      } else {
-        final errorBody = await streamedResponse.stream.bytesToString();
-        onError('Request failed: $errorBody');
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error streaming message: $e');
-      onError(e.toString());
+    final streamedResponse = await request.send();
+
+    if (streamedResponse.statusCode != 200) {
+      final errorBody = await streamedResponse.stream.bytesToString();
+      final error = jsonDecode(errorBody)['error'] ?? 'Stream failed';
+      _logResponse(streamedResponse.statusCode, corrId, error: error);
+      throw Exception(error);
     }
-  }
 
-  /// Process Server-Sent Events stream from backend
-  static Future<void> _processStreamResponse(
-      http.StreamedResponse response, {
-        required Function(String token) onToken,
-        required Function() onComplete,
-        required Function(String error) onError,
-      }) async {
-    try {
-      final buffer = StringBuffer();
-      bool hasReceivedData = false;
+    _logResponse(streamedResponse.statusCode, corrId);
 
-      await for (final chunk in response.stream.transform(utf8.decoder)) {
-        buffer.write(chunk);
-        final lines = buffer.toString().split('\n');
-
-        for (int i = 0; i < lines.length - 1; i++) {
-          final line = lines[i].trim();
-          if (line.isEmpty || !line.startsWith('data: ')) continue;
-
-          final jsonStr = line.substring(6); // Remove 'data: ' prefix
-
-          try {
-            final data = jsonDecode(jsonStr);
-
-            if (data['event'] == 'end') {
-              onComplete();
-              return;
-            }
-
-            if (data['event'] == 'error') {
-              onError(data['data']?['message'] ?? 'Unknown error');
-              return;
-            }
-
-            if (data['event'] == 'token') {
-              final token = data['data']?['chunk'] ?? '';
-              if (token.isNotEmpty) {
-                hasReceivedData = true;
-                onToken(token);
-              }
-            }
-          } catch (e) {
-            debugPrint('[BackendApiService] Error parsing SSE: $e');
-          }
-        }
-
-        buffer.clear();
-        buffer.write(lines.last);
-      }
-
-      if (hasReceivedData) {
-        onComplete();
-      }
-    } catch (e) {
-      debugPrint('[BackendApiService] Error processing stream: $e');
-      onError(e.toString());
-    }
+    // Parse SSE stream
+    return streamedResponse.stream
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .where((line) => line.startsWith('data: '))
+        .map((line) {
+      final jsonStr = line.substring(6); // Remove 'data: ' prefix
+      final data = jsonDecode(jsonStr);
+      return ChatChunk.fromJson(data);
+    });
   }
 }
 
@@ -247,7 +213,6 @@ class FinovateApiService {
 // DATA MODELS
 // ========================================
 
-/// Chat session model matching backend response
 class ChatSession {
   final String id;
   final String userAuthId;
@@ -273,21 +238,29 @@ class ChatSession {
       userAuthId: json['user_auth_id'],
       sessionId: json['session_id'],
       title: json['title'],
-      messageCount: json['message_count'] ?? 0,
+      messageCount: json['message_count'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
   }
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_auth_id': userAuthId,
-      'session_id': sessionId,
-      'title': title,
-      'message_count': messageCount,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
+class ChatChunk {
+  final String event;
+  final Map<String, dynamic>? data;
+
+  ChatChunk({
+    required this.event,
+    this.data,
+  });
+
+  factory ChatChunk.fromJson(Map<String, dynamic> json) {
+    return ChatChunk(
+      event: json['event'],
+      data: json['data'],
+    );
   }
+
+  String? get chunk => data?['chunk'];
+  String? get message => data?['message'];
 }

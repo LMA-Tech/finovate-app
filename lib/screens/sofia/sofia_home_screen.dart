@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/widgets/app_background.dart';
-import '../../screens/sofia/widgets/welcome_section.dart';
-import '../../screens/sofia/widgets/chat_input.dart';
-import '../../screens/sofia/sofia_controller.dart';
+import 'widgets/welcome_section.dart';
+import 'widgets/chat_input.dart';
+import 'sofia_home_controller.dart';  // ✅ Import home controller
 import '../../services/activity_tracker.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/routes.dart';
@@ -13,54 +13,34 @@ import '../../utils/constants/sizes.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// SofIA Home Screen - Welcome and dashboard interface
-///
-/// This screen provides the main entry point for SofIA interactions.
-/// Features personalized greeting, quick action suggestions, and navigation
-/// to start new conversations or view recent chat history.
 class SofiaHomeScreen extends StatelessWidget {
   const SofiaHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controllers
     final activityTracker = Get.find<ActivityTracker>();
-    final sofiaController = Get.put(SofiaController());
+    final controller = Get.put(SofiaHomeController());  // ✅ Use home controller
 
     return GestureDetector(
       onTap: () => activityTracker.recordActivity(),
       child: AppBackground(
         child: Scaffold(
-          // Clean minimal app bar for home screen
-          appBar: _buildHomeAppBar(),
-
+          appBar: buildHomeAppBar(),
           body: Column(
             children: [
-              // Main welcome content using existing widget
               Expanded(
                 child: WelcomeSection(
-                  userName: sofiaController.userName.value,
-                  onSuggestionTap: (suggestion) => _navigateToChat(suggestion, sofiaController),
-                  isLoading: sofiaController.isLoading.value,
+                  userName: controller.userName.value,
+                  onSuggestionTap: (suggestion) => navigateToChat(),
+                  isLoading: controller.isLoading.value,
                   useCompactLayout: false,
                 ),
               ),
-
-              // Recent conversations section using widget (TBA)
-              // Obx(() => sofiaController.hasMessages
-              //     ? ChatHistoryWidget(
-              //   controller: sofiaController,
-              //   onConversationTap: () => _openRecentConversation(sofiaController),
-              //   onViewAllTap: () => _viewAllConversations(sofiaController),
-              // )
-              //     : const SizedBox.shrink(),
-              // ),
-
-              // Chat input using existing widget
               Obx(() => ChatInput(
-                onSendMessage: (message) => _navigateToChat(message, sofiaController),
+                onSendMessage: (message) => navigateToChat(),
                 hintText: FinTexts.sofiaChatInputHint,
-                isEnabled: !sofiaController.isLoading.value,
-                isLoading: sofiaController.isLoading.value,
+                isEnabled: !controller.isLoading.value,
+                isLoading: controller.isLoading.value,
               )),
             ],
           ),
@@ -69,8 +49,7 @@ class SofiaHomeScreen extends StatelessWidget {
     );
   }
 
-  /// Build clean home screen app bar
-  PreferredSizeWidget _buildHomeAppBar() {
+  PreferredSizeWidget buildHomeAppBar() {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
@@ -78,54 +57,23 @@ class SofiaHomeScreen extends StatelessWidget {
       centerTitle: true,
       leading: IconButton(
         onPressed: () => Get.offAllNamed(AppRoutes.home),
-        icon: const Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-        ),
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
       ),
-      // No title on home screen for clean look
       title: null,
       actions: [
-        // Settings or menu option
         IconButton(
-          onPressed: () => _showHomeOptions(),
-          icon: const Icon(
-            Icons.more_vert,
-            color: Colors.white,
-          ),
+          onPressed: showHomeOptions,
+          icon: const Icon(Icons.more_vert, color: Colors.white),
         ),
       ],
     );
   }
 
-  /// Navigate to chat screen with message
-  void _navigateToChat(String message, SofiaController controller) {
-    Get.toNamed(AppRoutes.sofiaChat, arguments: { // ← USE CONSTANT
-      'initialMessage': message,
-      'controller': controller,
-    });
+  void navigateToChat() {
+    Get.toNamed(AppRoutes.sofiaChat);
   }
 
-  /// Open recent conversation in chat screen
-  void _openRecentConversation(SofiaController controller) {
-    Get.toNamed(AppRoutes.sofiaChat, arguments: { // ← USE CONSTANT
-      'controller': controller,
-      'resumeChat': true,
-    });
-  }
-
-  /// View all conversations (placeholder for future feature)
-  void _viewAllConversations(SofiaController controller) {
-    Get.snackbar(
-      'Em breve',
-      'Histórico completo de conversas estará disponível em breve',
-      backgroundColor: FinColors.primary.withValues(alpha: 0.8),
-      colorText: Colors.white,
-    );
-  }
-
-  /// Show home screen options menu
-  void _showHomeOptions() {
+  void showHomeOptions() {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(FinSizes.defaultSpace),
@@ -138,7 +86,6 @@ class SofiaHomeScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               width: 40,
               height: 4,
@@ -148,8 +95,6 @@ class SofiaHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: FinSizes.lg),
-
-            // Title
             const Text(
               'Opções',
               style: TextStyle(
@@ -159,63 +104,19 @@ class SofiaHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: FinSizes.lg),
-
-            // Settings option
             ListTile(
-              leading: const Icon(
-                Icons.settings_outlined,
-                color: Colors.white,
-              ),
-              title: const Text(
-                'Configurações',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: FinSizes.fontSizeMd,
-                ),
-              ),
+              leading: const Icon(Icons.delete_outline, color: Colors.white),
+              title: const Text('Limpar histórico', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Get.back();
-                // TODO: Navigate to settings
+                Get.snackbar(
+                  'Em breve',
+                  'Função disponível em breve',
+                  backgroundColor: FinColors.primary.withValues(alpha: 0.8),
+                  colorText: Colors.white,
+                );
               },
             ),
-
-            // Help option
-            ListTile(
-              leading: const Icon(
-                Icons.help_outline,
-                color: Colors.white,
-              ),
-              title: const Text(
-                'Ajuda',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: FinSizes.fontSizeMd,
-                ),
-              ),
-              onTap: () {
-                Get.back();
-                // TODO: Navigate to help
-              },
-            ),
-
-            // Close option
-            ListTile(
-              leading: Icon(
-                Icons.close,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-              title: Text(
-                FinTexts.sofiaClose,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: FinSizes.fontSizeMd,
-                ),
-              ),
-              onTap: () => Get.back(),
-            ),
-
-            // Safe area padding
-            SizedBox(height: MediaQuery.of(Get.context!).padding.bottom),
           ],
         ),
       ),
