@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import '../../common/dialogs/app_dialogs.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../utils/constants/colors.dart';
@@ -314,21 +315,17 @@ class ForgotPasswordController extends GetxController {
         debugPrint('✅ Password updated successfully');
       }
 
-      // Don't show snackbar here - let the success screen handle the messaging
-
     } catch (e) {
       if (kDebugMode) {
         debugPrint('❌ Password update failed: $e');
       }
 
       // Show error and don't proceed to next step
-      Get.snackbar(
-        FinTexts.error,
-        e.toString(),
-        backgroundColor: FinColors.error,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 4),
+      await AppDialogs.showError(
+        title: FinTexts.error,
+        message: FinTexts.passwordResetErrorUpdate,
       );
+
 
       // Re-throw to prevent navigation to success screen
       rethrow;

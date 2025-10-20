@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../services/biometric_service.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
+import '../../utils/constants/text_strings.dart';
+import 'app_dialogs.dart';
 
 /// Widget for educating users about biometric authentication and offering setup
 class BiometricEducationDialog extends StatelessWidget {
@@ -129,39 +131,33 @@ class BiometricEducationDialog extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 if (isAvailable) {
-                  // Test biometric authentication
+                  Get.back(result: null);
                   final result = await BiometricService.authenticateWithContext(
                     context: BiometricContext.settings,
-                    customReason: 'Teste sua $biometricType para ativar login rápido',
                   );
 
                   if (result.success) {
                     Get.back(result: true);
                     onBiometricEnabled?.call();
                     Get.snackbar(
-                      'Sucesso!',
+                       FinTexts.dialogSuccessTitle,
                       '$biometricType ativado com sucesso',
                       backgroundColor: FinColors.success,
                       colorText: FinColors.white,
                       duration: const Duration(seconds: 3),
                     );
                   } else {
-                    Get.snackbar(
-                      'Erro',
-                      result.errorMessage ?? 'Falha ao configurar biometria',
-                      backgroundColor: FinColors.error,
-                      colorText: FinColors.white,
-                    );
+                      await AppDialogs.showError(
+                      title: FinTexts.error,
+                      message: result.errorMessage ?? FinTexts.biometricErrorActivation,
+                      );
                   }
                 } else {
                   Get.back(result: false);
-                  // Direct user to settings
-                  Get.snackbar(
-                    'Configuração Necessária',
-                    'Configure a biometria nas configurações do seu dispositivo',
-                    backgroundColor: FinColors.info,
-                    colorText: FinColors.white,
-                    duration: const Duration(seconds: 4),
+                  // Use info dialog for configuration needed
+                  await AppDialogs.showInfo(
+                    title: FinTexts.biometricInfoTitle,
+                    message: FinTexts.biometricErrorNotEnrolled,
                   );
                 }
               },

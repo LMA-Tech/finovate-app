@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../common/dialogs/app_dialogs.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/session_manager.dart';
@@ -287,7 +288,10 @@ class SignupController extends GetxController {
       final email = step1Form.control('email').value;
       final emailExists = await _auth.checkEmailExists(email);
       if (emailExists) {
-        Get.snackbar('Erro', 'Este email já está cadastrado');
+        await AppDialogs.showError(
+          title: FinTexts.signupErrorTitle,
+          message: FinTexts.signupErrorEmailExists,
+        );
         return;
       }
     }
@@ -298,7 +302,10 @@ class SignupController extends GetxController {
       if (cpf != null && cpf.isNotEmpty) {
         final cpfExists = await _auth.checkCpfExists(cpf);
         if (cpfExists) {
-          Get.snackbar('Erro', 'Este CPF já está cadastrado');
+          await AppDialogs.showError(
+            title: FinTexts.signupErrorTitle,
+            message: FinTexts.signupErrorCpfExists,
+          );
           return;
         }
       }
@@ -402,7 +409,7 @@ class SignupController extends GetxController {
 
           // Show success message
           Get.snackbar(
-            'Sucesso!',
+            FinTexts.dialogSuccessTitle,
             selectedVerificationMethod.value == VerificationMethod.email
                 ? 'Email verificado com sucesso!'
                 : 'SMS verificado com sucesso!',
@@ -413,14 +420,23 @@ class SignupController extends GetxController {
 
         } catch (profileError) {
           print('Error creating user profile: $profileError');
-          _showSignUpError('Erro ao criar perfil do usuário');
+          await AppDialogs.showError(
+            title: FinTexts.signupErrorTitle,
+            message: FinTexts.signupErrorProfileCreation,
+          );
         }
       } else {
-        _showSignUpError('Código de verificação inválido');
+        await AppDialogs.showError(
+          title: FinTexts.signupErrorTitle,
+          message: FinTexts.signupErrorVerificationInvalid,
+        );
       }
     } catch (e) {
       print('Verification error: $e');
-      _showSignUpError(e.toString());
+      await AppDialogs.showError(
+        title: FinTexts.signupErrorTitle,
+        message: e.toString(),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -444,7 +460,10 @@ class SignupController extends GetxController {
       startResendTimer();
 
     } catch (e) {
-      _showSignUpError(e.toString());
+      await AppDialogs.showError(
+        title: FinTexts.signupErrorTitle,
+        message: e.toString(),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -537,7 +556,6 @@ class SignupController extends GetxController {
   // ═══════════════════════════════════════════════════════════════════════════════════════
 
   /// Attempt to sign up user with provided information
-  /// Attempt to sign up user with provided information
   Future<void> signUp() async {
     try {
       isLoading.value = true;
@@ -570,7 +588,10 @@ class SignupController extends GetxController {
 
       _handleSignUpResponse(response);
     } catch (e) {
-      _showSignUpError(e.toString());
+      await AppDialogs.showError(
+        title: FinTexts.signupErrorTitle,
+        message: e.toString(),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -629,19 +650,11 @@ class SignupController extends GetxController {
       _animateToPage(4);
       startResendTimer();
     } else {
-      _showSignUpError('Erro ao criar conta');
+      AppDialogs.showError(
+        title: FinTexts.signupErrorTitle,
+        message: FinTexts.signupErrorGeneric,
+      );
     }
-  }
-
-  /// Show signup error message
-  void _showSignUpError(String error) {
-    Get.snackbar(
-      FinTexts.signupErrorTitle,
-      error,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 4),
-    );
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════

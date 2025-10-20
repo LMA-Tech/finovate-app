@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../common/dialogs/app_dialogs.dart';
 import '../utils/constants/colors.dart';
+import '../utils/constants/text_strings.dart';
 
 /// Centralized service for handling all email sending operations
 /// Manages rate limiting, error handling, and user feedback consistently
@@ -125,43 +127,31 @@ class EmailService {
     if (errorString.contains('rate limit') ||
         errorString.contains('too many requests') ||
         errorString.contains('email rate limit exceeded')) {
-
-      // Rate limit error - show user-friendly message
-      _showRateLimitMessage();
-
+      // Rate limit - use info dialog
+      AppDialogs.showInfo(
+        title: FinTexts.emailErrorRateLimitTitle,
+        message: FinTexts.emailErrorRateLimit,
+      );
     } else if (errorString.contains('invalid email') ||
         errorString.contains('email not found')) {
-
-      // Invalid email - show validation message
-      Get.snackbar(
-        'Email inválido',
-        'Verifique se o email está correto e tente novamente',
-        backgroundColor: FinColors.warning,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 4),
+      // Invalid email - use error dialog
+      AppDialogs.showError(
+        title: FinTexts.error,
+        message: FinTexts.emailErrorInvalid,
       );
-
     } else if (errorString.contains('network') ||
         errorString.contains('connection') ||
         errorString.contains('timeout')) {
-
-      // Network error - show connection message
-      Get.snackbar(
-        'Erro de conexão',
-        'Verifique sua internet e tente novamente',
-        backgroundColor: FinColors.warning,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 4),
+      // Network error - use error dialog
+      AppDialogs.showError(
+        title: FinTexts.loginErrorNetworkTitle,
+        message: FinTexts.emailErrorNetwork,
       );
-
     } else {
-      // Generic error - show generic message
-      Get.snackbar(
-        'Erro temporário',
-        'Tente novamente em alguns instantes',
-        backgroundColor: FinColors.warning,
-        colorText: FinColors.white,
-        duration: const Duration(seconds: 4),
+      // Generic error
+      AppDialogs.showError(
+        title: FinTexts.error,
+        message: FinTexts.emailErrorGeneric,
       );
     }
   }

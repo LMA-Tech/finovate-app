@@ -10,6 +10,19 @@ class FinTexts {
   static const String error = "Erro";
   static const String resendCode = "Caso não tenha recebido o código, você poderá solicitá-lo novamente em ";
 
+  // -- Dialog Messages
+  static const String dialogErrorTitle = "Erro";
+  static const String dialogSuccessTitle = "Sucesso";
+  static const String dialogConfirmTitle = "Confirmação";
+  static const String dialogInfoTitle = "Informação";
+  static const String dialogDismiss = "OK";
+  static const String dialogCancel = "Cancelar";
+  static const String dialogConfirm = "Confirmar";
+  static const String dialogRetry = "Tentar Novamente";
+  static const String dialogUnderstood = "Entendi";
+  static const String dialogLoadingMessage = "Processando...";
+
+
   // -- Onboarding Texts
   static const String onboardingTitle1 = "Acompanhe seus investimentos";
   static const String onboardingTitle2 = "Acompanhe\nindicadores econômicos";
@@ -39,6 +52,11 @@ class FinTexts {
   static const String loginSuccessMessage = "Bem-vindo de volta!";
   static const String loginErrorTitle = "Erro no Login";
   static const String emailHint = "exemplo@email.com";
+  // -- Login Error Messages
+  static const String loginErrorInvalidCredentials = "Email ou senha incorretos. Por favor, verifique suas credenciais e tente novamente.";
+  static const String loginErrorNetworkTitle = "Sem Conexão";
+  static const String loginErrorNetwork = "Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.";
+  static const String loginErrorUnknown = "Ocorreu um erro inesperado. Por favor, tente novamente.";
   //Biometric enrollment
   static const String notNow = "Agora não";
   static const String activate = "Ativar";
@@ -50,6 +68,8 @@ class FinTexts {
   static const String resetPasswordEmailError = "Digite um email válido primeiro";
   static const String resetPasswordEmailSentTitle = "Email Enviado";
   static const String resetPasswordEmailSentMessage = "Instruções de redefinição de senha enviadas para seu email";
+  // Password Reset Error Messages
+  static const String passwordResetErrorUpdate = "Não foi possível atualizar sua senha. Por favor, tente novamente.";
   // Forgot Password Screen
   static const String forgotPasswordTitle = "Esqueceu a senha?";
   static const String forgotPasswordSubtitle = "Digite seu email para redefinir sua senha";
@@ -58,7 +78,6 @@ class FinTexts {
   static const String forgotPasswordCheckEmailTitle = "Verifique seu email";
   static const String forgotPasswordContinueButton = "Continuar";
   static const String forgotPasswordResendCode = "Reenviar código";
-
 
   // -- Sign Up Screen 1
   static const String signupTitle = "Vamos criar a sua conta";
@@ -118,6 +137,20 @@ class FinTexts {
   static const String signupSuccessMessage = "Conta criada com sucesso!";
   static const String signupErrorTitle = "Erro no Cadastro";
 
+  // Signup Error Messages
+  static const String signupErrorEmailExists = "Este email já está cadastrado. Por favor, use outro email ou faça login.";
+  static const String signupErrorCpfExists = "Este CPF já está cadastrado. Por favor, verifique seus dados.";
+  static const String signupErrorVerificationInvalid = "Código de verificação inválido. Por favor, verifique o código e tente novamente.";
+  static const String signupErrorProfileCreation = "Erro ao criar perfil do usuário. Por favor, tente novamente.";
+  static const String signupErrorGeneric = "Erro ao criar conta. Por favor, tente novamente.";
+
+  // -- Email Service Error Messages
+  static const String emailErrorInvalid = "Email inválido. Verifique se o email está correto e tente novamente.";
+  static const String emailErrorNetwork = "Erro de conexão. Verifique sua internet e tente novamente.";
+  static const String emailErrorRateLimitTitle = "Aguarde um momento";
+  static const String emailErrorRateLimit = "Para sua segurança, aguarde alguns minutos antes de solicitar outro email.";
+  static const String emailErrorGeneric = "Erro temporário. Tente novamente em alguns instantes.";
+
   // -- Biometric Authentication
   static const String biometricPromptTitle = "Desbloqueie o Finovate";
   static const String biometricPromptMessage = "Por favor, autentique-se para continuar";
@@ -125,13 +158,17 @@ class FinTexts {
   static const String biometricPromptSignOut = "Sair";
   static const String biometricAuthReason = "Desbloqueie o Finovate";
 
+  // -- Biometric Error Messages
+  static const String biometricErrorActivation = "Não foi possível ativar a biometria. Por favor, tente novamente.";
+  static const String biometricErrorNotEnrolled = "Configure a biometria nas configurações do seu dispositivo para continuar.";
+  static const String biometricInfoTitle = "Configuração Necessária";
+
   // -- Session Timeout Messages
   static const String sessionExpiredTitle = "Sessão Expirada";
   static const String sessionExpiredMessage = "Sua sessão expirou por inatividade";
   static const String sessionTimeoutWarning = "Sua sessão expirará em breve";
   static const String extendSession = "Estender Sessão";
   static const String sessionExtended = "Sessão estendida com sucesso";
-
 
   // -- Authentication Headings
   static const String forgetPasswordSubTitle = "Don’t worry sometimes people can forget too, enter your email and we will send you a password reset link.";
