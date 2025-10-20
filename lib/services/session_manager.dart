@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+import '../controllers/bottom_navigation_controller.dart';
 import 'activity_tracker.dart';
 import 'biometric_service.dart';
 
@@ -147,6 +148,15 @@ class SessionManager extends GetxController {
       if (kDebugMode) {
         debugPrint('✅ Navegando para home: Email confirmado e fora do fluxo de cadastro');
         debugPrint('🔒 Autenticação biométrica inicializada');
+      }
+
+      try {
+        final bottomNav = Get.find<BottomNavigationController>();
+        bottomNav.resetToHome();
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('⚠️ Could not reset bottom nav (controller not initialized yet)');
+        }
       }
 
       Get.offAllNamed('/home');

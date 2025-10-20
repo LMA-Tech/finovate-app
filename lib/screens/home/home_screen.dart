@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../common/widgets/app_background.dart';
 import '../../common/widgets/fin_bottom_navigation.dart';
+import '../../controllers/bottom_navigation_controller.dart';
 import '../../services/activity_tracker.dart';
 import '../../services/session_manager.dart';
+import '../../utils/constants/routes.dart';
 
 part 'home_controller.dart';
 
@@ -26,6 +28,17 @@ class _HomeScreen extends HomeController {
   Widget build(BuildContext context) {
     final sessionManager = Get.find<SessionManager>();
     final activityTracker = Get.find<ActivityTracker>();
+
+    // Sync bottom nav tab when home screen appears
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<BottomNavigationController>()) {
+        final bottomNav = Get.find<BottomNavigationController>();
+        // Only sync if we're actually on home route
+        if (Get.currentRoute == AppRoutes.home) {
+          bottomNav.syncWithCurrentRoute();
+        }
+      }
+    });
 
     return GestureDetector(
       onTap: () => activityTracker.recordActivity(),

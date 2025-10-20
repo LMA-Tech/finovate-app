@@ -6,6 +6,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../common/dialogs/app_dialogs.dart';
+import '../../controllers/bottom_navigation_controller.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/session_manager.dart';
@@ -404,6 +405,12 @@ class SignupController extends GetxController {
           // Clear signup flag
           Get.find<SessionManager>().isInSignupFlow.value = false;
 
+          try {
+            final bottomNav = Get.find<BottomNavigationController>();
+            bottomNav.resetToHome();
+          } catch (e) {
+            print('⚠️ Could not reset bottom nav: $e');
+          }
           // SUCCESS: Navigate to home
           Get.offAllNamed(AppRoutes.home);
 
