@@ -9,13 +9,14 @@ import '../../../utils/helpers/helper_functions.dart';
 import '../signup_controller.dart';
 import 'signup_continue_button.dart';
 
-class SignupStep6 extends StatelessWidget {
-  const SignupStep6({super.key});
+/// Step 7: Questionnaire Introduction
+/// Exact copy of Step 6 with only image and text changed
+class SignupStep7 extends StatelessWidget {
+  const SignupStep7({super.key});
 
   @override
   Widget build(BuildContext context) {
     final signupController = Get.find<SignupController>();
-    final firstName = signupController.step2Form.control('firstName').value ?? 'Usuário';
 
     return Scaffold(
       body: SafeArea(
@@ -50,20 +51,20 @@ class SignupStep6 extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Success image
+                    // Questionnaire intro image (ONLY CHANGE FROM STEP 6)
                     SvgPicture.asset(
-                      FinImages.trophySuccess,
+                      FinImages.questionnaireStart,
                       height: FinHelperFunctions.screenHeight() * 0.35,
                       fit: BoxFit.contain,
                     ),
                     const SizedBox(height: FinSizes.spaceBtwSections),
 
-                    // Success message
-                    SizedBox(
+                    // Title (ONLY TEXT CHANGED)
+                    const SizedBox(
                       width: double.infinity,
                       child: Text(
-                        'Conta criada com sucesso, $firstName!',
-                        style: const TextStyle(
+                        FinTexts.questionnaireIntroTitle,
+                        style: TextStyle(
                           fontSize: FinSizes.fontSizeXXLg,
                           fontWeight: FontWeight.w600,
                           height: 1.33,
@@ -75,9 +76,9 @@ class SignupStep6 extends StatelessWidget {
                     ),
                     const SizedBox(height: FinSizes.spaceBtwItems),
 
-                    // Subtitle message
+                    // Subtitle (ONLY TEXT CHANGED)
                     const Text(
-                      FinTexts.signupFinalSubtitle,
+                      FinTexts.questionnaireIntroSubtitle,
                       style: TextStyle(
                         color: Color(0xFFDFDFE0),
                         fontSize: FinSizes.fontSizeLg,
@@ -93,7 +94,7 @@ class SignupStep6 extends StatelessWidget {
 
               const SizedBox(height: FinSizes.spaceBtwItems),
 
-              // Reusable button (no arrow for success screen)
+              // Reusable button (no arrow for intro screen)
               Column(
                 children: [
                   const SignupContinueButton(showArrow: false),

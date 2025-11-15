@@ -79,6 +79,10 @@ class FinTexts {
   static const String forgotPasswordContinueButton = "Continuar";
   static const String forgotPasswordResendCode = "Reenviar código";
 
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// SIGN UP SCREENS
+// Text constants for the sign up flow
+// ═══════════════════════════════════════════════════════════════════════════════════════
   // -- Sign Up Screen 1
   static const String signupTitle = "Vamos criar a sua conta";
   static const String email = "Email";
@@ -112,6 +116,61 @@ class FinTexts {
   static const String verificationCode = "verificationCode";
   static const String resendEmail = "Resend Email";
   static const String resendEmailIn = "Resend email in";
+
+// ═══════════════════════════════════════════════════════════════════════════════════════
+// ONBOARDING QUESTIONNAIRE
+// Text constants for the post-signup questionnaire flow
+// ═══════════════════════════════════════════════════════════════════════════════════════
+
+  // Intro Screen (Step 6)
+  static const String questionnaireIntroTitle = 'Queremos te conhecer!';
+  static const String questionnaireIntroSubtitle =
+      'Compartilhe suas preferências de investimento para que possamos oferecer recomendações personalizadas e análises detalhadas para você!';
+  static const String questionnaireIntroButton = 'Ok, vamos!';
+
+  // Question 1: Wealth Range
+  static const String question1Title = 'Qual é o valor aproximado do seu patrimônio atualmente?';
+  static const String question1Option1 = 'Menos de R\$ 50.000';
+  static const String question1Option2 = 'De R\$ 50.001 a meio milhão de reais';
+  static const String question1Option3 = 'De meio milhão a um milhão de reais';
+  static const String question1Option4 = 'Acima de um milhão de reais';
+  static const String question1Option5 = 'Prefiro não responder';
+
+  // Question 2: Investment Knowledge
+  static const String question2Title = 'Como você avalia seu conhecimento em investimentos e finanças?';
+  static const String question2Option1 = 'Ainda estou começando e tenho pouca experiência';
+  static const String question2Option2 = 'Tenho algum conhecimento e já adquiri um pouco de experiência';
+  static const String question2Option3 = 'Entendo bem do assunto e tenho experiência sólida';
+  static const String question2Option4 = 'Tenho conhecimento avançado e ampla experiência';
+
+  // Question 3: Decision Style
+  static const String question3Title = 'A quem ou o que você recorre para tomar suas decisões de investimento?';
+  static const String question3Option1 = 'Consulto amigos e familiares';
+  static const String question3Option2 = 'Pesquiso online, assisto vídeos e utilizo ferramentas financeiras';
+  static const String question3Option3 = 'Consulto um assessor financeiro ou minha corretora';
+  static const String question3Option4 = 'Tomo decisões por conta própria, com base no meu conhecimento e experiência';
+
+  // Question 4: Risk Profile
+  static const String question4Title = 'Qual é o seu perfil de risco?';
+  static const String question4Subtitle =
+      'O perfil de risco reflete sua disposição para assumir riscos em investimentos, equilibrando a possibilidade de perder com os potenciais ganhos.';
+  static const String question4Option1 = 'Prefiro segurança e estabilidade';
+  static const String question4Option2 = 'Busco um equilíbrio entre segurança e crescimento';
+  static const String question4Option3 = 'Estou disposto a assumir maiores riscos em busca de altos retornos';
+
+  // Final Welcome Screen
+  static const String questionnaireWelcomeTitle = 'Seja bem-vindo à Finovate, {NAME}!';
+  static const String questionnaireWelcomeSubtitle =
+      'Agora é o momento de dar o primeiro passo para investimentos mais inteligentes e alinhados aos seus objetivos.';
+  static const String questionnaireWelcomeButton = 'Tudo certo!';
+
+  // Navigation buttons
+  static const String questionnaireNextButton = 'Próxima pergunta';
+  static const String questionnaireFinalizeButton = 'Finalizar';
+
+  // Error messages
+  static const String questionnaireErrorSubmit = 'Erro ao enviar questionário. Tente novamente.';
+  static const String questionnaireErrorIncomplete = 'Por favor, selecione uma opção para continuar.';
 
   // -- Sign Up Final Screen
   static const String signupFinalSubtitle = "Se você trocar seu número ou email no futuro, ajudaremos você a verificar sua conta novamente.";

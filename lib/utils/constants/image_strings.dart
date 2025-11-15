@@ -27,6 +27,7 @@ class FinImages {
 
   // -- Signup Images
   static const String trophySuccess = "assets/images/signup/trophy_success.svg";
+  static const String questionnaireStart = "assets/images/signup/questionnaire_start.svg";
 
   // -- Bottom Navigation Icons
   static const String bottomNavHome = "assets/icons/bottom_nav/home_icon.svg";

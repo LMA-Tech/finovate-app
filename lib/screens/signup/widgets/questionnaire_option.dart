@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+
+import '../../../utils/constants/sizes.dart';
+
+/// Radio-button style option for questionnaire questions
+///
+/// Displays text with a selection indicator (circle) on the right
+/// Changes appearance when selected
+class QuestionnaireOption extends StatelessWidget {
+  /// The option text to display
+  final String text;
+
+  /// Whether this option is currently selected
+  final bool isSelected;
+
+  /// Callback when option is tapped
+  final VoidCallback onTap;
+
+  const QuestionnaireOption({
+    super.key,
+    required this.text,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF2D3245) // Selected
+              : const Color(0xFF2D3245), // Unselected
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF1B6FFF) // Selected: Blue border
+                : const Color(0xFF3D3E42), // Unselected: Gray border
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Option Text
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: isSelected
+                      ? Colors.white // Selected: White text
+                      : const Color(0xFFDFDFE0), // Unselected: Light gray
+                  fontSize: FinSizes.fontSizeMd,
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                  height: 1.50,
+                  letterSpacing: -0.16,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // Selection Indicator (Radio Button)
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF1B6FFF) // Selected: Blue
+                      : const Color(0xFF6B6C70), // Unselected: Gray
+                  width: 2,
+                ),
+                color: Colors.transparent,
+              ),
+              child: isSelected
+                  ? Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1B6FFF), // Blue dot
+                  ),
+                ),
+              )
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

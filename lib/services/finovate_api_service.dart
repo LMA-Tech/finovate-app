@@ -71,6 +71,46 @@ class FinovateApiService {
     }
   }
 
+// ========================================
+// ONBOARDING ENDPOINTS
+// ========================================
+
+  /// Submit onboarding questionnaire
+  static Future<void> submitQuestionnaire({
+    required String wealthRange,
+    required String investmentKnowledge,
+    required String decisionStyle,
+    required String riskProfile,
+    String? correlationId,
+  }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
+
+    _logRequest('POST', '/onboarding/questionnaire', corrId);
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/onboarding/questionnaire'),
+      headers: headers,
+      body: jsonEncode({
+        'wealth_range': wealthRange,
+        'investment_knowledge': investmentKnowledge,
+        'decision_style': decisionStyle,
+        'risk_profile': riskProfile,
+      }),
+    );
+
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+
+    if (response.statusCode == 200) {
+      _logResponse(response.statusCode, responseCorrId);
+    } else {
+      final errorBody = jsonDecode(response.body);
+      final errorMessage = errorBody['error'] ?? 'Failed to submit questionnaire';
+      _logResponse(response.statusCode, responseCorrId, error: errorMessage);
+      throw Exception(errorMessage);
+    }
+  }
+
   // ========================================
   // CHAT ENDPOINTS
   // ========================================

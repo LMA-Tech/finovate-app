@@ -6,6 +6,7 @@ import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../signup_controller.dart';
+import 'signup_continue_button.dart';
 
 class SignupStep5 extends StatelessWidget {
   const SignupStep5({super.key});
@@ -19,7 +20,7 @@ class SignupStep5 extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title - full width up to progress bars
+          // Title
           const Text(
             'Digite seu código de verificação',
             style: TextStyle(
@@ -32,13 +33,13 @@ class SignupStep5 extends StatelessWidget {
           ),
           const SizedBox(height: FinSizes.spaceBtwSections),
 
-          // Subtitle with bold text - full width
+          // Subtitle with bold text
           Obx(() => SizedBox(
-            width: double.infinity, // Force full width
+            width: double.infinity,
             child: RichText(
               text: TextSpan(
                 style: const TextStyle(
-                  color: Color(0xFFDFDFE0), // Neutral-gray-200
+                  color: Color(0xFFDFDFE0),
                   fontSize: FinSizes.fontSizeSm,
                   fontWeight: FontWeight.w400,
                   height: 1.50,
@@ -132,7 +133,7 @@ class SignupStep5 extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: const TextStyle(
-                  color: Color(0xFFDFDFE0), // Regular text color
+                  color: Color(0xFFDFDFE0),
                   fontSize: FinSizes.fontSizeSm,
                   fontWeight: FontWeight.w400,
                   height: 1.29,
@@ -145,7 +146,7 @@ class SignupStep5 extends StatelessWidget {
                     text: controller.formattedTimer,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBADBC1), // Only the timer numbers in green
+                      color: Color(0xFFBADBC1),
                     ),
                   ),
                 ],
@@ -158,10 +159,7 @@ class SignupStep5 extends StatelessWidget {
           Center(
             child: Obx(() => controller.canResendCode.value
                 ? TextButton(
-              onPressed: () {
-                // Resend code logic
-                controller.resendCode();
-              },
+              onPressed: () => controller.resendCode(),
               child: const Text(
                 'Reenviar código',
                 style: TextStyle(
@@ -177,52 +175,11 @@ class SignupStep5 extends StatelessWidget {
           // Spacer to push button to bottom
           const Spacer(),
 
-          // Verify button
-          Obx(() => Container(
-            width: double.infinity,
-            height: 48,
-            decoration: ShapeDecoration(
-              color: controller.verificationCode.value.length == 6 && !controller.isLoading.value
-                  ? const Color(0xFF1B6FFF)
-                  : const Color(0xFF1B6FFF).withOpacity(0.4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: controller.verificationCode.value.length == 6 && !controller.isLoading.value
-                    ? () => controller.verifyCode()
-                    : null,
-                borderRadius: BorderRadius.circular(6),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Center(
-                    child: controller.isLoading.value
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                        : const Text(
-                      'Verificar código',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: FinColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )),
+          // Reusable button - calls controller.nextStep() which triggers verifyCode()
+          const SignupContinueButton(
+            showArrow: false,
+            customText: 'Verificar código',
+          ),
 
           // Bottom padding
           const SizedBox(height: FinSizes.spaceBtwSections),
