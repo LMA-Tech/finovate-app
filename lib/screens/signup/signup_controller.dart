@@ -214,7 +214,6 @@ class SignupController extends GetxController {
     if (currentStep.value == 5 || currentStep.value == 6) {
       return; // Do nothing - user cannot go back after account creation
     }
-
     if (currentStep.value > 0) {
       previousStep();
     } else {

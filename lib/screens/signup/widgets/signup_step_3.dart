@@ -110,7 +110,7 @@ class SignupStep3 extends StatelessWidget {
                         CustomTextFieldReactive(
                           formControlName: 'phone',
                           label: FinTexts.phoneNo,
-                          hintText: '+55 (11) 99999-9999',
+                          hintText: '(11) 99999-9999',
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.done,
                           inputFormatters: [controller.intelligentPhoneFormatter],

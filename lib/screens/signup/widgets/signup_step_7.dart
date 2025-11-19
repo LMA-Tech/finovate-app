@@ -76,7 +76,7 @@ class SignupStep7 extends StatelessWidget {
                     ),
                     const SizedBox(height: FinSizes.spaceBtwItems),
 
-                    // Subtitle (ONLY TEXT CHANGED)
+                    // Subtitle
                     const Text(
                       FinTexts.questionnaireIntroSubtitle,
                       style: TextStyle(
@@ -94,7 +94,7 @@ class SignupStep7 extends StatelessWidget {
 
               const SizedBox(height: FinSizes.spaceBtwItems),
 
-              // Reusable button (no arrow for intro screen)
+              // Reusable button (no arrow)
               Column(
                 children: [
                   const SignupContinueButton(showArrow: false),

@@ -63,7 +63,7 @@ class SignupStep2 extends StatelessWidget {
                         CustomTextFieldReactive(
                           formControlName: 'firstName',
                           label: FinTexts.firstName,
-                          hintText: 'Ariel',
+                          hintText: 'Maria',
                           keyboardType: TextInputType.name,
                           textInputAction: TextInputAction.next,
                           validationMessages: {
@@ -79,7 +79,7 @@ class SignupStep2 extends StatelessWidget {
                         CustomTextFieldReactive(
                           formControlName: 'lastName',
                           label: FinTexts.lastName,
-                          hintText: 'Sousa de Moraes',
+                          hintText: 'Clara',
                           keyboardType: TextInputType.name,
                           textInputAction: TextInputAction.done,
                           validationMessages: {
