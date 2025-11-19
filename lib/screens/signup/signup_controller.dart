@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../common/dialogs/app_dialogs.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
+import '../../services/finovate_api_service.dart';
 import '../../services/session_manager.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/text_strings.dart';
@@ -66,6 +67,13 @@ class SignupController extends GetxController {
   final RxString verificationCode = ''.obs;
   final RxInt resendTimer = 300.obs; // 5 minutes
   final RxBool canResendCode = false.obs;
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // QUESTIONNAIRE STATE (Steps 7-11)
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Stores questionnaire answers: {questionNumber: displayText}
+  final RxMap<int, String> questionnaireAnswers = <int, String>{}.obs;
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // PHONE FORMATTING
@@ -166,6 +174,7 @@ class SignupController extends GetxController {
     step1Form.statusChanged.listen((_) => _updateCanProceed());
     step2Form.statusChanged.listen((_) => _updateCanProceed());
     step3Form.statusChanged.listen((_) => _updateCanProceed());
+    ever(questionnaireAnswers, (_) => _updateCanProceed());
   }
 
   void _updateCanProceed() {
@@ -176,9 +185,25 @@ class SignupController extends GetxController {
   // UI HELPERS
   // ═══════════════════════════════════════════════════════════════════════════════════════
 
-  /// Show progress indicator on steps 1-4 only
-  bool shouldShowProgressIndicator() =>
-      currentStep.value >= 1 && currentStep.value <= 4;
+  /// Show progress indicator on steps 1-4 (signup flow) or 7-10 (questionnaire)
+  bool shouldShowProgressIndicator() {
+    // Show on signup steps 1-4
+    if (currentStep.value >= 1 && currentStep.value <= 4) return true;
+
+    // Show on questionnaire steps 7-10
+    if (currentStep.value >= 7 && currentStep.value <= 10) return true;
+
+    return false;
+  }
+
+  /// Check if we're in questionnaire mode (for progress indicator styling)
+  bool get isQuestionnaireMode => currentStep.value >= 7 && currentStep.value <= 10;
+
+  /// Get current questionnaire progress (1-4)
+  int get questionnaireProgress {
+    if (currentStep.value < 7) return 0;
+    return currentStep.value - 6; // Step 7 = Q1, Step 8 = Q2, etc.
+  }
 
   /// Get button text for current step
   String getButtonText() {
@@ -312,6 +337,15 @@ class SignupController extends GetxController {
       case 5:
       case 6:
         return true; // Success and intro screens
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      // Questionnaire questions - must have answer for current question
+        final questionNumber = currentStep.value - 6; // Map step 7→Q1, 8→Q2, etc.
+        return questionnaireAnswers.containsKey(questionNumber);
+      case 11:
+        return allQuestionsAnswered; // Final screen - all questions must be answered
       default:
         return false;
     }
@@ -333,6 +367,15 @@ class SignupController extends GetxController {
       case 5:
       case 6:
         return true; // Success and intro screens
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      // Questionnaire questions - must have answer for current question
+        final questionNumber = currentStep.value - 6; // Map step 7→Q1, 8→Q2, etc.
+        return questionnaireAnswers.containsKey(questionNumber);
+      case 11:
+        return allQuestionsAnswered; // Final screen - all questions must be answered
       default:
         return false;
     }
@@ -644,23 +687,114 @@ class SignupController extends GetxController {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
-  // QUESTIONNAIRE (STUBS - Not implemented yet)
-  // These methods exist to prevent compile errors in unused questionnaire widgets
+  // QUESTIONNAIRE METHODS
   // ═══════════════════════════════════════════════════════════════════════════════════════
 
+  /// Select an answer for a questionnaire question
   void selectQuestionnaireAnswer(int questionNumber, String displayText) {
-    // TODO: Implement when adding questionnaire
-    print('Questionnaire answer selected: Q$questionNumber = $displayText');
+    questionnaireAnswers[questionNumber] = displayText;
   }
 
+  /// Get the selected answer for a question (returns null if not answered)
   String? getSelectedAnswer(int questionNumber) {
-    // TODO: Implement when adding questionnaire
-    return null;
+    return questionnaireAnswers[questionNumber];
   }
 
+  /// Check if all questionnaire questions have been answered
+  bool get allQuestionsAnswered {
+    return questionnaireAnswers.length == 4 &&
+        questionnaireAnswers.containsKey(1) &&
+        questionnaireAnswers.containsKey(2) &&
+        questionnaireAnswers.containsKey(3) &&
+        questionnaireAnswers.containsKey(4);
+  }
+
+  /// Map display text to backend enum value
+  String _mapAnswerToBackendEnum(int questionNumber, String displayText) {
+    switch (questionNumber) {
+      case 1: // Wealth Range
+        if (displayText == FinTexts.question1Option1) return 'UNDER_50K';
+        if (displayText == FinTexts.question1Option2) return 'BETWEEN_50K_500K';
+        if (displayText == FinTexts.question1Option3) return 'BETWEEN_500K_1M';
+        if (displayText == FinTexts.question1Option4) return 'OVER_1M';
+        if (displayText == FinTexts.question1Option5) return 'PREFER_NOT_SAY';
+        break;
+
+      case 2: // Investment Knowledge
+        if (displayText == FinTexts.question2Option1) return 'BEGINNER';
+        if (displayText == FinTexts.question2Option2) return 'INTERMEDIATE';
+        if (displayText == FinTexts.question2Option3) return 'ADVANCED';
+        if (displayText == FinTexts.question2Option4) return 'EXPERT';
+        break;
+
+      case 3: // Decision Style
+        if (displayText == FinTexts.question3Option1) return 'CONSULT_FRIENDS_FAMILY';
+        if (displayText == FinTexts.question3Option2) return 'RESEARCH_ONLINE';
+        if (displayText == FinTexts.question3Option3) return 'CONSULT_ADVISOR';
+        if (displayText == FinTexts.question3Option4) return 'INDEPENDENT_DECISION';
+        break;
+
+      case 4: // Risk Profile
+        if (displayText == FinTexts.question4Option1) return 'CONSERVATIVE';
+        if (displayText == FinTexts.question4Option2) return 'MODERATE';
+        if (displayText == FinTexts.question4Option3) return 'AGGRESSIVE';
+        break;
+    }
+
+    throw Exception('Invalid answer mapping: Q$questionNumber = $displayText');
+  }
+
+  /// Submit questionnaire to backend (called from final welcome screen)
   Future<void> submitQuestionnaire() async {
-    // TODO: Implement when adding questionnaire
-    print('Questionnaire submission - not implemented yet');
+    // Validate all questions answered
+    if (!allQuestionsAnswered) {
+      await AppDialogs.showError(
+        title: 'Questionário incompleto',
+        message: 'Por favor, responda todas as perguntas antes de continuar.',
+      );
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+
+      // Map display text to backend enum values
+      final wealthRange = _mapAnswerToBackendEnum(1, questionnaireAnswers[1]!);
+      final investmentKnowledge = _mapAnswerToBackendEnum(2, questionnaireAnswers[2]!);
+      final decisionStyle = _mapAnswerToBackendEnum(3, questionnaireAnswers[3]!);
+      final riskProfile = _mapAnswerToBackendEnum(4, questionnaireAnswers[4]!);
+
+      print('Submitting questionnaire:');
+      print('  Wealth: $wealthRange');
+      print('  Knowledge: $investmentKnowledge');
+      print('  Decision: $decisionStyle');
+      print('  Risk: $riskProfile');
+
+      // Submit to backend
+      await FinovateApiService.submitQuestionnaire(
+        wealthRange: wealthRange,
+        investmentKnowledge: investmentKnowledge,
+        decisionStyle: decisionStyle,
+        riskProfile: riskProfile,
+      );
+
+      print('Questionnaire submitted successfully!');
+
+      // Mark signup flow as complete
+      Get.find<SessionManager>().isInSignupFlow.value = false;
+
+      // Navigate to home
+      Get.offAllNamed('/home');
+
+    } catch (e) {
+      print('Questionnaire submission error: $e');
+      await AppDialogs.showError(
+        title: 'Erro ao enviar',
+        message: 'Não foi possível enviar o questionário. Tente novamente.',
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════

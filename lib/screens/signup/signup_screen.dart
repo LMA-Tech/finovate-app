@@ -120,7 +120,7 @@ class SignupScreen extends StatelessWidget {
       // Conditionally show back button
       leading: Obx(() {
         // Hide on Steps 5 & 6 (success + questionnaire intro)
-        if (controller.currentStep.value == 5 || controller.currentStep.value == 6) {
+        if (controller.currentStep.value == 5 || controller.currentStep.value == 6 || controller.currentStep.value == 11) {
           return const SizedBox.shrink(); // No back button
         }
 

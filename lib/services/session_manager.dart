@@ -93,6 +93,11 @@ class SessionManager extends GetxController {
     currentUser.value = user;
     isAuthenticated.value = user != null;
 
+    // Validate session on startup
+    if (user != null) {
+      validateSession();
+    }
+
     if (kDebugMode) {
       debugPrint('=== SessionManager Inicializado ===');
       debugPrint('Usuário inicial: ${user?.email ?? "Nenhum"}');
@@ -308,6 +313,33 @@ class SessionManager extends GetxController {
   // PUBLIC METHODS
   // Public API for authentication management
   // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Validate current session and refresh if needed
+  Future<void> validateSession() async {
+    try {
+      // Try to get current session
+      final session = _supabase.auth.currentSession;
+
+      if (session != null) {
+        // Try to refresh the session (this will fail if user is deleted)
+        await _supabase.auth.refreshSession();
+
+        if (kDebugMode) {
+          debugPrint('✅ Session validated successfully');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Session validation failed: $e');
+        debugPrint('🔄 Logging out invalid session');
+      }
+
+      // Clear invalid session
+      await _supabase.auth.signOut();
+      currentUser.value = null;
+      isAuthenticated.value = false;
+    }
+  }
 
   /// Signs out the current user
   /// Triggers Supabase sign-out which will cause _handleSignedOut to be called

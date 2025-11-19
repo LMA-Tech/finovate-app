@@ -10,13 +10,11 @@ import '../signup_controller.dart';
 import 'signup_continue_button.dart';
 
 /// Step 7: Questionnaire Introduction
-/// Exact copy of Step 6 with only image and text changed
 class SignupStep7 extends StatelessWidget {
   const SignupStep7({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final signupController = Get.find<SignupController>();
 
     return Scaffold(
       body: SafeArea(
@@ -59,7 +57,7 @@ class SignupStep7 extends StatelessWidget {
                     ),
                     const SizedBox(height: FinSizes.spaceBtwSections),
 
-                    // Title (ONLY TEXT CHANGED)
+                    // Title
                     const SizedBox(
                       width: double.infinity,
                       child: Text(

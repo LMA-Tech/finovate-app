@@ -34,13 +34,11 @@ class QuestionnaireOption extends StatelessWidget {
           vertical: 16,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2D3245) // Selected
-              : const Color(0xFF2D3245), // Unselected
+          color: const Color(0xFF2D3245), // Background color from Figma
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF1B6FFF) // Selected: Blue border
-                : const Color(0xFF3D3E42), // Unselected: Gray border
+                : const Color(0xFFBADBC1), // Unselected: Light mint/teal border from Figma
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -56,9 +54,8 @@ class QuestionnaireOption extends StatelessWidget {
                       ? Colors.white // Selected: White text
                       : const Color(0xFFDFDFE0), // Unselected: Light gray
                   fontSize: FinSizes.fontSizeMd,
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w600,
                   height: 1.50,
-                  letterSpacing: -0.16,
                 ),
               ),
             ),

@@ -9,7 +9,6 @@ import '../../../utils/helpers/helper_functions.dart';
 import '../signup_controller.dart';
 
 /// Final Welcome Screen (Step 11 - After questionnaire completion)
-/// Matches the format of SignupStep6 (success screen) exactly
 /// Button calls submitQuestionnaire() directly to navigate to home
 class SignupStepQuestionnaireFinal extends StatelessWidget {
   const SignupStepQuestionnaireFinal({super.key});
@@ -32,46 +31,36 @@ class SignupStepQuestionnaireFinal extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Small logo at the top (matches Step 6)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SvgPicture.asset(
                     FinImages.tealStripWhite,
-                    width: 40,
-                    height: 40,
+                    height: FinHelperFunctions.screenHeight() * 0.13,
                     fit: BoxFit.contain,
                   ),
                 ],
               ),
 
-              const SizedBox(height: FinSizes.spaceBtwItems),
+              const SizedBox(height: FinSizes.spaceBtwSections),
 
-              // Flexible content section (matches Step 6)
               Expanded(
                 flex: 3,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Plane logo (using dark app logo like in your Figma)
-                    SvgPicture.asset(
-                      FinImages.darkAppLogo,
-                      height: FinHelperFunctions.screenHeight() * 0.35,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: FinSizes.spaceBtwSections),
-
-                    // Welcome title with user's name (matches Step 6 format)
+                    const Spacer(flex: 1),
+                    // Title
                     SizedBox(
                       width: double.infinity,
                       child: Text(
                         FinTexts.questionnaireWelcomeTitle.replaceAll('{NAME}', firstName),
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.start,
                         style: const TextStyle(
-                          fontSize: FinSizes.fontSizeLg + 6, // 24px
+                          fontSize: FinSizes.fontSizeXXLg,
                           fontWeight: FontWeight.w600,
-                          height: 1.33,
+                          height: 1.67,
                           letterSpacing: -0.48,
                           color: Colors.white,
                         ),
@@ -80,29 +69,29 @@ class SignupStepQuestionnaireFinal extends StatelessWidget {
 
                     const SizedBox(height: FinSizes.spaceBtwItems),
 
-                    // Welcome subtitle (matches Step 6 format)
+                    // Subtitle
                     const Text(
                       FinTexts.questionnaireWelcomeSubtitle,
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.start,
                       style: TextStyle(
                         color: Color(0xFFDFDFE0), // Neutral-gray-200
                         fontSize: FinSizes.fontSizeMd,
                         fontWeight: FontWeight.w400,
                         height: 1.50,
-                        letterSpacing: -0.16,
+                        letterSpacing: -0.32,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Bottom button section (matches Step 6)
+              // Button
               Expanded(
                 flex: 1,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Final button - Calls submitQuestionnaire() directly
+                    // Final button - Calls submitQuestionnaire() with loading state
                     Obx(() => Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -128,12 +117,12 @@ class SignupStepQuestionnaireFinal extends StatelessWidget {
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
                                 : const Text(
-                              FinTexts.signupFinalbutton, // "Finalizar Cadastro"
+                              FinTexts.questionnaireWelcomeButton,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,

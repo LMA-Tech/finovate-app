@@ -35,81 +35,82 @@ class SignupStepQuestionnaire extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<SignupController>();
 
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top -
-                kToolbarHeight, // Account for status bar and app bar
-          ),
-        child: IntrinsicHeight(
-          child: Padding(
-              padding: const EdgeInsets.all(FinSizes.defaultSpace),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //Question Title
-                  Text(
-                    questionTitle,
-                    style: const TextStyle(
-                      fontSize: FinSizes.fontSizeLg + 6, // 24px
-                      fontWeight: FontWeight.w600,
-                      height: 1.33,
-                      letterSpacing: -0.48,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  // Subtitle (if needed)
-                  if (questionSubtitle != null) ...[
-                    const SizedBox(height: FinSizes.spaceBtwItems),
-                    Text(
-                      questionSubtitle!,
-                      style: const TextStyle(
-                        color: Color(0xFFDFDFE0), // Neutral-gray-200
-                        fontSize: FinSizes.fontSizeSm,
-                        fontWeight: FontWeight.w400,
-                        height: 1.50,
-                        letterSpacing: -0.16,
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: FinSizes.spaceBtwSections),
-
-                  // Answer Options
-                  Obx(() {
-                    final selectedAnswer = controller.getSelectedAnswer(questionNumber);
-
-                    return Column(
-                      children: options.map((option) {
-                        final isSelected = selectedAnswer == option;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: FinSizes.spaceBtwItems),
-                          child: QuestionnaireOption(
-                            text: option,
-                            isSelected: isSelected,
-                            onTap: () {
-                              controller.selectQuestionnaireAnswer(questionNumber, option);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }),
-
-                  const SizedBox(height: FinSizes.spaceBtwSections),
-
-                  // Continue/Next Button
-                  const SignupContinueButton(),
-
-                  const SizedBox(height: FinSizes.spaceBtwSections),
-                ],
-              ),
+    return Column(
+      children: [
+        // Question Title with reduced horizontal padding
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, FinSizes.defaultSpace, 8, 0),
+          child: Text(
+            questionTitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: FinSizes.fontSizeXLg,
+              fontWeight: FontWeight.w600,
+              height: 1.60,
+              letterSpacing: -0.40,
+              color: Colors.white,
+            ),
           ),
         ),
-      )
+
+        // Subtitle (if needed)
+        if (questionSubtitle != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, FinSizes.spaceBtwItems, 8, 0),
+            child: Text(
+              questionSubtitle!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFFDFDFE0),
+                fontSize: FinSizes.fontSizeSm,
+                fontWeight: FontWeight.w400,
+                height: 1.50,
+                letterSpacing: -0.16,
+              ),
+            ),
+          ),
+
+        const SizedBox(height: 32), // 32px gap as specified
+
+        // Answer Options
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+            child: SingleChildScrollView(
+              child: Obx(() {
+                final selectedAnswer = controller.getSelectedAnswer(questionNumber);
+
+                return Column(
+                  children: options.map((option) {
+                    final isSelected = selectedAnswer == option;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 24), // 24px gap between options
+                      child: QuestionnaireOption(
+                        text: option,
+                        isSelected: isSelected,
+                        onTap: () {
+                          controller.selectQuestionnaireAnswer(questionNumber, option);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                );
+              }),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: FinSizes.spaceBtwSections), // Space above button
+
+        // Button pinned to bottom with horizontal padding only
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+          child: SignupContinueButton(),
+        ),
+
+        const SizedBox(height: FinSizes.spaceBtwSections),
+      ],
     );
   }
 }
