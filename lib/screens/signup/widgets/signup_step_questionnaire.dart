@@ -37,9 +37,9 @@ class SignupStepQuestionnaire extends StatelessWidget {
 
     return Column(
       children: [
-        // Question Title with reduced horizontal padding
+        // Question Title
         Padding(
-          padding: const EdgeInsets.fromLTRB(8, FinSizes.defaultSpace, 8, 0),
+          padding: const EdgeInsets.fromLTRB(8, FinSizes.spaceBtwItems, 8, 0),
           child: Text(
             questionTitle,
             textAlign: TextAlign.center,
@@ -62,20 +62,20 @@ class SignupStepQuestionnaire extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Color(0xFFDFDFE0),
-                fontSize: FinSizes.fontSizeSm,
+                fontSize: FinSizes.fontSizeMd,
                 fontWeight: FontWeight.w400,
                 height: 1.50,
-                letterSpacing: -0.16,
+                letterSpacing: -0.32,
               ),
             ),
           ),
 
-        const SizedBox(height: 32), // 32px gap as specified
+        const SizedBox(height: FinSizes.spaceBtwSections),
 
         // Answer Options
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+            padding: const EdgeInsets.symmetric(horizontal: FinSizes.xl),
             child: SingleChildScrollView(
               child: Obx(() {
                 final selectedAnswer = controller.getSelectedAnswer(questionNumber);
@@ -85,7 +85,7 @@ class SignupStepQuestionnaire extends StatelessWidget {
                     final isSelected = selectedAnswer == option;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 24), // 24px gap between options
+                      padding: const EdgeInsets.only(bottom: FinSizes.lg),
                       child: QuestionnaireOption(
                         text: option,
                         isSelected: isSelected,
@@ -101,7 +101,7 @@ class SignupStepQuestionnaire extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: FinSizes.spaceBtwSections), // Space above button
+        const SizedBox(height: FinSizes.spaceBtwSections),
 
         // Button pinned to bottom with horizontal padding only
         const Padding(

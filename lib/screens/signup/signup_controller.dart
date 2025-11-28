@@ -476,7 +476,7 @@ class SignupController extends GetxController {
       print('Verification error: $e');
       await AppDialogs.showError(
         title: FinTexts.signupErrorTitle,
-        message: e.toString(),
+        message: FinTexts.signupErrorVerificationInvalid,
       );
     } finally {
       isLoading.value = false;

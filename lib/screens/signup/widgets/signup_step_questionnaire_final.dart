@@ -36,7 +36,7 @@ class SignupStepQuestionnaireFinal extends StatelessWidget {
                 children: [
                   SvgPicture.asset(
                     FinImages.tealStripWhite,
-                    height: FinHelperFunctions.screenHeight() * 0.13,
+                    height: FinHelperFunctions.screenHeight() * 0.15,
                     fit: BoxFit.contain,
                   ),
                 ],
