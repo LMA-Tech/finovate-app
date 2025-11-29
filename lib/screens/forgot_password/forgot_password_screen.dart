@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/widgets/app_background.dart';
+import '../../common/widgets/custom_appbar.dart';
 import '../../services/activity_tracker.dart';
 import '../../utils/helpers/helper_functions.dart';
 import 'forgot_password_controller.dart';
@@ -24,11 +25,9 @@ class ForgotPasswordScreen extends StatelessWidget {
       child: AppBackground(
         child: Obx(() => Scaffold(
           resizeToAvoidBottomInset: false,
-          // Always show app bar, but conditionally show back button
           appBar: _buildAppBar(controller, dark, context),
           body: Column(
             children: [
-              // Main content - swiping disabled
               Expanded(
                 child: PageView(
                   controller: controller.pageController,
@@ -50,20 +49,11 @@ class ForgotPasswordScreen extends StatelessWidget {
 
   PreferredSizeWidget _buildAppBar(
       ForgotPasswordController controller, bool dark, BuildContext context) {
-    return AppBar(
-      // Conditionally show back button - hide on success screen (step 4)
-      leading: controller.currentStep.value == 3
-          ? null // No back button on success screen
-          : IconButton(
-        icon: Icon(
-          Icons.chevron_left,
-          color: dark ? Colors.white : Colors.black,
-        ),
-        onPressed: () => controller.handleBackNavigation(context),
-      ),
-      automaticallyImplyLeading: false, // Prevents default back button when leading is null
-      backgroundColor: Colors.transparent,
-      elevation: 0,
+    final hideBackButton = controller.currentStep.value == 3;
+
+    return CustomAppBar(
+      showBackButton: !hideBackButton,
+      onBackPressed: () => controller.handleBackNavigation(context),
     );
   }
 }

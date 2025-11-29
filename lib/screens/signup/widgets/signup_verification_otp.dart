@@ -8,8 +8,8 @@ import '../../../utils/constants/text_strings.dart';
 import '../signup_controller.dart';
 import 'signup_continue_button.dart';
 
-class SignupStep5 extends StatelessWidget {
-  const SignupStep5({super.key});
+class SignupVerificationOtp extends StatelessWidget {
+  const SignupVerificationOtp({super.key});
 
   @override
   Widget build(BuildContext context) {

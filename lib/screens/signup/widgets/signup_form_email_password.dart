@@ -10,8 +10,8 @@ import '../signup_controller.dart';
 import '../widgets/signup_continue_button.dart';
 import 'disclaimers.dart';
 
-class SignupStep1 extends StatelessWidget {
-  const SignupStep1({super.key});
+class SignupFormEmailPassword extends StatelessWidget {
+  const SignupFormEmailPassword({super.key});
 
   @override
   Widget build(BuildContext context) {

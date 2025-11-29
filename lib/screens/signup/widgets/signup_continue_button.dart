@@ -13,10 +13,10 @@ class SignupContinueButton extends StatelessWidget {
   /// Whether to show the arrow icon (default: true for form steps)
   final bool showArrow;
 
-  /// Optional custom text (overrides controller.getButtonText())
+  /// Optional custom text
   final String? customText;
 
-  /// Optional custom onTap (overrides controller.nextStep())
+  /// Optional custom onTap
   final VoidCallback? customOnTap;
 
   const SignupContinueButton({

@@ -10,7 +10,6 @@ import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/finovate_api_service.dart';
 import '../../services/session_manager.dart';
-import '../../utils/constants/colors.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for managing the multi-step signup process
@@ -780,11 +779,9 @@ class SignupController extends GetxController {
 
       print('Questionnaire submitted successfully!');
 
-      // Mark signup flow as complete
-      Get.find<SessionManager>().isInSignupFlow.value = false;
-
-      // Navigate to home
-      Get.offAllNamed('/home');
+      // Navigate to final welcome screen (step 11)
+      // Don't mark signup complete yet - final screen will do that
+      nextStep(); // Moves to Success Screen
 
     } catch (e) {
       print('Questionnaire submission error: $e');

@@ -1,3 +1,4 @@
+import 'package:finovate_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,12 +24,16 @@ class SignupStepQuestionnaire extends StatelessWidget {
   /// List of answer options to display
   final List<String> options;
 
+  /// Whether this is the last question (triggers submission)
+  final bool isLastQuestion;
+
   const SignupStepQuestionnaire({
     super.key,
     required this.questionNumber,
     required this.questionTitle,
     this.questionSubtitle,
     required this.options,
+    this.isLastQuestion = false,
   });
 
   @override
@@ -103,10 +108,15 @@ class SignupStepQuestionnaire extends StatelessWidget {
 
         const SizedBox(height: FinSizes.spaceBtwSections),
 
-        // Button pinned to bottom with horizontal padding only
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
-          child: SignupContinueButton(),
+        // Button pinned to bottom
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+          child: isLastQuestion
+              ? SignupContinueButton(
+            customText: FinTexts.questionnaireFinalizeButton,
+            customOnTap: () => controller.submitQuestionnaire(),
+          )
+              : const SignupContinueButton(),
         ),
 
         const SizedBox(height: FinSizes.spaceBtwSections),
