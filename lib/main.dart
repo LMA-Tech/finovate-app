@@ -71,7 +71,7 @@ class FinovateApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Finovate',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       theme: FinAppTheme.lightTheme,
       darkTheme: FinAppTheme.darkTheme,
 

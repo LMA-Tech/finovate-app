@@ -3,6 +3,7 @@
 import 'package:finovate_app/screens/sofia/sofia_chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../common/widgets/app_background.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
 
@@ -14,9 +15,10 @@ class SofiaChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SofiaChatController());
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF1E2332),
-      appBar: buildAppBar(controller),
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: buildAppBar(controller),
       body: Column(
         children: [
           // Messages list
@@ -30,6 +32,7 @@ class SofiaChatScreen extends StatelessWidget {
           buildMessageInput(controller),
         ],
       ),
+    ),
     );
   }
 
