@@ -526,6 +526,33 @@ class SessionManager extends GetxController {
 
   /// Checks if current user's email is confirmed
   bool get isEmailConfirmed => currentUser.value?.emailConfirmedAt != null;
+
+  /// Gets current user's full name from metadata (first_name + last_name)
+  String? get userFullName {
+    final metadata = currentUser.value?.userMetadata;
+    if (metadata == null) return null;
+
+    final firstName = metadata['first_name'] as String?;
+    final lastName = metadata['last_name'] as String?;
+
+    if (firstName == null && lastName == null) return null;
+    if (firstName == null) return lastName;
+    if (lastName == null) return firstName;
+
+    return '$firstName $lastName';
+  }
+
+  /// Gets current user's first name from metadata
+  String? get userFirstName {
+    final metadata = currentUser.value?.userMetadata;
+    return metadata?['first_name'] as String?;
+  }
+
+  /// Gets current user's profile photo URL from metadata
+  String? get userPhotoUrl {
+    final metadata = currentUser.value?.userMetadata;
+    return metadata?['avatar_url'] as String? ?? metadata?['photo_url'] as String?;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════

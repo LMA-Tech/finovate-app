@@ -52,7 +52,8 @@ class _HomeScreen extends HomeController {
 
                   // Header with greeting and notification
                   Obx(() => HomeHeader(
-                    userName: _getUserFirstName(sessionManager.userEmail ?? ''),
+                    userName: sessionManager.userFullName ?? 'Usuário',
+                    userPhotoUrl: sessionManager.userPhotoUrl,
                     hasNotification: true,
                     onNotificationPressed: _handleNotificationPressed,
                   )),
@@ -111,16 +112,6 @@ class _HomeScreen extends HomeController {
         ),
       ),
     );
-  }
-
-  /// Extract first name from email
-  String _getUserFirstName(String email) {
-    if (email.isEmpty) return 'Usuário';
-
-    // For demo purposes, extract from email
-    // In real app, you'd get this from user profile
-    final username = email.split('@').first;
-    return username.split('.').first.capitalize ?? 'Usuário';
   }
 
   /// Handle notification press
