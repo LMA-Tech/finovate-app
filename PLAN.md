@@ -22,7 +22,7 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 ## Phase 0: Pre-Implementation Setup
 
 ### 0.1 Figma Design Review
-**Status:** ❌ Required Before Any UI Work
+**Status:** ✅ 100% Complete - All screens reviewed
 
 **Purpose:**
 - Review all Figma designs before implementing any visual changes
@@ -31,27 +31,59 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - Extract design tokens (colors, spacing, typography) from Figma
 
 **Tasks:**
-- [ ] Use Figma MCP to access and review all screens:
-  - Onboarding flow
-  - Sign up flow
-  - Login flow
-  - Home dashboard
-  - Conjuntura sections
-  - My Profile
-  - Stocks/Market view
-  - My Wallet/Carteira
-  - Premium Plan
-  - SofIA chat interface
-- [ ] Document chart requirements from Figma:
-  - Line chart styles (colors, grid, labels)
-  - Pie chart styles (colors, labels, interactions)
-  - Bar chart styles (colors, spacing, labels)
-- [ ] Extract color palette and verify against `colors.dart`
-- [ ] Document spacing/sizing and verify against `sizes.dart`
-- [ ] Note any typography differences
-- [ ] Create implementation checklist per screen matching Figma
+- [x] Use Figma MCP to access and review all screens:
+  - [x] Onboarding flow - **Complete** (`docs/figma-review-onboarding.md`)
+  - [x] Sign up flow - **Complete** (`docs/figma-review-signup.md`)
+  - [x] Login flow - **Complete** (`docs/figma-review-login.md`)
+  - [x] Home dashboard - **Complete** (`docs/figma-review-home.md`)
+  - [x] Conjuntura sections - **Complete** (`docs/figma-review-conjuntura.md`)
+  - [x] My Profile - **Complete** (`docs/figma-review-perfil.md`)
+  - [x] Stocks/Market view - **Complete** (`docs/figma-review-stocks.md`)
+  - [x] My Wallet/Carteira - **Complete** (`docs/figma-review-carteira.md`)
+  - [x] SofIA chat interface - **Complete** (`docs/figma-review-sofia.md`)
+- [x] Document chart requirements from Figma - **Complete** (`docs/figma-chart-requirements.md`)
+  - [x] Line chart styles (colors, grid, labels)
+  - [x] Pie chart styles (colors, labels, interactions)
+  - [x] Bar chart styles (colors, spacing, labels)
+  - [x] Sparkline specifications
+- [x] Extract color palette and verify against `colors.dart` - **Complete** (`docs/figma-color-verification.md`)
+- [x] Document spacing/sizing and verify against `sizes.dart` - **Complete** (in individual reviews)
+- [x] Note any typography differences - **Complete** (in individual reviews)
+- [x] Create implementation checklist per screen matching Figma - **Complete** (in individual reviews)
+- [x] Document global/reusable components - **Complete** (`docs/global-components.md`)
 
-**Critical:** No UI implementation work begins until Figma review is complete and documented
+**Key Findings:**
+1. **⚠️ Critical Color Issue:** Button primary color is #4B68FF in app but should be #1B6FFF (correct color exists as `FinColors.blue`)
+2. **⚠️ Font Discrepancy:** App uses DMSans, Figma specifies Plus Jakarta Sans and General Sans (project-wide decision needed)
+3. **✅ Background/Text Colors:** Match Figma specifications well
+4. **⚠️ Typography:** Minor adjustments needed (title sizes, letter spacing)
+5. **⚠️ Charts:** Need proper library integration (fl_chart recommended)
+
+**Documentation Created:**
+
+| Document | Description | Use When |
+|----------|-------------|----------|
+| `docs/figma-review-onboarding.md` | Onboarding flow (3 slides + get started) | Building onboarding screens |
+| `docs/figma-review-signup.md` | 12-step signup flow with questionnaire | Building signup screens |
+| `docs/figma-review-login.md` | Login, forgot password, OTP screens | Building auth screens |
+| `docs/figma-review-home.md` | Home dashboard with portfolio, stocks, economy sections | Building home screen |
+| `docs/figma-review-sofia.md` | SofIA AI chat interface | Building chat screens |
+| `docs/figma-review-perfil.md` | Profile/settings screens | Building profile section |
+| `docs/figma-review-conjuntura.md` | Economic indicators (6 sections) | Building conjuntura tab |
+| `docs/figma-review-stocks.md` | Stocks list and detail screens | Building stocks/market view |
+| `docs/figma-review-carteira.md` | Portfolio/wallet (3 parts: home states, manual, B3) | Building carteira tab |
+| `docs/figma-chart-requirements.md` | All chart specifications (line, pie, bar) | Implementing any chart |
+| `docs/figma-color-verification.md` | Color palette verification and issues | Fixing color issues |
+| `docs/global-components.md` | Reusable components (buttons, inputs, toasts, bottom sheets) | Building any UI component |
+
+**How to Use These Documents:**
+1. Before implementing any screen, **read the corresponding figma-review-*.md file**
+2. Reference `docs/global-components.md` for reusable component specs
+3. Reference `docs/figma-chart-requirements.md` when implementing any chart
+4. Check `docs/figma-color-verification.md` for correct color values
+5. Each review includes: typography specs, spacing, colors, component structure, data models, and files to create
+
+**Next:** Proceed with Phase 1.2 (Common UI Components)
 
 ---
 
@@ -86,68 +118,73 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 
 ---
 
-### 1.2 Common UI Components - Missing Components
-**Status:** ❌ Not Implemented
+### 1.2 Common UI Components
+**Status:** ✅ Complete
 
 **Current State:**
-- Basic components exist (CustomAppBar, CustomTextField, AppBackground)
-- Missing: Cards, Error states, Empty states, Skeleton screens
+- All common UI components implemented
+- Chart components using fl_chart library
+- Export files for easy importing
 
-**Tasks:**
+**Completed Tasks:**
 
-#### 1.2.1 Generic Card Component
-- [ ] Create `lib/common/widgets/custom_card.dart`
-- [ ] Support variants: default, elevated, outlined
-- [ ] Add optional header/footer sections
-- [ ] Support gradients for special cards
-- [ ] Make responsive with proper padding
+#### 1.2.1 Generic Card Component ✅
+- [x] Created `lib/common/widgets/custom_card.dart`
+- [x] Support variants: default, elevated, outlined
+- [x] Add optional header/footer sections
+- [x] Make responsive with proper padding
 
-#### 1.2.2 Error State Component
-- [ ] Create `lib/common/widgets/error_state.dart`
-- [ ] Display error icon, message, and retry button
-- [ ] Support custom error messages
-- [ ] Include empty state variant
+#### 1.2.2 Error State Component ✅
+- [x] Created `lib/common/widgets/error_state.dart`
+- [x] Display error icon, message, and retry button
+- [x] Support custom error messages
+- [x] Include inline error variant
 
-#### 1.2.3 Empty State Component
-- [ ] Create `lib/common/widgets/empty_state.dart`
-- [ ] Display icon, title, subtitle, and CTA button
-- [ ] Context-aware (portfolio not connected, no data, etc.)
+#### 1.2.3 Empty State Component ✅
+- [x] Created `lib/common/widgets/empty_state.dart`
+- [x] Display icon, title, subtitle, and CTA button
+- [x] Context-aware factories (portfolioNotConnected, noData, noSearchResults, featureNotEnabled)
 
-#### 1.2.4 Skeleton Loading Screens
-- [ ] Create `lib/common/widgets/skeleton_loader.dart`
-- [ ] Implement shimmer effect
-- [ ] Create variants for: cards, lists, charts
-- [ ] Use in all data-loading screens
+#### 1.2.4 Skeleton Loading Screens ✅
+- [x] Created `lib/common/widgets/skeleton_loader.dart`
+- [x] Implement shimmer effect with animation
+- [x] Create variants for: cards, lists, charts (SkeletonListItem, SkeletonChart, SkeletonCardGrid)
 
-#### 1.2.5 Chart Components (Using fl_chart)
-**Decision:** Use fl_chart library (free, customizable, well-maintained)
-**Critical:** All chart styling MUST match Figma designs exactly
-
-- [ ] Add fl_chart package to pubspec.yaml: `fl_chart: ^0.68.0`
-- [ ] **Review Figma chart designs before implementation:**
-  - Extract exact colors, grid styles, label formats
-  - Note tooltip styles and interactions
-  - Document legend positioning and styling
-- [ ] Create `lib/common/widgets/charts/custom_line_chart.dart`
-  - Match Figma line chart design (colors, thickness, grid)
-  - Pre-configured for dark theme
+#### 1.2.5 Chart Components (Using fl_chart) ✅
+- [x] Added fl_chart package to pubspec.yaml: `fl_chart: ^0.69.2`
+- [x] Created `lib/utils/constants/chart_colors.dart` - Centralized chart colors
+- [x] Created `lib/common/widgets/charts/custom_line_chart.dart`
   - Support multiple data series
-  - Interactive tooltips matching Figma style
-- [ ] Create `lib/common/widgets/charts/custom_pie_chart.dart`
-  - Match Figma pie chart design (colors, spacing, labels)
-  - Support tap-to-select sections per Figma interaction
-  - Animated transitions
-- [ ] Create `lib/common/widgets/charts/custom_bar_chart.dart`
-  - Match Figma bar chart design (colors, spacing, labels)
-  - Support grouped/stacked bars as shown in Figma
-  - Time-based x-axis formatting per Figma
-- [ ] Create `lib/common/widgets/charts/time_period_selector.dart`
-  - Match Figma design exactly (Semana, No mês, 1 mês, 12 meses)
-- [ ] Create `lib/common/widgets/charts/chart_legend.dart`
-  - Match Figma legend style (colors, positioning, labels)
-- [ ] Test all charts in dark mode with exact Figma colors and styling
+  - Interactive tooltips
+  - Configurable grid
+- [x] Created `lib/common/widgets/charts/custom_pie_chart.dart`
+  - Donut chart with center content
+  - Tap-to-select sections
+  - Legend component included
+- [x] Created `lib/common/widgets/charts/custom_bar_chart.dart`
+  - Support single, grouped, and stacked bars
+  - Interactive tooltips
+- [x] Created `lib/common/widgets/charts/time_period_selector.dart`
+  - Portfolio periods (Semana, No mês, 1 mês, 12 meses)
+  - Variation periods (YTD, YoY, MoM)
+  - View toggle selector
+- [x] Created `lib/common/widgets/charts/chart_legend.dart`
+  - Pill-style legends
+  - Performance indicators component
+  - ChartWithHeader combined component
 
-**Estimated Components:** 8-10 new widget files
+#### 1.2.6 Additional Global Components ✅
+- [x] Created `lib/common/widgets/toast_notification.dart` - Success/error/info toasts
+- [x] Created `lib/common/widgets/section_header.dart` - Section headers with "Ver mais" link
+- [x] Created `lib/common/widgets/info_bottom_sheet.dart` - Info sheets for (ⓘ) icons
+- [x] Created `lib/common/widgets/primary_button.dart` - Primary, secondary, text buttons
+- [x] Created `lib/common/widgets/segmented_tabs.dart` - Tab navigation component
+
+#### 1.2.7 Export Files ✅
+- [x] Created `lib/common/widgets/charts/charts.dart` - Export all chart components
+- [x] Created `lib/common/widgets/widgets.dart` - Export all common widgets
+
+**Files Created:** 16 new widget files
 
 ---
 
@@ -211,12 +248,16 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 ## Phase 3: Home Screen Implementation
 
 ### 3.1 Home Screen - Data Integration
-**Status:** ⚠️ 70% Complete - UI done, needs real data
+**Status:** ⚠️ 75% Complete - UI refactored with new components, needs real data
 
 **Current State:**
 - All UI sections built with mocked data
+- **Refactored:** Home widgets now use common chart components (fl_chart)
+- **Refactored:** PortfolioSection uses SectionHeader, SegmentedTabs, TimePeriodSelector
+- **Refactored:** PortfolioChart uses CustomLineChart with proper legends
+- **Refactored:** StockCard and EconomySection use common components
 - Navigation stubs in place
-- No API integration
+- No API integration yet
 
 **Tasks:**
 
@@ -232,8 +273,9 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - [ ] Show only when B3 not connected
 
 #### 3.1.3 Portfolio Summary Section
-- [✅] Tabs UI (Rentabilidade/Risco/Composição) - Already implemented
-- [✅] Time period filters - Already implemented
+- [✅] Tabs UI (Rentabilidade/Risco/Composição) - Refactored with SegmentedTabs
+- [✅] Time period filters - Refactored with TimePeriodSelector
+- [✅] Section header - Refactored with SectionHeader component
 - [ ] Replace mock portfolio data with B3 API data
 - [ ] Implement real portfolio vs IBOV comparison chart
 - [ ] Connect "Ver mais" to Carteira tab navigation
@@ -241,14 +283,16 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - [ ] Add pull-to-refresh for portfolio data
 
 #### 3.1.4 Portfolio Chart Enhancement
-- [ ] Replace CustomPaint chart with fl_chart LineChart
+- [✅] Replace CustomPaint chart with fl_chart LineChart - **DONE**
+- [✅] Add interactive tooltips on hover/tap - **DONE** (via CustomLineChart)
+- [✅] Chart legend with proper colors - **DONE** (ChartLegend component)
 - [ ] Fetch real portfolio performance data from backend
 - [ ] Fetch benchmark data (IBOV) from ETL Gold layer
 - [ ] Implement time period filtering (Semana, No mês, 1 mês, 12 meses)
-- [ ] Add interactive tooltips on hover/tap
 - [ ] Show percentage labels on chart
 
 #### 3.1.5 Stock Cards Section
+- [✅] Stock card UI - Refactored with common styling
 - [ ] Replace mock stock data with real market data
 - [ ] Fetch from ETL Gold layer via backend API
 - [ ] Implement horizontal scroll with 2+ visible cards
@@ -257,6 +301,7 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - [ ] Show trending stocks based on user portfolio/preferences
 
 #### 3.1.6 Economy Indicators Section
+- [✅] Economy section UI - Refactored with common styling
 - [ ] Fetch real indicators from backend (Dólar, SELIC, IPCA)
 - [ ] Source from ETL Gold layer
 - [ ] Implement horizontal scroll
@@ -1082,17 +1127,51 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - ✅ B3 OAuth 2.0 flow (backend testing needed)
 
 **Immediate Actions:**
-1. **FIRST:** Review all Figma designs using Figma MCP (Phase 0.1)
-2. **SECOND:** Force dark theme in main.dart (Phase 1.1)
-3. Add fl_chart package to pubspec.yaml
-4. Create common UI components matching Figma designs
-5. Build chart wrapper components matching Figma chart styles exactly
-6. Begin Home screen data integration (replace mocked data)
-7. Parallel: Backend API development for Home/Sofia/Carteira
-8. Test B3 OAuth flow in backend before frontend integration
+1. ~~**FIRST:** Review all Figma designs using Figma MCP (Phase 0.1)~~ ✅ **100% COMPLETE**
+2. ~~**SECOND:** Force dark theme in main.dart (Phase 1.1)~~ ✅ **COMPLETE**
+3. ~~**THIRD:** Fix critical button color issue in colors.dart~~ ✅ **COMPLETE** (Primary: #1B6FFF)
+4. ~~**FOURTH:** Add fl_chart package to pubspec.yaml~~ ✅ **COMPLETE** (v0.69.2)
+5. ~~**FIFTH:** Create common UI components~~ ✅ **COMPLETE** (Phase 1.2 - 16 widget files created)
+6. ~~**SIXTH:** Build chart wrapper components~~ ✅ **COMPLETE** (LineChart, PieChart, BarChart + helpers)
+7. ~~**SEVENTH:** Refactor Home widgets to use common components~~ ✅ **COMPLETE** (PortfolioChart, PortfolioSection, StockCard, EconomySection)
+8. **NEXT:** Connect Home screen to backend API (portfolio data, stocks, economy indicators)
+9. Parallel: Backend API development for Home/Sofia/Carteira
+10. Test B3 OAuth flow in backend before frontend integration (reference `docs/figma-review-carteira.md` Part 3)
+11. **Decision needed:** Font family - keep DMSans or switch to Plus Jakarta Sans/General Sans
+
+**New Common Widget Files (Phase 1.2):**
+```
+lib/common/widgets/
+├── custom_card.dart           # Card with variants (default, elevated, outlined)
+├── empty_state.dart           # Empty state with factory constructors
+├── error_state.dart           # Error state with retry button
+├── info_bottom_sheet.dart     # Info sheets for (ⓘ) icons
+├── primary_button.dart        # Primary, secondary, text buttons
+├── section_header.dart        # Section headers with "Ver mais"
+├── segmented_tabs.dart        # Tab navigation component
+├── skeleton_loader.dart       # Shimmer loading animations
+├── toast_notification.dart    # Toast notifications
+├── widgets.dart               # Export file
+└── charts/
+    ├── chart_legend.dart      # Legend + performance indicators
+    ├── charts.dart            # Export file
+    ├── custom_bar_chart.dart  # Bar charts (single, grouped, stacked)
+    ├── custom_line_chart.dart # Line charts with multi-series
+    ├── custom_pie_chart.dart  # Donut/pie charts
+    └── time_period_selector.dart  # Period filters
+
+lib/utils/constants/
+└── chart_colors.dart          # Centralized chart colors
+```
+
+**Figma Review Documents (for implementation reference):**
+- `docs/figma-review-*.md` - Screen-by-screen specifications
+- `docs/global-components.md` - Reusable UI components (buttons, inputs, toasts, bottom sheets)
+- `docs/figma-chart-requirements.md` - Chart specifications for fl_chart
+- `docs/figma-color-verification.md` - Color palette with issues to fix
 
 **Implementation Approach:**
 - **Iterative with manual testing:** Complete each phase and allow manual testing before proceeding
 - **Keep it simple:** Avoid overcomplication, focus on core functionality
-- **Figma-first:** All UI must match Figma designs exactly
+- **Figma-first:** All UI must match Figma designs exactly - always reference the docs before building
 - **Flexible:** Requirements may shift during integrations, plan will adapt

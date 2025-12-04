@@ -10,7 +10,7 @@ class FinColors {
   static const Color darkNavy = Color(0xFF071735);    // CMYK 97, 87, 47, 60 | RGB 7, 23, 53
 
   // App theme colors
-  static const Color primary = Color(0xFF1355FF);
+  static const Color primary = Color(0xFF1B6FFF);  // Figma: Primary button/tab color
   static const Color secondary = Color(0xFFFFE24B);
   static const Color accent = Color(0xFFb0c7ff);
 
@@ -34,7 +34,7 @@ class FinColors {
   static Color darkContainer = FinColors.white.withValues(alpha: 0.1);
 
   // Button colors
-  static const Color buttonPrimary = Color(0xFF4b68ff);
+  static const Color buttonPrimary = Color(0xFF1B6FFF);  // Figma: Primary button color
   static const Color buttonSecondary = Color(0xFF6C757D);
   static const Color buttonDisabled = Color(0xFFC4C4C4);
 

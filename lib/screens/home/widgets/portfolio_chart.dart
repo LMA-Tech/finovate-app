@@ -1,68 +1,68 @@
 import 'package:flutter/material.dart';
+import '../../../common/widgets/charts/custom_line_chart.dart';
+import '../../../common/widgets/charts/chart_legend.dart';
+import '../../../utils/constants/chart_colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// Portfolio Chart Component
-/// Displays a line chart with portfolio performance and legend
+/// Displays a line chart with portfolio performance vs benchmark (IBOV)
+/// Using fl_chart via CustomLineChart component
 class PortfolioChart extends StatelessWidget {
   const PortfolioChart({
     super.key,
     this.height = 200,
-    this.portfolioReturn = '9.21%',
-    this.benchmarkReturn = '7.13%',
+    this.portfolioReturn = 9.21,
+    this.benchmarkReturn = 7.13,
+    this.portfolioData,
+    this.benchmarkData,
+    this.selectedPeriod = 0,
   });
 
   final double height;
-  final String portfolioReturn;
-  final String benchmarkReturn;
+  final double portfolioReturn;
+  final double benchmarkReturn;
+  final List<ChartDataPoint>? portfolioData;
+  final List<ChartDataPoint>? benchmarkData;
+  final int selectedPeriod;
 
   @override
   Widget build(BuildContext context) {
+    final data = _getChartData();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
       child: Column(
         children: [
-          // Chart area (placeholder for now - you can integrate a real chart library)
-          Container(
+          // Chart (no performance indicators above - they show in tooltip only)
+          CustomLineChart(
+            dataSeries: data,
             height: height,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: CustomPaint(
-              painter: _ChartPainter(),
-            ),
+            showGrid: true,
+            showTooltip: true,
+            showBottomLabels: false, // No month labels per Figma
           ),
 
           const SizedBox(height: 16),
 
-          // Performance indicators
+          // Legend below chart, aligned to the right per Figma
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _buildPerformanceIndicator(
-                portfolioReturn,
-                'Sua carteira',
-                const Color(0xFFBADBC1),
+              ChartLegend(
+                mainAxisAlignment: MainAxisAlignment.end,
+                items: [
+                  LegendItem(
+                    label: 'IBOV',
+                    color: ChartColors.ibovLine, // Blue to match the IBOV line
+                    strokeColor: const Color(0xFF68686E),
+                  ),
+                  LegendItem(
+                    label: 'Sua carteira',
+                    color: ChartColors.portfolioLine, // Green to match portfolio line
+                    strokeColor: const Color(0xFF39DDA2),
+                  ),
+                ],
               ),
-              const SizedBox(width: 32),
-              _buildPerformanceIndicator(
-                benchmarkReturn,
-                'IBOV',
-                const Color(0xFF39DDA2),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Legend
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLegendItem('IBOV', const Color(0xFF5FB3D3)),
-              const SizedBox(width: 16),
-              _buildLegendItem('Sua carteira', const Color(0xFFBADBC1)),
             ],
           ),
         ],
@@ -70,145 +70,60 @@ class PortfolioChart extends StatelessWidget {
     );
   }
 
-  Widget _buildPerformanceIndicator(String percentage, String label, Color color) {
-    return Column(
-      children: [
-        Text(
-          percentage,
-          style: TextStyle(
-            color: color,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            height: 1.33,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFFDFDFE0),
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
+  /// Get chart data - uses provided data or sample data
+  List<LineChartSeries> _getChartData() {
+    // Use provided data or generate sample data
+    final portfolio = portfolioData ?? _generateSamplePortfolioData();
+    final benchmark = benchmarkData ?? _generateSampleBenchmarkData();
 
-  Widget _buildLegendItem(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF15254E),
-        borderRadius: BorderRadius.circular(6),
+    return [
+      LineChartSeries(
+        label: 'IBOV',
+        dataPoints: benchmark,
+        color: ChartColors.ibovLine,
+        lineWidth: 2,
+        isCurved: true,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFFDFDFE0),
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              height: 1.85,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ],
+      LineChartSeries(
+        label: 'Sua carteira',
+        dataPoints: portfolio,
+        color: ChartColors.portfolioLine,
+        lineWidth: 2,
+        isCurved: true,
       ),
-    );
-  }
-}
-
-/// Custom painter for drawing a simplified chart
-/// You can replace this with a proper chart library like fl_chart
-class _ChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Portfolio line (green/teal)
-    final portfolioPaint = Paint()
-      ..color = const Color(0xFFBADBC1)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    // IBOV line (blue)
-    final ibovPaint = Paint()
-      ..color = const Color(0xFF5FB3D3)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    // Grid lines
-    final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..strokeWidth = 1;
-
-    // Draw vertical grid lines
-    for (int i = 0; i <= 4; i++) {
-      final x = (size.width / 4) * i;
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        gridPaint,
-      );
-    }
-
-    // Draw horizontal grid lines
-    for (int i = 0; i <= 3; i++) {
-      final y = (size.height / 3) * i;
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        gridPaint,
-      );
-    }
-
-    // Sample data points for portfolio (trending up)
-    final portfolioPoints = [
-      Offset(0, size.height * 0.8),
-      Offset(size.width * 0.2, size.height * 0.6),
-      Offset(size.width * 0.4, size.height * 0.4),
-      Offset(size.width * 0.6, size.height * 0.3),
-      Offset(size.width * 0.8, size.height * 0.5),
-      Offset(size.width, size.height * 0.2),
     ];
-
-    // Sample data points for IBOV (more volatile)
-    final ibovPoints = [
-      Offset(0, size.height * 0.7),
-      Offset(size.width * 0.2, size.height * 0.8),
-      Offset(size.width * 0.4, size.height * 0.5),
-      Offset(size.width * 0.6, size.height * 0.6),
-      Offset(size.width * 0.8, size.height * 0.4),
-      Offset(size.width, size.height * 0.3),
-    ];
-
-    // Draw portfolio line
-    final portfolioPath = Path();
-    portfolioPath.moveTo(portfolioPoints.first.dx, portfolioPoints.first.dy);
-    for (int i = 1; i < portfolioPoints.length; i++) {
-      portfolioPath.lineTo(portfolioPoints[i].dx, portfolioPoints[i].dy);
-    }
-    canvas.drawPath(portfolioPath, portfolioPaint);
-
-    // Draw IBOV line
-    final ibovPath = Path();
-    ibovPath.moveTo(ibovPoints.first.dx, ibovPoints.first.dy);
-    for (int i = 1; i < ibovPoints.length; i++) {
-      ibovPath.lineTo(ibovPoints[i].dx, ibovPoints[i].dy);
-    }
-    canvas.drawPath(ibovPath, ibovPaint);
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  /// Generate sample portfolio data for demonstration
+  List<ChartDataPoint> _generateSamplePortfolioData() {
+    // Sample data showing portfolio performance (percentage change from base)
+    return const [
+      ChartDataPoint(x: 0, y: 0, label: 'Jan'),
+      ChartDataPoint(x: 1, y: 1.5, label: 'Fev'),
+      ChartDataPoint(x: 2, y: 3.2, label: 'Mar'),
+      ChartDataPoint(x: 3, y: 2.8, label: 'Abr'),
+      ChartDataPoint(x: 4, y: 5.5, label: 'Mai'),
+      ChartDataPoint(x: 5, y: 7.0, label: 'Jun'),
+      ChartDataPoint(x: 6, y: 6.2, label: 'Jul'),
+      ChartDataPoint(x: 7, y: 8.5, label: 'Ago'),
+      ChartDataPoint(x: 8, y: 9.21, label: 'Set'),
+    ];
+  }
+
+  /// Generate sample benchmark (IBOV) data for demonstration
+  List<ChartDataPoint> _generateSampleBenchmarkData() {
+    // Sample data showing IBOV performance (percentage change from base)
+    return const [
+      ChartDataPoint(x: 0, y: 0, label: 'Jan'),
+      ChartDataPoint(x: 1, y: 0.8, label: 'Fev'),
+      ChartDataPoint(x: 2, y: 2.1, label: 'Mar'),
+      ChartDataPoint(x: 3, y: 1.5, label: 'Abr'),
+      ChartDataPoint(x: 4, y: 3.8, label: 'Mai'),
+      ChartDataPoint(x: 5, y: 4.5, label: 'Jun'),
+      ChartDataPoint(x: 6, y: 5.2, label: 'Jul'),
+      ChartDataPoint(x: 7, y: 6.0, label: 'Ago'),
+      ChartDataPoint(x: 8, y: 7.13, label: 'Set'),
+    ];
+  }
+
 }

@@ -43,7 +43,8 @@ dependencies:
 
 
   # Product Specific
-
+  # Charts
+  fl_chart: ^0.69.2
 
   #--------------- ./ PACKAGES END ------------------#
 dev_dependencies:

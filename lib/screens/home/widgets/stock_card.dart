@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../common/widgets/section_header.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// Stock Card Component
@@ -184,36 +185,13 @@ class StocksGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header
+        // Header using SectionHeader component
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Color(0xFFFEFEFE),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 1.5,
-                  letterSpacing: 0.1,
-                ),
-              ),
-              GestureDetector(
-                onTap: onSeeMorePressed,
-                child: const Text(
-                  'Ver mais',
-                  style: TextStyle(
-                    color: Color(0xFFBADBC1),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.43,
-                    letterSpacing: 0.1,
-                  ),
-                ),
-              ),
-            ],
+          child: SectionHeader(
+            title: title,
+            actionText: 'Ver mais',
+            onActionTap: onSeeMorePressed,
           ),
         ),
 
