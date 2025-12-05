@@ -108,47 +108,80 @@ Files with `debugPrint()` statements to refactor:
 - Multiple other files
 
 ### 2. Hardcoded Colors (Replace with FinColors.*)
-**Status:** ✅ Mostly Complete (28/31 files refactored)
+**Status:** ✅ Complete (31/31 screen files + common widgets refactored)
 
-**Completed:**
+**All Screen Files Refactored:**
 - ✅ `lib/screens/feedback/widgets/*.dart` (5 files)
 - ✅ `lib/screens/home/widgets/*.dart` (5 files)
 - ✅ `lib/screens/sofia/*.dart` (4 files)
 - ✅ `lib/screens/signup/widgets/*.dart` (8 files)
 - ✅ `lib/screens/forgot_password/widgets/*.dart` (4 files)
 - ✅ `lib/screens/login/widgets/login_header.dart`
+- ✅ `lib/screens/perfil/perfil_screen.dart`
+- ✅ `lib/screens/carteira/carteria_screen.dart`
+- ✅ `lib/screens/conjuntura/conjuntura_screen.dart`
 
-**Remaining (mocked screens - low priority):**
-- ❌ `lib/screens/perfil/perfil_screen.dart`
-- ❌ `lib/screens/carteira/carteria_screen.dart`
-- ❌ `lib/screens/conjuntura/conjuntura_screen.dart`
+**Common Widgets Refactored:**
+- ✅ `lib/common/widgets/primary_button.dart`
+- ✅ `lib/common/widgets/segmented_tabs.dart`
+- ✅ `lib/common/widgets/toast_notification.dart`
+- ✅ `lib/common/widgets/info_bottom_sheet.dart`
+- ✅ `lib/common/widgets/custom_text_field.dart`
 
-**New constants added to FinColors:**
-- `FinColors.trendPositive` (#0CB97B) - Stock/trend positive indicator
-- `FinColors.trendNegative` (#E02244) - Stock/trend negative indicator
-- `FinColors.trendPositiveBg` (#BADBC1) - Positive trend background
-- `FinColors.trendNegativeBg` (#FFD7DE) - Negative trend background
-- `FinColors.textSubtitle` (#CAD7F8) - Subtitle text color
-- `FinColors.avatarBorder` (#39DDA2) - Avatar border color
-- `FinColors.bannerText` (#F0F5EF) - Banner text color
-- `FinColors.bannerGradientStart` (#013ACB) - Banner gradient start
-- `FinColors.bannerGradientEnd` (#477552) - Banner gradient end
-- `FinColors.otpInputBorder` (#E3EBFF) - OTP input border
-- `FinColors.radioUnselected` (#6B6C70) - Unselected radio button
+**FinColors Constants (Complete Set):**
 
-**New constants added to ChartColors:**
-- `ChartColors.ibovStroke` (#68686E) - IBOV legend stroke
-- `ChartColors.portfolioStroke` (#39DDA2) - Portfolio legend stroke
+*UI Components:*
+- `cardBackground` (#2D3245) - Card/input background
+- `inputBackground` (#2D3245) - Input field background
+- `dialogBackground` (#1A1A2E) - Modal/dialog background
+- `bottomNavBackground` (#242432) - Bottom nav bar
+- `bottomNavBorder` (#2A2A3A) - Nav bar top border
+- `tooltipBackground` (#15254E) - Chart tooltip background
 
-**Previously added to FinColors:**
-- `FinColors.cardBackground` (#2D3245)
-- `FinColors.inputBackground` (#2D3245)
-- `FinColors.borderMint` (#BADBC1)
-- `FinColors.borderBlue` (#1B6FFF)
-- `FinColors.textGray200` (#DFDFE0)
-- `FinColors.textGray300` (#7C7C83)
-- `FinColors.starGold` (#FFD700)
-- `FinColors.progressInactive` (#3D4255)
+*Text Colors:*
+- `textWhite` (Colors.white) - Primary text on dark
+- `textGray200` (#DFDFE0) - Secondary text
+- `textGray300` (#7C7C83) - Placeholder/muted text
+- `textSubtitle` (#CAD7F8) - Light blue subtitle
+
+*Border Colors:*
+- `borderMint` (#BADBC1) - Mint/teal accent border
+- `borderBlue` (#1B6FFF) - Selected state blue
+- `otpInputBorder` (#E3EBFF) - OTP/input field border
+
+*Trend Indicators:*
+- `trendPositive` (#0CB97B) - Positive green
+- `trendNegative` (#E02244) - Negative red
+- `trendPositiveBg` (#BADBC1) - Positive background
+- `trendNegativeBg` (#FFD7DE) - Negative background
+
+*UI Elements:*
+- `avatarBorder` (#39DDA2) - Green avatar border
+- `starGold` (#FFD700) - Rating stars
+- `radioUnselected` (#6B6C70) - Unselected radio
+- `progressInactive` (#3D4255) - Inactive progress
+- `shimmerHighlight` (#3D4255) - Skeleton loader
+- `iconGray` (#9E9E9E) - Generic gray icon
+- `checkmarkGreen` (#00C853) - Success checkmark
+
+*Segmented Tabs:*
+- `segmentUnselectedText` (#FEFEFE) - Unselected text
+- `segmentShadow` (#3D1A2F5C) - Tab shadow (24% opacity)
+
+*Toast Notifications:*
+- `toastSuccess` (#BADBC1) - Success background
+- `toastSuccessText` (#0D1B2A) - Success text
+- `toastError` (#FF6B6B) - Error background
+- `toastInfo` (#1B6FFF) - Info background
+
+*Banner:*
+- `bannerText` (#F0F5EF) - Banner text
+- `bannerGradientStart` (#013ACB) - Gradient start
+- `bannerGradientEnd` (#477552) - Gradient end
+
+**ChartColors Constants:**
+- `ibovStroke` (#68686E) - IBOV legend stroke
+- `portfolioStroke` (#39DDA2) - Portfolio legend stroke
 
 ### 3. Folder Structure Violations
 Screens missing proper structure (controller + widgets directory):
@@ -492,8 +525,8 @@ Screens with proper structure ✅:
 - [✅] PrimaryButton icon position fixed (icon AFTER text) - **DONE**
 - [✅] Text box fixed height (56px min, 200px max) - **DONE**
 - [✅] Star rating positioned 48px below text - **DONE**
+- [✅] Refactor hardcoded colors to use FinColors constants - **DONE**
 - [ ] Add backend API endpoint for feedback submission
-- [ ] Refactor hardcoded colors to use FinColors constants (technical debt)
 
 #### 3.1.8 General Home Improvements
 - [ ] Add pull-to-refresh for all sections
