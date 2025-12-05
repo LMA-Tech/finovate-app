@@ -99,7 +99,7 @@ class _SectionHeader extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeXLg,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         const SizedBox(height: 4),
@@ -107,7 +107,7 @@ class _SectionHeader extends StatelessWidget {
           subtitle,
           style: TextStyle(
             fontSize: FinSizes.fontSizeSm,
-            color: Colors.white.withOpacity(0.7),
+            color: FinColors.textWhite.withOpacity(0.7),
           ),
         ),
       ],
@@ -199,7 +199,7 @@ class _MarketAnalysisSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.analytics,
             size: 48,
             color: FinColors.primary,
@@ -210,7 +210,7 @@ class _MarketAnalysisSection extends StatelessWidget {
             style: TextStyle(
               fontSize: FinSizes.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
           const SizedBox(height: FinSizes.sm),
@@ -218,7 +218,7 @@ class _MarketAnalysisSection extends StatelessWidget {
             'Gráficos interativos, análise técnica e insights do mercado serão implementados aqui.',
             style: TextStyle(
               fontSize: FinSizes.fontSizeSm,
-              color: Colors.white.withOpacity(0.8),
+              color: FinColors.textWhite.withOpacity(0.8),
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -233,7 +233,7 @@ class _MarketAnalysisSection extends StatelessWidget {
               color: FinColors.primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(FinSizes.borderRadiusSm),
             ),
-            child: Text(
+            child: const Text(
               'Em desenvolvimento',
               style: TextStyle(
                 fontSize: FinSizes.md,
@@ -266,17 +266,17 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color changeColor = Colors.white.withOpacity(0.7);
+    Color changeColor = FinColors.textWhite.withOpacity(0.7);
     if (isPositive == true) changeColor = FinColors.success;
     if (isPositive == false) changeColor = FinColors.error;
 
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: FinColors.textWhite.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -290,7 +290,7 @@ class _MetricCard extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: FinSizes.fontSizeSm,
-                  color: Colors.white.withOpacity(0.7),
+                  color: FinColors.textWhite.withOpacity(0.7),
                 ),
               ),
               Icon(
@@ -306,7 +306,7 @@ class _MetricCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: FinSizes.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
           const SizedBox(height: FinSizes.xs),
@@ -354,16 +354,16 @@ class _IndicatorItem extends StatelessWidget {
         break;
       default:
         trendIcon = Icons.trending_flat;
-        trendColor = Colors.white.withOpacity(0.7);
+        trendColor = FinColors.textWhite.withOpacity(0.7);
     }
 
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: FinColors.textWhite.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -378,7 +378,7 @@ class _IndicatorItem extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -386,7 +386,7 @@ class _IndicatorItem extends StatelessWidget {
                   period,
                   style: TextStyle(
                     fontSize: FinSizes.fontSizeSm,
-                    color: Colors.white.withOpacity(0.7),
+                    color: FinColors.textWhite.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -400,7 +400,7 @@ class _IndicatorItem extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: FinSizes.fontSizeLg,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                 ),
               ),
               Icon(

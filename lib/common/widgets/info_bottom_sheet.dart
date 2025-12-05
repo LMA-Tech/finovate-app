@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 /// Shows a simple info bottom sheet with title and description.
 ///
 /// Use this anywhere in the app where (ⓘ) icon or "O que é X?" links appear.
@@ -11,7 +13,7 @@ void showInfoBottomSheet({
 }) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: const Color(0xFF1A1A2E),
+    backgroundColor: FinColors.dialogBackground,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -26,7 +28,7 @@ void showInfoBottomSheet({
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
           const SizedBox(height: 12),
@@ -35,7 +37,7 @@ void showInfoBottomSheet({
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFDFDFE0),
+              color: FinColors.textGray200,
               height: 1.5,
             ),
           ),
@@ -72,7 +74,7 @@ class InfoIconButton extends StatelessWidget {
       child: Icon(
         Icons.info_outline,
         size: size,
-        color: color ?? const Color(0xFF9E9E9E),
+        color: color ?? FinColors.iconGray,
       ),
     );
   }
@@ -105,13 +107,13 @@ class WhatIsLink extends StatelessWidget {
           const Icon(
             Icons.info_outline,
             size: 16,
-            color: Color(0xFF9E9E9E),
+            color: FinColors.iconGray,
           ),
           const SizedBox(width: 8),
           Text(
             'O que é $subject?',
             style: const TextStyle(
-              color: Color(0xFF9E9E9E),
+              color: FinColors.iconGray,
               fontSize: 13,
             ),
           ),

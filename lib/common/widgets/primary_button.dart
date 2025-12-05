@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 /// Primary button component with Finovate styling.
 ///
 /// Based on Figma design specs from docs/global-components.md
@@ -29,9 +31,9 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1B6FFF),
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFF1B6FFF).withValues(alpha: 0.5),
+          backgroundColor: FinColors.primary,
+          foregroundColor: FinColors.textWhite,
+          disabledBackgroundColor: FinColors.primary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -42,7 +44,7 @@ class PrimaryButton extends StatelessWidget {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                   strokeWidth: 2,
                 ),
               )
@@ -95,8 +97,8 @@ class SecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.white,
-          side: const BorderSide(color: Color(0xFF7C7C83)),
+          foregroundColor: FinColors.textWhite,
+          side: const BorderSide(color: FinColors.textGray300),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -106,7 +108,7 @@ class SecondaryButton extends StatelessWidget {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                   strokeWidth: 2,
                 ),
               )
@@ -156,7 +158,7 @@ class TextLinkButton extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
-          color: textColor ?? const Color(0xFFBADBC1),
+          color: textColor ?? FinColors.borderMint,
         ),
       ),
     );

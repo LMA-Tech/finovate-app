@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 /// A segmented tab control with Finovate styling.
 ///
 /// Based on Figma design specs - selected tab "pops out" with shadow
@@ -30,7 +32,7 @@ class SegmentedTabs extends StatelessWidget {
         return Container(
           height: height,
           decoration: BoxDecoration(
-            color: const Color(0xFF2D3245),
+            color: FinColors.cardBackground,
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: Stack(
@@ -51,7 +53,7 @@ class SegmentedTabs extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.1,
-                            color: isSelected ? Colors.transparent : const Color(0xFFFEFEFE),
+                            color: isSelected ? Colors.transparent : FinColors.segmentUnselectedText,
                           ),
                         ),
                       ),
@@ -69,11 +71,11 @@ class SegmentedTabs extends StatelessWidget {
                 child: Container(
                   height: 54, // Taller than container (48px)
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1B6FFF),
+                    color: FinColors.primary,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [
                       BoxShadow(
-                        color: Color(0x3D1A2F5C), // rgba(26,47,92,0.24)
+                        color: FinColors.segmentShadow,
                         offset: Offset(2, 2),
                         blurRadius: 4,
                       ),
@@ -86,7 +88,7 @@ class SegmentedTabs extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.1,
-                      color: Color(0xFFFEFEFE),
+                      color: FinColors.segmentUnselectedText,
                     ),
                   ),
                 ),
@@ -118,7 +120,7 @@ class CompactSegmentedTabs extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -133,7 +135,7 @@ class CompactSegmentedTabs extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFF1B6FFF)
+                    ? FinColors.primary
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -142,7 +144,7 @@ class CompactSegmentedTabs extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.white : const Color(0xFFDFDFE0),
+                  color: isSelected ? FinColors.textWhite : FinColors.textGray200,
                 ),
               ),
             ),

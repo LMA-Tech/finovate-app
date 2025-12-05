@@ -112,7 +112,7 @@ class _SectionHeader extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeXLg,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         const SizedBox(height: 4),
@@ -120,7 +120,7 @@ class _SectionHeader extends StatelessWidget {
           subtitle,
           style: TextStyle(
             fontSize: FinSizes.fontSizeSm,
-            color: Colors.white.withOpacity(0.7),
+            color: FinColors.textWhite.withOpacity(0.7),
           ),
         ),
       ],
@@ -157,12 +157,12 @@ class _UserProfileHeader extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.2),
+              color: FinColors.textWhite.withOpacity(0.2),
             ),
             child: const Icon(
               Icons.person,
               size: 40,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
 
@@ -178,7 +178,7 @@ class _UserProfileHeader extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: FinSizes.fontSizeXLg,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -186,7 +186,7 @@ class _UserProfileHeader extends StatelessWidget {
                   sessionManager.currentUser.value?.email ?? 'email@exemplo.com',
                   style: TextStyle(
                     fontSize: FinSizes.fontSizeMd,
-                    color: Colors.white.withOpacity(0.8),
+                    color: FinColors.textWhite.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -381,21 +381,21 @@ class _LogoutButton extends StatelessWidget {
           // Show confirmation dialog
           final shouldLogout = await Get.dialog<bool>(
             AlertDialog(
-              backgroundColor: const Color(0xFF2D3245),
+              backgroundColor: FinColors.cardBackground,
               title: const Text(
                 'Sair da Conta',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: FinColors.textWhite),
               ),
               content: const Text(
                 'Tem certeza que deseja sair da sua conta?',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: FinColors.textWhite),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Get.back(result: false),
                   child: Text(
                     'Cancelar',
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    style: TextStyle(color: FinColors.textWhite.withOpacity(0.7)),
                   ),
                 ),
                 ElevatedButton(
@@ -405,7 +405,7 @@ class _LogoutButton extends StatelessWidget {
                   ),
                   child: const Text(
                     'Sair',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: FinColors.textWhite),
                   ),
                 ),
               ],
@@ -460,11 +460,11 @@ class _SettingsItem extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.all(FinSizes.md),
-        tileColor: const Color(0xFF2D3245),
+        tileColor: FinColors.cardBackground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
           side: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: FinColors.textWhite.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -486,20 +486,20 @@ class _SettingsItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeMd,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
             fontSize: FinSizes.fontSizeSm,
-            color: Colors.white.withOpacity(0.7),
+            color: FinColors.textWhite.withOpacity(0.7),
           ),
         ),
         trailing: trailing ??
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withOpacity(0.5),
+              color: FinColors.textWhite.withOpacity(0.5),
             ),
       ),
     );

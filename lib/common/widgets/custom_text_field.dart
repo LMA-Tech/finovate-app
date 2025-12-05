@@ -63,7 +63,7 @@ class CustomTextFieldReactive extends StatelessWidget {
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF2D3245),
+            fillColor: FinColors.cardBackground,
             hintText: hintText,
             hintStyle: TextStyle(
               color: FinColors.white.withOpacity(0.4),
@@ -73,21 +73,21 @@ class CustomTextFieldReactive extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                color: FinColors.otpInputBorder.withOpacity(0.3),
                 width: 1,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                color: FinColors.otpInputBorder.withOpacity(0.3),
                 width: 1,
               ),
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(
-                color: Color(0xFFE3EBFF),
+                color: FinColors.otpInputBorder,
                 width: 1,
               ),
             ),
@@ -178,7 +178,7 @@ class CustomTextField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF2D3245),
+            fillColor: FinColors.cardBackground,
             hintText: hintText,
             hintStyle: TextStyle(
               color: FinColors.white.withOpacity(0.4),
@@ -189,21 +189,21 @@ class CustomTextField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                color: FinColors.otpInputBorder.withOpacity(0.3),
                 width: 1,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                color: FinColors.otpInputBorder.withOpacity(0.3),
                 width: 1,
               ),
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(
-                color: Color(0xFFE3EBFF),
+                color: FinColors.otpInputBorder,
                 width: 1,
               ),
             ),

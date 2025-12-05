@@ -14,7 +14,9 @@ class OnboardingNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = OnBoardingController.instance;
-    final bool isDarkMode = FinHelperFunctions.isDarkMode(context);
+    // Dark mode check available for future styling
+    // ignore: unused_local_variable
+    final bool _ = FinHelperFunctions.isDarkMode(context);
 
     return Obx(() {
       final isLastPage = controller.currentPageIndex.value == OnBoardingController.pageCount - 1;

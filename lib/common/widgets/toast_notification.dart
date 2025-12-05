@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/constants/colors.dart';
+
 /// A toast notification component for user feedback.
 ///
 /// Based on Figma design specs from docs/global-components.md
@@ -20,18 +22,18 @@ class ToastNotification {
 
     switch (type) {
       case ToastType.success:
-        backgroundColor = const Color(0xFFBADBC1);
-        textColor = const Color(0xFF0D1B2A);
+        backgroundColor = FinColors.toastSuccess;
+        textColor = FinColors.toastSuccessText;
         icon = Icons.check;
         break;
       case ToastType.error:
-        backgroundColor = const Color(0xFFFF6B6B);
-        textColor = Colors.white;
+        backgroundColor = FinColors.toastError;
+        textColor = FinColors.textWhite;
         icon = Icons.error_outline;
         break;
       case ToastType.info:
-        backgroundColor = const Color(0xFF1B6FFF);
-        textColor = Colors.white;
+        backgroundColor = FinColors.toastInfo;
+        textColor = FinColors.textWhite;
         icon = Icons.info_outline;
         break;
     }
@@ -133,7 +135,7 @@ class _ToastWidgetState extends State<_ToastWidget>
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
+                      color: FinColors.black.withValues(alpha: 0.2),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),

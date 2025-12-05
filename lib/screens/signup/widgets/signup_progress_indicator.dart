@@ -70,7 +70,9 @@ class SignupProgressIndicator extends StatelessWidget {
       children: List.generate(totalQuestions, (index) {
         final questionNumber = index + 1;
         final isActive = questionNumber <= currentQuestion;
-        final isCompleted = controller.questionnaireAnswers.containsKey(questionNumber);
+        // Track completion for potential future use
+        // ignore: unused_local_variable
+        final _ = controller.questionnaireAnswers.containsKey(questionNumber);
 
         return Expanded(
           child: Container(

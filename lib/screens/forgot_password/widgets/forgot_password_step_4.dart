@@ -13,7 +13,9 @@ class ForgotPasswordStep4 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ForgotPasswordController>();
+    // Controller available if needed for future logic
+    // ignore: unused_local_variable
+    final _ = Get.find<ForgotPasswordController>();
 
     return Scaffold(
       body: SafeArea(

@@ -21,7 +21,9 @@ class OnboardingDotNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onboardingCon = OnBoardingController.instance;
-    final dark = FinHelperFunctions.isDarkMode(context);
+    // Dark mode check available for future styling
+    // ignore: unused_local_variable
+    final _ = FinHelperFunctions.isDarkMode(context);
 
     return Positioned(
       top: FinDeviceUtils.getAppBarHeight(),

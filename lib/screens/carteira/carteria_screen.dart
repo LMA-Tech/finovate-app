@@ -103,7 +103,7 @@ class _SectionHeader extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeXLg,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         const SizedBox(height: 4),
@@ -111,7 +111,7 @@ class _SectionHeader extends StatelessWidget {
           subtitle,
           style: TextStyle(
             fontSize: FinSizes.fontSizeSm,
-            color: Colors.white.withOpacity(0.7),
+            color: FinColors.textWhite.withOpacity(0.7),
           ),
         ),
       ],
@@ -146,7 +146,7 @@ class _PortfolioSummary extends StatelessWidget {
             'Patrimônio Total',
             style: TextStyle(
               fontSize: FinSizes.fontSizeMd,
-              color: Colors.white,
+              color: FinColors.textWhite,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -156,7 +156,7 @@ class _PortfolioSummary extends StatelessWidget {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
           const SizedBox(height: FinSizes.sm),
@@ -180,7 +180,7 @@ class _PortfolioSummary extends StatelessWidget {
                       color: FinColors.success,
                     ),
                     const SizedBox(width: 4),
-                    Text(
+                    const Text(
                       '+R\$ 8.432,12 (6.05%)',
                       style: TextStyle(
                         fontSize: FinSizes.fontSizeSm,
@@ -196,7 +196,7 @@ class _PortfolioSummary extends StatelessWidget {
                 'Este mês',
                 style: TextStyle(
                   fontSize: FinSizes.fontSizeSm,
-                  color: Colors.white.withOpacity(0.8),
+                  color: FinColors.textWhite.withOpacity(0.8),
                 ),
               ),
             ],
@@ -216,10 +216,10 @@ class _AssetAllocation extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: FinColors.textWhite.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -378,7 +378,7 @@ class _AllocationItem extends StatelessWidget {
             label,
             style: const TextStyle(
               fontSize: FinSizes.fontSizeMd,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
         ),
@@ -387,7 +387,7 @@ class _AllocationItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeMd,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         const SizedBox(width: FinSizes.sm),
@@ -395,7 +395,7 @@ class _AllocationItem extends StatelessWidget {
           value,
           style: TextStyle(
             fontSize: FinSizes.fontSizeSm,
-            color: Colors.white.withOpacity(0.7),
+            color: FinColors.textWhite.withOpacity(0.7),
           ),
         ),
       ],
@@ -426,10 +426,10 @@ class _HoldingItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: FinColors.textWhite.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -445,21 +445,21 @@ class _HoldingItem extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                   ),
                 ),
                 Text(
                   name,
                   style: TextStyle(
                     fontSize: FinSizes.fontSizeSm,
-                    color: Colors.white.withOpacity(0.7),
+                    color: FinColors.textWhite.withOpacity(0.7),
                   ),
                 ),
                 Text(
                   '$quantity cotas',
                   style: TextStyle(
                     fontSize: FinSizes.md,
-                    color: Colors.white.withOpacity(0.5),
+                    color: FinColors.textWhite.withOpacity(0.5),
                   ),
                 ),
               ],
@@ -475,7 +475,7 @@ class _HoldingItem extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: FinSizes.fontSizeMd,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                 ),
               ),
               Text(
@@ -538,10 +538,10 @@ class _TransactionItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: FinColors.textWhite.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -574,14 +574,14 @@ class _TransactionItem extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                   ),
                 ),
                 Text(
                   '$quantity x $price',
                   style: TextStyle(
                     fontSize: FinSizes.fontSizeSm,
-                    color: Colors.white.withOpacity(0.7),
+                    color: FinColors.textWhite.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -593,7 +593,7 @@ class _TransactionItem extends StatelessWidget {
             date,
             style: TextStyle(
               fontSize: FinSizes.fontSizeSm,
-              color: Colors.white.withOpacity(0.5),
+              color: FinColors.textWhite.withOpacity(0.5),
             ),
           ),
         ],

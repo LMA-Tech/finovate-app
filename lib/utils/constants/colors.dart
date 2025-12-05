@@ -87,6 +87,33 @@ class FinColors {
   static const Color otpInputBorder = Color(0xFFE3EBFF);  // OTP field border
   static const Color radioUnselected = Color(0xFF6B6C70);  // Radio button unselected color
 
+  // Dialog/Modal background
+  static const Color dialogBackground = Color(0xFF1A1A2E);  // Dark modal background
+
+  // Bottom navigation
+  static const Color bottomNavBackground = Color(0xFF242432);  // Bottom nav bar
+  static const Color bottomNavBorder = Color(0xFF2A2A3A);  // Subtle top border
+
+  // Shimmer/Skeleton loading
+  static const Color shimmerHighlight = Color(0xFF3D4255);  // Skeleton shimmer highlight
+
+  // Toast/Notification colors
+  static const Color toastSuccess = Color(0xFFBADBC1);  // Success toast background
+  static const Color toastSuccessText = Color(0xFF0D1B2A);  // Success toast text
+  static const Color toastError = Color(0xFFFF6B6B);  // Error toast background
+  static const Color toastInfo = Color(0xFF1B6FFF);  // Info toast background
+
+  // Icon/Indicator colors
+  static const Color checkmarkGreen = Color(0xFF00C853);  // Green checkmark
+  static const Color iconGray = Color(0xFF9E9E9E);  // Generic gray icon
+
+  // Segmented control
+  static const Color segmentUnselectedText = Color(0xFFFEFEFE);  // Unselected segment text
+  static const Color segmentShadow = Color(0x3D1A2F5C);  // Segment shadow (24% opacity)
+
+  // Chart tooltip background (same as card)
+  static const Color tooltipBackground = Color(0xFF15254E);  // Dark blue tooltip
+
   // Neutral Shades
   static const Color black = Color(0xFF232323);
   static const Color neutralGray = Color(0xFFEFEFF0);
