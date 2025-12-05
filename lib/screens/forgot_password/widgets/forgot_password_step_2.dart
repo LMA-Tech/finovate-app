@@ -29,7 +29,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
               fontWeight: FontWeight.w600,
               height: 1.33,
               letterSpacing: -0.48,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
           const SizedBox(height: FinSizes.spaceBtwSections),
@@ -40,7 +40,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
             child: RichText(
               text: TextSpan(
                 style: const TextStyle(
-                  color: Color(0xFFDFDFE0), // Neutral-gray-200
+                  color: FinColors.textGray200,
                   fontSize: FinSizes.fontSizeSm,
                   fontWeight: FontWeight.w400,
                   height: 1.50,
@@ -70,15 +70,15 @@ class ForgotPasswordStep2 extends StatelessWidget {
                 width: 48,
                 height: 56,
                 textStyle: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
+                  fontSize: FinSizes.fontSizeXLg,
+                  color: FinColors.textWhite,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2D3245),
+                  color: FinColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                    color: FinColors.otpInputBorder.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -87,15 +87,15 @@ class ForgotPasswordStep2 extends StatelessWidget {
                 width: 48,
                 height: 56,
                 textStyle: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
+                  fontSize: FinSizes.fontSizeXLg,
+                  color: FinColors.textWhite,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2D3245),
+                  color: FinColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFE3EBFF),
+                    color: FinColors.otpInputBorder,
                     width: 1,
                   ),
                 ),
@@ -104,15 +104,15 @@ class ForgotPasswordStep2 extends StatelessWidget {
                 width: 48,
                 height: 56,
                 textStyle: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
+                  fontSize: FinSizes.fontSizeXLg,
+                  color: FinColors.textWhite,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2D3245),
+                  color: FinColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFF1B6FFF),
+                    color: FinColors.borderBlue,
                     width: 1,
                   ),
                 ),
@@ -129,7 +129,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: const TextStyle(
-                  color: Color(0xFFDFDFE0), // Regular text color
+                  color: FinColors.textGray200,
                   fontSize: FinSizes.fontSizeSm,
                   fontWeight: FontWeight.w400,
                   height: 1.29,
@@ -142,7 +142,7 @@ class ForgotPasswordStep2 extends StatelessWidget {
                     text: controller.formattedTimer,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFBADBC1), // Green timer color
+                      color: FinColors.borderMint,
                     ),
                   ),
                 ],

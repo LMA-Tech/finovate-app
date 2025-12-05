@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../../../common/widgets/custom_text_field.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../../../utils/helpers/helper_functions.dart';
@@ -45,7 +46,7 @@ class ForgotPasswordStep1 extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           height: 1.33,
                           letterSpacing: -0.48,
-                          color: Colors.white,
+                          color: FinColors.textWhite,
                         ),
                         maxLines: 2,
                       ),
@@ -67,7 +68,7 @@ class ForgotPasswordStep1 extends StatelessWidget {
                     child: Text(
                       FinTexts.forgotPasswordSubtitle,
                       style: TextStyle(
-                        color: const Color(0xFFDFDFE0),
+                        color: FinColors.textGray200,
                         fontSize: screenWidth < 360 ? 14 : FinSizes.fontSizeMd, // Responsive
                         fontWeight: FontWeight.w400,
                         height: 1.50,

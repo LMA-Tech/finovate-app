@@ -44,10 +44,10 @@ class ActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(FinSizes.md),
           decoration: BoxDecoration(
             // Dark background similar to the design
-            color: backgroundColor ?? const Color(0xFF2D3245),
+            color: backgroundColor ?? FinColors.cardBackground,
             borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: FinColors.textWhite.withOpacity(0.1),
               width: 1,
             ),
           ),
@@ -76,7 +76,7 @@ class ActionCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                     height: 1.4, // Increased line height for better readability
                   ),
                   maxLines: 3, // Allow up to 3 lines instead of 2

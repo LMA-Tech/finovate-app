@@ -2,6 +2,7 @@ import 'package:finovate_app/utils/constants/text_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../signup_controller.dart';
 import 'questionnaire_option.dart';
@@ -53,7 +54,7 @@ class SignupStepQuestionnaire extends StatelessWidget {
               fontWeight: FontWeight.w600,
               height: 1.60,
               letterSpacing: -0.40,
-              color: Colors.white,
+              color: FinColors.textWhite,
             ),
           ),
         ),
@@ -66,7 +67,7 @@ class SignupStepQuestionnaire extends StatelessWidget {
               questionSubtitle!,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFFDFDFE0),
+                color: FinColors.textGray200,
                 fontSize: FinSizes.fontSizeMd,
                 fontWeight: FontWeight.w400,
                 height: 1.50,

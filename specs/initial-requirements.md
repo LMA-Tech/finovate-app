@@ -654,7 +654,10 @@ feedback
 
 ### Code Style
 
-- Ensure proper separation of concerns by creating a suitable folder structure 
+- Ensure proper separation of concerns by creating a suitable folder structure
+- Follow the screen, controller and widgets directory approach when creating new screens.
 - Prefer small composable widgets over large ones
 - Prefer using flex values over hardcoded sizes when creating widgets inside rows/columns, ensuring the UI adapts to various screen sizes
 - Use `log` from `dart:developer` rather than `print` or `debugPrint` for logging
+- Ensure to use utils directory to avoid in line code for text, sizes and colors, and many other things already implemented to be reused in the code. 
+- Keep track of common directory for reusing widgets and/or make note of similar code that is being used in different places that could be a common reuseable widget.

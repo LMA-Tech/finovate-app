@@ -11,6 +11,167 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - **Keep It Simple:** Avoid overcomplication, focus on core functionality
 - **Sofia:** Skip conversation persistence (using Zep later) and search (post-MVP)
 
+---
+
+## Code Style Guidelines
+
+**IMPORTANT:** All code must follow these guidelines for consistency and maintainability.
+
+### Folder Structure & Separation of Concerns
+- **Screen Structure:** Follow the `screen`, `controller`, and `widgets` directory approach:
+  ```
+  lib/screens/<feature>/
+  ├── <feature>_screen.dart       # Main screen widget
+  ├── <feature>_controller.dart   # GetX controller for state
+  └── widgets/                    # Small, composable widgets
+      ├── widget_one.dart
+      └── widget_two.dart
+  ```
+- **Controller:** State management and business logic
+- **Screen:** Layout composition using widgets
+- **Widgets:** Small, reusable, single-responsibility components
+
+### Widget Design
+- **Prefer small composable widgets** over large monolithic ones
+- **Prefer flex values** (`Expanded`, `Flexible`, `Spacer`) over hardcoded sizes in Rows/Columns
+- This ensures the UI adapts to various screen sizes
+- Extract repeated UI patterns into separate widget classes
+
+### Logging
+- **Use `log` from `dart:developer`** rather than `print` or `debugPrint`
+- Example: `import 'dart:developer'; log('message');`
+- Never leave `print()` statements in production code
+
+### Utils & Constants
+- **Always use utils directory** to avoid inline code for:
+  - Colors: `lib/utils/constants/colors.dart` (FinColors)
+  - Sizes: `lib/utils/constants/sizes.dart` (FinSizes)
+  - Text strings: `lib/utils/constants/text_strings.dart`
+  - Routes: `lib/utils/constants/routes.dart`
+  - Images: `lib/utils/constants/image_strings.dart`
+- **Never hardcode** colors, sizes, or strings inline
+- Add new constants to the appropriate file when needed
+
+### Common Widgets
+- **Track reusable patterns** in `lib/common/widgets/`
+- When similar code appears in multiple places, extract to common widget
+- Document common widgets in `docs/global-components.md`
+- Current common widgets:
+  - `primary_button.dart` - Primary, secondary, text buttons
+  - `custom_card.dart` - Card variants
+  - `skeleton_loader.dart` - Loading states
+  - `empty_state.dart` - Empty state displays
+  - `error_state.dart` - Error state with retry
+  - `section_header.dart` - Section headers with "Ver mais"
+  - `segmented_tabs.dart` - Tab navigation
+  - `toast_notification.dart` - Toast messages
+  - `info_bottom_sheet.dart` - Info sheets
+  - `charts/` - Chart components (line, pie, bar, legends)
+
+### Code Quality Checklist
+Before committing code, verify:
+- [ ] No `print()` statements (use `log()` instead)
+- [ ] No hardcoded colors (use `FinColors.*`)
+- [ ] No hardcoded sizes (use `FinSizes.*`)
+- [ ] No hardcoded strings for UI text
+- [ ] Widgets are small and composable
+- [ ] Flex values used instead of fixed sizes where appropriate
+- [ ] Similar code extracted to common widgets
+- [ ] Follows screen/controller/widgets structure
+
+---
+
+## Technical Debt: Code Style Violations
+
+**Note:** The following violations were identified during code review. These should be addressed incrementally.
+
+### 1. print()/debugPrint() Usage (Replace with log())
+Files with `print()` statements to refactor:
+- `lib/services/auth_service.dart` (1 occurrence)
+- `lib/controllers/bottom_navigation_controller.dart` (3 occurrences)
+- `lib/services/finovate_api_service.dart` (3 occurrences)
+- `lib/screens/splash/splash_controller.dart` (8 occurrences)
+- `lib/screens/sofia/sofia_home_controller.dart` (5 occurrences - uses kDebugMode)
+- `lib/screens/signup/signup_controller.dart` (12 occurrences)
+- `lib/config/env_config.dart` (11 occurrences)
+
+Files with `debugPrint()` statements to refactor:
+- `lib/services/session_manager.dart` (50+ occurrences)
+- `lib/services/biometric_service.dart` (15+ occurrences)
+- `lib/services/activity_tracker.dart` (15+ occurrences)
+- `lib/services/centralized_email_service.dart` (4 occurrences)
+- `lib/controllers/bottom_navigation_controller.dart` (6 occurrences)
+- `lib/screens/sofia/sofia_chat_controller.dart` (8 occurrences)
+- `lib/screens/login/login_controller.dart` (1 occurrence)
+- `lib/screens/home/home_controller.dart` (3 occurrences)
+- `lib/screens/forgot_password/forgot_password_controller.dart` (2 occurrences)
+- Multiple other files
+
+### 2. Hardcoded Colors (Replace with FinColors.*)
+**Status:** ✅ Mostly Complete (28/31 files refactored)
+
+**Completed:**
+- ✅ `lib/screens/feedback/widgets/*.dart` (5 files)
+- ✅ `lib/screens/home/widgets/*.dart` (5 files)
+- ✅ `lib/screens/sofia/*.dart` (4 files)
+- ✅ `lib/screens/signup/widgets/*.dart` (8 files)
+- ✅ `lib/screens/forgot_password/widgets/*.dart` (4 files)
+- ✅ `lib/screens/login/widgets/login_header.dart`
+
+**Remaining (mocked screens - low priority):**
+- ❌ `lib/screens/perfil/perfil_screen.dart`
+- ❌ `lib/screens/carteira/carteria_screen.dart`
+- ❌ `lib/screens/conjuntura/conjuntura_screen.dart`
+
+**New constants added to FinColors:**
+- `FinColors.trendPositive` (#0CB97B) - Stock/trend positive indicator
+- `FinColors.trendNegative` (#E02244) - Stock/trend negative indicator
+- `FinColors.trendPositiveBg` (#BADBC1) - Positive trend background
+- `FinColors.trendNegativeBg` (#FFD7DE) - Negative trend background
+- `FinColors.textSubtitle` (#CAD7F8) - Subtitle text color
+- `FinColors.avatarBorder` (#39DDA2) - Avatar border color
+- `FinColors.bannerText` (#F0F5EF) - Banner text color
+- `FinColors.bannerGradientStart` (#013ACB) - Banner gradient start
+- `FinColors.bannerGradientEnd` (#477552) - Banner gradient end
+- `FinColors.otpInputBorder` (#E3EBFF) - OTP input border
+- `FinColors.radioUnselected` (#6B6C70) - Unselected radio button
+
+**New constants added to ChartColors:**
+- `ChartColors.ibovStroke` (#68686E) - IBOV legend stroke
+- `ChartColors.portfolioStroke` (#39DDA2) - Portfolio legend stroke
+
+**Previously added to FinColors:**
+- `FinColors.cardBackground` (#2D3245)
+- `FinColors.inputBackground` (#2D3245)
+- `FinColors.borderMint` (#BADBC1)
+- `FinColors.borderBlue` (#1B6FFF)
+- `FinColors.textGray200` (#DFDFE0)
+- `FinColors.textGray300` (#7C7C83)
+- `FinColors.starGold` (#FFD700)
+- `FinColors.progressInactive` (#3D4255)
+
+### 3. Folder Structure Violations
+Screens missing proper structure (controller + widgets directory):
+- `lib/screens/carteira/` - Only has `carteria_screen.dart` (also typo in filename)
+- `lib/screens/conjuntura/` - Only has `conjuntura_screen.dart`
+- `lib/screens/perfil/` - Only has `perfil_screen.dart`
+- `lib/screens/splash/` - Missing widgets directory
+
+Screens with proper structure ✅:
+- `lib/screens/home/` - Has screen, controller, widgets/
+- `lib/screens/signup/` - Has screen, controller, widgets/
+- `lib/screens/login/` - Has screen, controller, widgets/
+- `lib/screens/feedback/` - Has screen, controller, widgets/
+- `lib/screens/sofia/` - Has screens, controller, widgets/
+- `lib/screens/forgot_password/` - Has controller, widgets/
+- `lib/screens/onboarding/` - Has controller, widgets/
+- `lib/screens/get_started/` - Has controller, widgets/
+
+### 4. Priority for Refactoring
+1. **High Priority:** New code must follow guidelines
+2. **Medium Priority:** Feedback flow files (recently created)
+3. **Low Priority:** Legacy files (refactor during feature work)
+
 **Status Legend:**
 - ✅ Complete
 - ⚠️ Needs Fixes/Enhancement
@@ -72,6 +233,7 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 | `docs/figma-review-conjuntura.md` | Economic indicators (6 sections) | Building conjuntura tab |
 | `docs/figma-review-stocks.md` | Stocks list and detail screens | Building stocks/market view |
 | `docs/figma-review-carteira.md` | Portfolio/wallet (3 parts: home states, manual, B3) | Building carteira tab |
+| `docs/figma-review-feedback.md` | 4-screen feedback flow (rating, focus areas, comments, success) | Building feedback screens |
 | `docs/figma-chart-requirements.md` | All chart specifications (line, pie, bar) | Implementing any chart |
 | `docs/figma-color-verification.md` | Color palette verification and issues | Fixing color issues |
 | `docs/global-components.md` | Reusable components (buttons, inputs, toasts, bottom sheets) | Building any UI component |
@@ -248,7 +410,7 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 ## Phase 3: Home Screen Implementation
 
 ### 3.1 Home Screen - Data Integration
-**Status:** ⚠️ 75% Complete - UI refactored with new components, needs real data
+**Status:** ⚠️ 85% Complete - UI complete, needs real data integration
 
 **Current State:**
 - All UI sections built with mocked data
@@ -256,7 +418,9 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - **Refactored:** PortfolioSection uses SectionHeader, SegmentedTabs, TimePeriodSelector
 - **Refactored:** PortfolioChart uses CustomLineChart with proper legends
 - **Refactored:** StockCard and EconomySection use common components
-- Navigation stubs in place
+- **Added:** Skeleton loading states for all sections
+- **Added:** "Ver mais" navigation to appropriate tabs
+- **Added:** 3-screen feedback flow (category → message → success)
 - No API integration yet
 
 **Tasks:**
@@ -264,6 +428,9 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 #### 3.1.1 Header Section
 - [✅] User greeting - Already implemented
 - [✅] Notification bell - Already implemented
+- [✅] User avatar with green border (#39DDA2) - 32x32 per Figma
+- [✅] Display full name from Supabase metadata (first_name + last_name)
+- [✅] Initials fallback when no profile photo
 - [ ] Connect notifications to backend (post-MVP)
 
 #### 3.1.2 B3 Connection Banner
@@ -276,9 +443,9 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - [✅] Tabs UI (Rentabilidade/Risco/Composição) - Refactored with SegmentedTabs
 - [✅] Time period filters - Refactored with TimePeriodSelector
 - [✅] Section header - Refactored with SectionHeader component
+- [✅] Connect "Ver mais" to Carteira tab navigation - **DONE**
 - [ ] Replace mock portfolio data with B3 API data
 - [ ] Implement real portfolio vs IBOV comparison chart
-- [ ] Connect "Ver mais" to Carteira tab navigation
 - [ ] Add last updated timestamp
 - [ ] Add pull-to-refresh for portfolio data
 
@@ -293,31 +460,44 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 
 #### 3.1.5 Stock Cards Section
 - [✅] Stock card UI - Refactored with common styling
+- [✅] Connect "Ver mais" to Conjuntura tab navigation - **DONE**
 - [ ] Replace mock stock data with real market data
 - [ ] Fetch from ETL Gold layer via backend API
 - [ ] Implement horizontal scroll with 2+ visible cards
 - [ ] Add real-time price updates (D-1 acceptable for MVP)
-- [ ] Connect "Ver mais" to market section navigation
 - [ ] Show trending stocks based on user portfolio/preferences
 
 #### 3.1.6 Economy Indicators Section
 - [✅] Economy section UI - Refactored with common styling
+- [✅] Connect "Ver mais" to Conjuntura tab navigation - **DONE**
 - [ ] Fetch real indicators from backend (Dólar, SELIC, IPCA)
 - [ ] Source from ETL Gold layer
 - [ ] Implement horizontal scroll
 - [ ] Add last updated timestamp per indicator
-- [ ] Connect "Ver mais" to Conjuntura tab navigation
 - [ ] Add skeleton loading states
 
 #### 3.1.7 Feedback Button
-- [ ] Implement 3-screen feedback flow
-- [ ] Create feedback form screens
+- [✅] Implement 4-screen feedback flow - **DONE** (restructured to match Figma)
+- [✅] Create feedback form screens - **DONE** (rating, focus areas, comments, success)
+- [✅] Create Figma review document - **DONE** (`docs/figma-review-feedback.md`)
+- [✅] Show success confirmation after submission - **DONE**
+- [✅] Add progress indicator (3 steps) per Figma - **DONE**
+- [✅] Add navigation arrows per Figma - **DONE** (back arrow in app bar, no forward arrow)
+- [✅] Update focus areas to match Figma (8 options) - **DONE**
+- [✅] Update success screen to use Finovate branded icon - **DONE** (uses `FinImages.tealStripWhite` SVG)
+- [✅] Success screen button with "Obrigado pelo feedback!" and close icon - **DONE**
+- [✅] Checkbox styling matches signup questionnaire (mint border `#BADBC1`) - **DONE**
+- [✅] All titles centered per Figma - **DONE**
+- [✅] Single "Próxima pergunta" button (no "Voltar" - back arrow in app bar) - **DONE**
+- [✅] PrimaryButton icon position fixed (icon AFTER text) - **DONE**
+- [✅] Text box fixed height (56px min, 200px max) - **DONE**
+- [✅] Star rating positioned 48px below text - **DONE**
 - [ ] Add backend API endpoint for feedback submission
-- [ ] Show success confirmation after submission
+- [ ] Refactor hardcoded colors to use FinColors constants (technical debt)
 
 #### 3.1.8 General Home Improvements
 - [ ] Add pull-to-refresh for all sections
-- [ ] Implement skeleton loading states for each section
+- [✅] Implement skeleton loading states for each section - **DONE**
 - [ ] Add error states with retry buttons
 - [ ] Optimize data refresh on app foreground
 - [ ] Cache data locally for offline viewing
@@ -327,8 +507,14 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - `lib/screens/home/widgets/portfolio_chart.dart` (replace)
 - `lib/screens/home/widgets/stock_card.dart`
 - `lib/screens/home/widgets/economy_section.dart`
-- Create: `lib/screens/home/home_controller.dart` for state management
-- Create: `lib/screens/feedback/` directory with 3 screens
+- `lib/screens/home/home_controller.dart` ✅ Created
+- `lib/screens/feedback/` directory ✅ Created with 4-screen flow:
+  - `feedback_controller.dart` - State management
+  - `feedback_screen.dart` - Main screen with step navigation
+  - `widgets/rating_step.dart` - Screen 1: Star rating
+  - `widgets/focus_areas_step.dart` - Screen 2: Multi-select checkboxes
+  - `widgets/comments_step.dart` - Screen 3: Text input
+  - `widgets/success_step.dart` - Screen 4: Thank you confirmation
 
 ---
 

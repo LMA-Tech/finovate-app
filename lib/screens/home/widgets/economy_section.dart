@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/widgets/section_header.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// Economy Indicator Card Component
@@ -29,7 +30,7 @@ class EconomyIndicatorCard extends StatelessWidget {
       height: 120, // Fixed height to match container
       padding: const EdgeInsets.all(12), // Reduced padding
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -50,7 +51,7 @@ class EconomyIndicatorCard extends StatelessWidget {
                     child: Text(
                       title,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: FinColors.textWhite,
                         fontSize: 15, // Slightly smaller font
                         fontWeight: FontWeight.w600,
                         height: 1.2, // Tighter line height
@@ -69,8 +70,8 @@ class EconomyIndicatorCard extends StatelessWidget {
                       height: 20,
                       decoration: BoxDecoration(
                         color: isPositive
-                            ? const Color(0xFFBADBC1)
-                            : const Color(0xFFFFD7DE),
+                            ? FinColors.trendPositiveBg
+                            : FinColors.trendNegativeBg,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
@@ -78,8 +79,8 @@ class EconomyIndicatorCard extends StatelessWidget {
                             ? Icons.trending_up
                             : Icons.trending_down,
                         color: isPositive
-                            ? const Color(0xFF0CB97B)
-                            : const Color(0xFFE02244),
+                            ? FinColors.trendPositive
+                            : FinColors.trendNegative,
                         size: 12, // Smaller icon
                       ),
                     ),
@@ -97,8 +98,8 @@ class EconomyIndicatorCard extends StatelessWidget {
                       Text(
                         value,
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                          color: FinColors.textWhite,
+                          fontSize: FinSizes.fontSizeMd,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
                         ),
@@ -112,8 +113,8 @@ class EconomyIndicatorCard extends StatelessWidget {
                         '$change • $changePercent',
                         style: TextStyle(
                           color: isPositive
-                              ? const Color(0xFF0CB97B)
-                              : const Color(0xFFE02244),
+                              ? FinColors.trendPositive
+                              : FinColors.trendNegative,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           height: 1.2,
@@ -126,9 +127,9 @@ class EconomyIndicatorCard extends StatelessWidget {
                         changePercent,
                         style: TextStyle(
                           color: isPositive
-                              ? const Color(0xFF0CB97B)
-                              : const Color(0xFFE02244),
-                          fontSize: 14,
+                              ? FinColors.trendPositive
+                              : FinColors.trendNegative,
+                          fontSize: FinSizes.fontSizeSm,
                           fontWeight: FontWeight.w600,
                           height: 1.2,
                         ),
@@ -138,8 +139,8 @@ class EconomyIndicatorCard extends StatelessWidget {
                           change,
                           style: TextStyle(
                             color: isPositive
-                                ? const Color(0xFF0CB97B)
-                                : const Color(0xFFE02244),
+                                ? FinColors.trendPositive
+                                : FinColors.trendNegative,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             height: 1.2,

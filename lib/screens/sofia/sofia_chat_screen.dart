@@ -41,7 +41,7 @@ class SofiaChatScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        icon: const Icon(Icons.arrow_back, color: FinColors.textWhite),
         onPressed: () => Get.back(),
       ),
       title: Obx(() => Column(
@@ -50,7 +50,7 @@ class SofiaChatScreen extends StatelessWidget {
           const Text(
             'Backend Chat Test',
             style: TextStyle(
-              color: Colors.white,
+              color: FinColors.textWhite,
               fontSize: FinSizes.fontSizeLg,
               fontWeight: FontWeight.w600,
             ),
@@ -68,7 +68,7 @@ class SofiaChatScreen extends StatelessWidget {
       )),
       actions: [
         IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.white),
+          icon: const Icon(Icons.delete_outline, color: FinColors.textWhite),
           onPressed: controller.clearChat,
           tooltip: 'Clear chat',
         ),
@@ -90,7 +90,7 @@ class SofiaChatScreen extends StatelessWidget {
           Text(
             'Send a message to start chatting',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: FinColors.textWhite.withOpacity(0.7),
               fontSize: FinSizes.fontSizeMd,
             ),
           ),
@@ -124,7 +124,7 @@ class SofiaChatScreen extends StatelessWidget {
               ? FinColors.error.withOpacity(0.2)
               : message.isUser
               ? FinColors.primary
-              : const Color(0xFF2D3245),
+              : FinColors.cardBackground,
           borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
           border: message.isError
               ? Border.all(color: FinColors.error, width: 1)
@@ -136,7 +136,7 @@ class SofiaChatScreen extends StatelessWidget {
             Text(
               message.text.isEmpty ? ' ' : message.text,
               style: TextStyle(
-                color: message.isError ? FinColors.error : Colors.white,
+                color: message.isError ? FinColors.error : FinColors.textWhite,
                 fontSize: FinSizes.fontSizeMd,
               ),
             ),
@@ -147,7 +147,7 @@ class SofiaChatScreen extends StatelessWidget {
                 Text(
                   controller.formatTime(message.timestamp),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: FinColors.textWhite.withOpacity(0.5),
                     fontSize: FinSizes.fontSizeSm,
                   ),
                 ),
@@ -159,7 +159,7 @@ class SofiaChatScreen extends StatelessWidget {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white.withOpacity(0.5),
+                        FinColors.textWhite.withOpacity(0.5),
                       ),
                     ),
                   ),
@@ -176,10 +176,10 @@ class SofiaChatScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         border: Border(
           top: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: FinColors.textWhite.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -191,18 +191,18 @@ class SofiaChatScreen extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: controller.messageController,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: FinColors.textWhite),
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
                   hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: FinColors.textWhite.withOpacity(0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: const Color(0xFF1E2332),
+                  fillColor: FinColors.inputBackground,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: FinSizes.md,
                     vertical: FinSizes.sm,
@@ -225,7 +225,7 @@ class SofiaChatScreen extends StatelessWidget {
               child: IconButton(
                 icon: Icon(
                   controller.isLoading.value ? Icons.stop : Icons.arrow_upward,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                 ),
                 onPressed: controller.isLoading.value ? null : controller.sendMessage,
               ),

@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../../../common/widgets/custom_text_field.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 import '../../../utils/helpers/helper_functions.dart';
@@ -38,7 +39,7 @@ class ForgotPasswordStep3 extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     height: 1.33,
                     letterSpacing: -0.48,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                   ),
                 ),
                 const SizedBox(height: FinSizes.sm),
@@ -47,7 +48,7 @@ class ForgotPasswordStep3 extends StatelessWidget {
                 const Text(
                   'Crie uma nova senha, mas certifique de que ela seja diferente das anteriores por questões de segurança.',
                   style: TextStyle(
-                    color: Color(0xFFDFDFE0), // Neutral-gray-200
+                    color: FinColors.textGray200,
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w400,
                     height: 1.50,
@@ -75,7 +76,7 @@ class ForgotPasswordStep3 extends StatelessWidget {
                           onPressed: controller.togglePassword,
                           icon: Icon(
                             controller.hidePassword.value ? Iconsax.eye_slash : Iconsax.eye,
-                            color: Colors.white,
+                            color: FinColors.textWhite,
                             size: 20,
                           ),
                         ),
@@ -96,7 +97,7 @@ class ForgotPasswordStep3 extends StatelessWidget {
                           onPressed: controller.toggleConfirmPassword,
                           icon: Icon(
                             controller.hideConfirmPassword.value ? Iconsax.eye_slash : Iconsax.eye,
-                            color: Colors.white,
+                            color: FinColors.textWhite,
                             size: 20,
                           ),
                         ),
@@ -110,10 +111,10 @@ class ForgotPasswordStep3 extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(FinSizes.md),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2D3245).withOpacity(0.5),
+                    color: FinColors.cardBackground.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFFE3EBFF).withOpacity(0.3),
+                      color: FinColors.otpInputBorder.withOpacity(0.3),
                       width: 1,
                     ),
                   ),

@@ -10,6 +10,7 @@ import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/finovate_api_service.dart';
 import '../../services/session_manager.dart';
+import '../../utils/constants/colors.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for managing the multi-step signup process
@@ -221,9 +222,9 @@ class SignupController extends GetxController {
   /// Get button color based on validation
   Color getButtonColor() {
     if (canProceedReactive.value && !isLoading.value) {
-      return const Color(0xFF1B6FFF);
+      return FinColors.primary;
     }
-    return const Color(0xFF1B6FFF).withValues(alpha: 0.4);
+    return FinColors.primary.withValues(alpha: 0.4);
   }
 
   /// Get button action (null when disabled)

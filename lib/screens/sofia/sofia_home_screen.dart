@@ -57,13 +57,13 @@ class SofiaHomeScreen extends StatelessWidget {
       centerTitle: true,
       leading: IconButton(
         onPressed: () => Get.offAllNamed(AppRoutes.home),
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        icon: const Icon(Icons.arrow_back, color: FinColors.textWhite),
       ),
       title: null,
       actions: [
         IconButton(
           onPressed: showHomeOptions,
-          icon: const Icon(Icons.more_vert, color: Colors.white),
+          icon: const Icon(Icons.more_vert, color: FinColors.textWhite),
         ),
       ],
     );
@@ -84,7 +84,7 @@ class SofiaHomeScreen extends StatelessWidget {
       Container(
         padding: const EdgeInsets.all(FinSizes.defaultSpace),
         decoration: const BoxDecoration(
-          color: Color(0xFF2D3245),
+          color: FinColors.cardBackground,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(FinSizes.borderRadiusLg),
           ),
@@ -96,7 +96,7 @@ class SofiaHomeScreen extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: FinColors.textWhite.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -106,20 +106,20 @@ class SofiaHomeScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: FinSizes.fontSizeLg,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: FinColors.textWhite,
               ),
             ),
             const SizedBox(height: FinSizes.lg),
             ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.white),
-              title: const Text('Limpar histórico', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.delete_outline, color: FinColors.textWhite),
+              title: const Text('Limpar histórico', style: TextStyle(color: FinColors.textWhite)),
               onTap: () {
                 Get.back();
                 Get.snackbar(
                   'Em breve',
                   'Função disponível em breve',
                   backgroundColor: FinColors.primary.withValues(alpha: 0.8),
-                  colorText: Colors.white,
+                  colorText: FinColors.textWhite,
                 );
               },
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/policy_content.dart';
 import '../../../utils/constants/sizes.dart';
 
@@ -53,7 +54,7 @@ class PolicyBottomSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Color(0xFF2D3245), // Same as your input fields
+        color: FinColors.cardBackground, // Same as your input fields
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -67,7 +68,7 @@ class PolicyBottomSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(top: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: FinColors.textWhite.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -81,8 +82,8 @@ class PolicyBottomSheet extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeXLg,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -90,7 +91,7 @@ class PolicyBottomSheet extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(
                     Icons.close,
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                     size: 24,
                   ),
                 ),
@@ -108,8 +109,8 @@ class PolicyBottomSheet extends StatelessWidget {
               child: Text(
                 content,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+                  color: FinColors.textWhite,
+                  fontSize: FinSizes.fontSizeSm,
                   height: 1.6,
                 ),
               ),

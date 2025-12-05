@@ -2,6 +2,7 @@
 
 import 'package:finovate_app/screens/carteira/carteria_screen.dart';
 import 'package:finovate_app/screens/conjuntura/conjuntura_screen.dart';
+import 'package:finovate_app/screens/feedback/feedback_screen.dart';
 import 'package:finovate_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:finovate_app/screens/get_started/get_started_screen.dart';
 import 'package:finovate_app/screens/home/home_screen.dart';
@@ -148,6 +149,14 @@ class FinovateApp extends StatelessWidget {
         GetPage(
           name: AppRoutes.sofiaChat,
           page: () => const SofiaChatScreen(),
+        ),
+
+        // ═══════════════════════════════════════════════════════════════
+        // FEEDBACK
+        // ═══════════════════════════════════════════════════════════════
+        GetPage(
+          name: AppRoutes.feedback,
+          page: () => FeedbackScreen(),
         ),
       ],
 

@@ -31,6 +31,10 @@ class ChartColors {
   static const Color legendBackground = Color(0xFF15254E);
   static const Color labelColor = Color(0xFF7C7C83);
 
+  // Legend stroke colors
+  static const Color ibovStroke = Color(0xFF68686E); // IBOV legend stroke
+  static const Color portfolioStroke = Color(0xFF39DDA2); // Portfolio legend stroke
+
   // Bar chart colors
   static const Color barPrimary = Color(0xFF1B6FFF);
   static const Color barSecondary = Color(0xFFBADBC1);

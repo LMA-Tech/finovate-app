@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// B3 Connection Banner Component
@@ -21,8 +22,8 @@ class B3ConnectionBanner extends StatelessWidget {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
-            Color(0xFF013ACB), // from-[#013acb]
-            Color(0xFF477552), // to-[#477552]
+            FinColors.bannerGradientStart,
+            FinColors.bannerGradientEnd,
           ],
           stops: [0.01389, 0.72345],
         ),
@@ -41,8 +42,8 @@ class B3ConnectionBanner extends StatelessWidget {
                   child: Text(
                     'Conecte sua conta B3 para aproveitar todos os recursos.',
                     style: TextStyle(
-                      color: Color(0xFFF0F5EF),
-                      fontSize: 16,
+                      color: FinColors.bannerText,
+                      fontSize: FinSizes.fontSizeMd,
                       fontWeight: FontWeight.w500,
                       height: 1.5,
                     ),
@@ -52,7 +53,7 @@ class B3ConnectionBanner extends StatelessWidget {
                 // Arrow icon
                 const Icon(
                   Icons.arrow_forward,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                   size: 24,
                 ),
               ],

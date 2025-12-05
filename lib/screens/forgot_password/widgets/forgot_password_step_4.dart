@@ -66,7 +66,7 @@ class ForgotPasswordStep4 extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           height: 1.33,
                           letterSpacing: -0.48,
-                          color: Colors.white,
+                          color: FinColors.textWhite,
                         ),
                         textAlign: TextAlign.left,
                       ),
@@ -77,7 +77,7 @@ class ForgotPasswordStep4 extends StatelessWidget {
                     const Text(
                       'Sua senha foi redefinida com sucesso. Use sua nova senha para fazer login.',
                       style: TextStyle(
-                        color: Color(0xFFDFDFE0), // Neutral-gray-200
+                        color: FinColors.textGray200,
                         fontSize: FinSizes.fontSizeLg,
                         fontWeight: FontWeight.w400,
                         height: 1.50,

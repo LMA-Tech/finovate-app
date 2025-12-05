@@ -48,6 +48,45 @@ class FinColors {
   static const Color warning = Color(0xFFF57C00);
   static const Color info = Color(0xFF1976D2);
 
+  // Card and container colors (Dark theme)
+  static const Color cardBackground = Color(0xFF2D3245);  // Dark card background
+  static const Color inputBackground = Color(0xFF2D3245);  // Input field background
+
+  // Border colors (Dark theme)
+  static const Color borderMint = Color(0xFFBADBC1);  // Light mint/teal border (questionnaire options)
+  static const Color borderBlue = Color(0xFF1B6FFF);  // Selected state blue border
+
+  // Text colors (Dark theme)
+  static const Color textGray200 = Color(0xFFDFDFE0);  // Secondary text on dark
+  static const Color textGray300 = Color(0xFF7C7C83);  // Placeholder text
+
+  // Star rating
+  static const Color starGold = Color(0xFFFFD700);  // Selected star color
+
+  // Progress indicator
+  static const Color progressInactive = Color(0xFF3D4255);  // Inactive step color
+
+  // Trend indicator colors (stocks/economy)
+  static const Color trendPositive = Color(0xFF0CB97B);  // Positive trend green
+  static const Color trendNegative = Color(0xFFE02244);  // Negative trend red
+  static const Color trendPositiveBg = Color(0xFFBADBC1);  // Positive trend background
+  static const Color trendNegativeBg = Color(0xFFFFD7DE);  // Negative trend background
+
+  // Company name/subtitle text
+  static const Color textSubtitle = Color(0xFFCAD7F8);  // Light blue subtitle text
+
+  // Avatar border
+  static const Color avatarBorder = Color(0xFF39DDA2);  // Green avatar border
+
+  // Banner colors
+  static const Color bannerText = Color(0xFFF0F5EF);  // Light text for banners
+  static const Color bannerGradientStart = Color(0xFF013ACB);  // B3 banner gradient start
+  static const Color bannerGradientEnd = Color(0xFF477552);  // B3 banner gradient end
+
+  // OTP/Verification input colors
+  static const Color otpInputBorder = Color(0xFFE3EBFF);  // OTP field border
+  static const Color radioUnselected = Color(0xFF6B6C70);  // Radio button unselected color
+
   // Neutral Shades
   static const Color black = Color(0xFF232323);
   static const Color neutralGray = Color(0xFFEFEFF0);

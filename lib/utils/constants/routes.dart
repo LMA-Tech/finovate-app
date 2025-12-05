@@ -65,6 +65,13 @@ class AppRoutes {
   static const String sofiaTest = '/sofia/test';
 
   // ═══════════════════════════════════════════════════════════════
+  // FEEDBACK
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Feedback flow screen
+  static const String feedback = '/feedback';
+
+  // ═══════════════════════════════════════════════════════════════
   // HELPER LISTS
   // For validation and utilities
   // ═══════════════════════════════════════════════════════════════
@@ -84,6 +91,7 @@ class AppRoutes {
     sofiaHome,
     sofiaChat,
     sofiaTest,
+    feedback,
   ];
 
   /// Bottom navigation accessible routes

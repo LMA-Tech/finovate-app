@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/helpers/helper_functions.dart';
@@ -114,7 +115,7 @@ class SignupMilestoneScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           height: 1.33,
                           letterSpacing: -0.48,
-                          color: Colors.white,
+                          color: FinColors.textWhite,
                         ),
                       ),
                     ),
@@ -128,7 +129,7 @@ class SignupMilestoneScreen extends StatelessWidget {
                         subtitle,
                         textAlign: TextAlign.left,
                         style: const TextStyle(
-                          color: Color(0xFFDFDFE0),
+                          color: FinColors.textGray200,
                           fontSize: FinSizes.fontSizeLg,
                           fontWeight: FontWeight.w400,
                           height: 1.50,

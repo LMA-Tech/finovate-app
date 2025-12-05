@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/widgets/section_header.dart';
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// Stock Card Component
@@ -32,7 +33,7 @@ class StockCard extends StatelessWidget {
       width: 212,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Material(
@@ -55,7 +56,7 @@ class StockCard extends StatelessWidget {
                         width: 41,
                         height: 41,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: FinColors.white,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
@@ -64,7 +65,7 @@ class StockCard extends StatelessWidget {
                               : Text(
                             symbol[0],
                             style: const TextStyle(
-                              color: Colors.black,
+                              color: FinColors.black,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
@@ -81,8 +82,8 @@ class StockCard extends StatelessWidget {
                           Text(
                             symbol,
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
+                              color: FinColors.textWhite,
+                              fontSize: FinSizes.fontSizeMd,
                               fontWeight: FontWeight.w600,
                               height: 1.5,
                               letterSpacing: 0.1,
@@ -91,8 +92,8 @@ class StockCard extends StatelessWidget {
                           Text(
                             companyName,
                             style: const TextStyle(
-                              color: Color(0xFFCAD7F8),
-                              fontSize: 14,
+                              color: FinColors.textSubtitle,
+                              fontSize: FinSizes.fontSizeSm,
                               fontWeight: FontWeight.w500,
                               height: 1.14,
                               letterSpacing: 0.4,
@@ -109,8 +110,8 @@ class StockCard extends StatelessWidget {
                     height: 24,
                     decoration: BoxDecoration(
                       color: isPositive
-                          ? const Color(0xFFBADBC1)
-                          : const Color(0xFFFFD7DE),
+                          ? FinColors.trendPositiveBg
+                          : FinColors.trendNegativeBg,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Icon(
@@ -118,8 +119,8 @@ class StockCard extends StatelessWidget {
                           ? Icons.trending_up
                           : Icons.trending_down,
                       color: isPositive
-                          ? const Color(0xFF0CB97B)
-                          : const Color(0xFFE02244),
+                          ? FinColors.trendPositive
+                          : FinColors.trendNegative,
                       size: 15,
                     ),
                   ),
@@ -135,8 +136,8 @@ class StockCard extends StatelessWidget {
                   Text(
                     price,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                      color: FinColors.textWhite,
+                      fontSize: FinSizes.fontSizeSm,
                       fontWeight: FontWeight.w500,
                       height: 1.14,
                       letterSpacing: 0.4,
@@ -149,9 +150,9 @@ class StockCard extends StatelessWidget {
                     '$change • $changePercent',
                     style: TextStyle(
                       color: isPositive
-                          ? const Color(0xFF0CB97B)
-                          : const Color(0xFFE02244),
-                      fontSize: 14,
+                          ? FinColors.trendPositive
+                          : FinColors.trendNegative,
+                      fontSize: FinSizes.fontSizeSm,
                       fontWeight: FontWeight.w500,
                       height: 1.14,
                       letterSpacing: 0.4,

@@ -50,10 +50,6 @@ class PrimaryButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (icon != null) ...[
-                    icon!,
-                    const SizedBox(width: 8),
-                  ],
                   Text(
                     text,
                     style: const TextStyle(
@@ -61,6 +57,10 @@ class PrimaryButton extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  if (icon != null) ...[
+                    const SizedBox(width: 8),
+                    icon!,
+                  ],
                 ],
               ),
       ),

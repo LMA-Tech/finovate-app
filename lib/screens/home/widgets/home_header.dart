@@ -18,8 +18,6 @@ class HomeHeader extends StatelessWidget {
   final VoidCallback? onNotificationPressed;
   final bool hasNotification;
 
-  /// Avatar border color (green per Figma: #39DDA2)
-  static const Color _avatarBorderColor = Color(0xFF39DDA2);
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +44,8 @@ class HomeHeader extends StatelessWidget {
                       Text(
                         'Olá, $userName',
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                          color: FinColors.textWhite,
+                          fontSize: FinSizes.fontSizeSm,
                           fontWeight: FontWeight.w400,
                           height: 1.29,
                           letterSpacing: -0.28,
@@ -60,8 +58,8 @@ class HomeHeader extends StatelessWidget {
                       const Text(
                         'Bem vindo',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
+                          color: FinColors.textWhite,
+                          fontSize: FinSizes.fontSizeXLg,
                           fontWeight: FontWeight.w600,
                           height: 1.6,
                           letterSpacing: -0.4,
@@ -81,7 +79,7 @@ class HomeHeader extends StatelessWidget {
                 onPressed: onNotificationPressed,
                 icon: const Icon(
                   Icons.notifications_none,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                   size: 24,
                 ),
                 padding: EdgeInsets.zero,
@@ -121,7 +119,7 @@ class HomeHeader extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: _avatarBorderColor,
+          color: FinColors.avatarBorder,
           width: 2,
         ),
       ),
@@ -147,12 +145,12 @@ class HomeHeader extends StatelessWidget {
     return Container(
       width: 28,
       height: 28,
-      color: const Color(0xFF2D3245),
+      color: FinColors.cardBackground,
       child: Center(
         child: Text(
           initials,
           style: const TextStyle(
-            color: Colors.white,
+            color: FinColors.textWhite,
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),

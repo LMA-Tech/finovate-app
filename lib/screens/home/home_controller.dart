@@ -5,6 +5,11 @@ abstract class HomeController extends State<HomeScreen> {
   final selectedTab = 0.obs; // 0: Rentabilidade, 1: Risco, 2: Composição
   final selectedPeriod = 0.obs; // 0: Semana, 1: No mês, 2: 1 mês, 3: 12 meses
 
+  // Loading states
+  final isPortfolioLoading = true.obs;
+  final isStocksLoading = true.obs;
+  final isEconomyLoading = true.obs;
+
   @override
   void initState() {
     super.initState();
@@ -28,44 +33,51 @@ abstract class HomeController extends State<HomeScreen> {
 
   /// Initialize screen data
   void _initializeData() {
-    // TODO: Load user portfolio data
-    // TODO: Load stocks data
-    // TODO: Load economy indicators
-    // TODO: Check for notifications
     _loadPortfolioData();
     _loadStocksData();
     _loadEconomyData();
   }
 
   /// Load portfolio data based on selected tab and period
-  void _loadPortfolioData() {
-    // TODO: Implement portfolio data loading
-    // This would typically make API calls based on:
-    // - selectedTab.value (Rentabilidade/Risco/Composição)
-    // - selectedPeriod.value (time period)
+  Future<void> _loadPortfolioData() async {
+    isPortfolioLoading.value = true;
 
-    // For now, just log the current selection
+    // TODO: Replace with actual API call
+    // Simulate network delay for now
+    await Future.delayed(const Duration(milliseconds: 800));
+
     debugPrint('Loading portfolio data - Tab: ${selectedTab.value}, Period: ${selectedPeriod.value}');
+    isPortfolioLoading.value = false;
   }
 
   /// Load stocks data
-  void _loadStocksData() {
-    // TODO: Implement stocks data loading
-    // This would typically fetch current stock prices and changes
+  Future<void> _loadStocksData() async {
+    isStocksLoading.value = true;
+
+    // TODO: Replace with actual API call
+    await Future.delayed(const Duration(milliseconds: 600));
+
     debugPrint('Loading stocks data...');
+    isStocksLoading.value = false;
   }
 
   /// Load economy indicators
-  void _loadEconomyData() {
-    // TODO: Implement economy data loading
-    // This would fetch current economic indicators like USD, interest rates, etc.
+  Future<void> _loadEconomyData() async {
+    isEconomyLoading.value = true;
+
+    // TODO: Replace with actual API call
+    await Future.delayed(const Duration(milliseconds: 700));
+
     debugPrint('Loading economy data...');
+    isEconomyLoading.value = false;
   }
 
-  /// Refresh all data
+  /// Refresh all data (for pull-to-refresh)
   Future<void> refreshData() async {
-    _loadPortfolioData();
-    _loadStocksData();
-    _loadEconomyData();
+    await Future.wait([
+      _loadPortfolioData(),
+      _loadStocksData(),
+      _loadEconomyData(),
+    ]);
   }
 }

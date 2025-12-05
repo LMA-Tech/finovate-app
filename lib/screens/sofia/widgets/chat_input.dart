@@ -87,10 +87,10 @@ class _ChatInputState extends State<ChatInput> {
     return Container(
       padding: const EdgeInsets.all(FinSizes.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3245),
+        color: FinColors.cardBackground,
         border: Border(
           top: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: FinColors.textWhite.withOpacity(0.1),
             width: 0.5,
           ),
         ),
@@ -114,19 +114,19 @@ class _ChatInputState extends State<ChatInput> {
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _sendMessage(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: FinColors.textWhite,
                     fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w400,
                   ),
                   decoration: InputDecoration(
                     hintText: widget.hintText,
                     hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: FinColors.textWhite.withOpacity(0.6),
                       fontSize: FinSizes.fontSizeMd,
                       fontWeight: FontWeight.w400,
                     ),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
+                    fillColor: FinColors.textWhite.withOpacity(0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
                       borderSide: BorderSide.none,
@@ -134,7 +134,7 @@ class _ChatInputState extends State<ChatInput> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
                       borderSide: BorderSide(
-                        color: Colors.white.withOpacity(0.2),
+                        color: FinColors.textWhite.withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -181,15 +181,15 @@ class _ChatInputState extends State<ChatInput> {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.8),
+                          FinColors.textWhite.withOpacity(0.8),
                         ),
                       ),
                     )
                         : Icon(
                       Icons.arrow_upward,
                       color: _canSend && widget.isEnabled
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+                          ? FinColors.textWhite
+                          : FinColors.textWhite.withOpacity(0.5),
                       size: FinSizes.iconMd,
                     ),
                   ),

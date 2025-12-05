@@ -53,13 +53,13 @@ class PortfolioChart extends StatelessWidget {
                 items: [
                   LegendItem(
                     label: 'IBOV',
-                    color: ChartColors.ibovLine, // Blue to match the IBOV line
-                    strokeColor: const Color(0xFF68686E),
+                    color: ChartColors.ibovLine,
+                    strokeColor: ChartColors.ibovStroke,
                   ),
                   LegendItem(
                     label: 'Sua carteira',
-                    color: ChartColors.portfolioLine, // Green to match portfolio line
-                    strokeColor: const Color(0xFF39DDA2),
+                    color: ChartColors.portfolioLine,
+                    strokeColor: ChartColors.portfolioStroke,
                   ),
                 ],
               ),

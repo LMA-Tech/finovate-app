@@ -61,7 +61,7 @@ class SignupContinueButton extends StatelessWidget {
                   width: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(FinColors.textWhite),
                   ),
                 )
                     : Row(
@@ -72,7 +72,7 @@ class SignupContinueButton extends StatelessWidget {
                       customText ?? controller.getButtonText(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: FinColors.textWhite,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         height: 1.50,
@@ -83,7 +83,7 @@ class SignupContinueButton extends StatelessWidget {
                       const SizedBox(width: 8),
                       const Icon(
                         Icons.arrow_forward,
-                        color: Colors.white,
+                        color: FinColors.textWhite,
                         size: 24,
                       ),
                     ],

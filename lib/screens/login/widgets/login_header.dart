@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 
@@ -20,14 +21,14 @@ class FinLoginHeader extends StatelessWidget {
             fontWeight: FontWeight.w600,
             height: 1.33,
             letterSpacing: -0.48,
-            color: Colors.white,
+            color: FinColors.textWhite,
           ),
         ),
         SizedBox(height: FinSizes.sm),
         Text(
           FinTexts.loginSubTitle,
           style: TextStyle(
-            color: Color(0xFFDFDFE0), // Neutral-gray-200
+            color: FinColors.textGray200,
             fontSize: FinSizes.fontSizeMd,
             fontWeight: FontWeight.w400,
             height: 1.50,

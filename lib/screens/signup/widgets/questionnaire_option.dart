@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 
 /// Radio-button style option for questionnaire questions
@@ -34,11 +35,11 @@ class QuestionnaireOption extends StatelessWidget {
           vertical: 16,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFF2D3245), // Background color from Figma
+          color: FinColors.cardBackground, // Background color from Figma
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF1B6FFF) // Selected: Blue border
-                : const Color(0xFFBADBC1), // Unselected: Light mint/teal border from Figma
+                ? FinColors.borderBlue // Selected: Blue border
+                : FinColors.borderMint, // Unselected: Light mint/teal border from Figma
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -51,8 +52,8 @@ class QuestionnaireOption extends StatelessWidget {
                 text,
                 style: TextStyle(
                   color: isSelected
-                      ? Colors.white // Selected: White text
-                      : const Color(0xFFDFDFE0), // Unselected: Light gray
+                      ? FinColors.textWhite // Selected: White text
+                      : FinColors.textGray200, // Unselected: Light gray
                   fontSize: FinSizes.fontSizeMd,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w600,
                   height: 1.50,
@@ -70,8 +71,8 @@ class QuestionnaireOption extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF1B6FFF) // Selected: Blue
-                      : const Color(0xFF6B6C70), // Unselected: Gray
+                      ? FinColors.borderBlue // Selected: Blue
+                      : FinColors.radioUnselected, // Unselected: Gray
                   width: 2,
                 ),
                 color: Colors.transparent,
@@ -83,7 +84,7 @@ class QuestionnaireOption extends StatelessWidget {
                   height: 12,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFF1B6FFF), // Blue dot
+                    color: FinColors.borderBlue, // Blue dot
                   ),
                 ),
               )

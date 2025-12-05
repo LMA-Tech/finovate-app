@@ -2,6 +2,7 @@ import 'package:finovate_app/screens/signup/widgets/policy_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
+import '../../../utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
 import '../../../utils/constants/text_strings.dart';
 
@@ -31,7 +32,7 @@ class DisclaimerWidget extends StatelessWidget {
       case DisclaimerType.privacy:
         return TextSpan(
           style: const TextStyle(
-            color: Color(0xFFDFDFE0) /* Neutral-gray-200 */,
+            color: FinColors.textGray200,
             fontSize: FinSizes.fontSizeSm,
             fontWeight: FontWeight.w400,
             height: 1.29,
@@ -77,7 +78,7 @@ class DisclaimerWidget extends StatelessWidget {
       style: TextStyle(
         fontSize: FinSizes.fontSizeSm,
         fontWeight: FontWeight.w400,
-        color: Colors.white.withOpacity(0.8),
+        color: FinColors.textWhite.withOpacity(0.8),
       ),
     );
   }
@@ -88,7 +89,7 @@ class DisclaimerWidget extends StatelessWidget {
       style: const TextStyle(
         fontSize: FinSizes.fontSizeSm,
         fontWeight: FontWeight.w500,
-        color: Colors.white,
+        color: FinColors.textWhite,
         decoration: TextDecoration.underline,
       ),
       recognizer: TapGestureRecognizer()..onTap = onTap,

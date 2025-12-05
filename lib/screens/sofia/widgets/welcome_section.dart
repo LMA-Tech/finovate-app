@@ -80,7 +80,7 @@ class WelcomeSection extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeXXLg + 4,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
             height: 1.2,
           ),
           textAlign: TextAlign.center,
@@ -93,7 +93,7 @@ class WelcomeSection extends StatelessWidget {
           style: TextStyle(
             fontSize: FinSizes.fontSizeXXLg + 4,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
             height: 1.2,
           ),
           textAlign: TextAlign.center,
@@ -196,7 +196,7 @@ class WelcomeSectionVertical extends StatelessWidget {
           style: const TextStyle(
             fontSize: FinSizes.fontSizeXXLg + 2,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
             height: 1.2,
           ),
           textAlign: TextAlign.center,
@@ -209,7 +209,7 @@ class WelcomeSectionVertical extends StatelessWidget {
           style: TextStyle(
             fontSize: FinSizes.fontSizeXXLg + 2,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: FinColors.textWhite,
             height: 1.2,
           ),
           textAlign: TextAlign.center,

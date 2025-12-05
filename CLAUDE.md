@@ -225,6 +225,68 @@ final response = await FinovateApiService.post(
 - **🚧 In Progress:** SofIA AI Chat (backend integration)
 - **📋 Mocked (no backend):** Home widgets, Portfolio, Economy, Profile
 
+## Code Style Guidelines
+
+**IMPORTANT:** All code must follow these guidelines for consistency and maintainability.
+
+### Folder Structure & Separation of Concerns
+- **Screen Structure:** Follow the `screen`, `controller`, and `widgets` directory approach:
+  ```
+  lib/screens/<feature>/
+  ├── <feature>_screen.dart       # Main screen widget
+  ├── <feature>_controller.dart   # GetX controller for state
+  └── widgets/                    # Small, composable widgets
+      ├── widget_one.dart
+      └── widget_two.dart
+  ```
+- **Controller:** State management and business logic
+- **Screen:** Layout composition using widgets
+- **Widgets:** Small, reusable, single-responsibility components
+
+### Widget Design
+- **Prefer small composable widgets** over large monolithic ones
+- **Prefer flex values** (`Expanded`, `Flexible`, `Spacer`) over hardcoded sizes in Rows/Columns
+- This ensures the UI adapts to various screen sizes
+- Extract repeated UI patterns into separate widget classes
+
+### Logging
+- **Use `log` from `dart:developer`** rather than `print` or `debugPrint`
+- Example: `import 'dart:developer'; log('message');`
+- Never leave `print()` statements in production code
+
+### Utils & Constants
+- **Always use utils directory** to avoid inline code for:
+  - Colors: `lib/utils/constants/colors.dart` (FinColors)
+  - Sizes: `lib/utils/constants/sizes.dart` (FinSizes)
+  - Text strings: `lib/utils/constants/text_strings.dart`
+  - Routes: `lib/utils/constants/routes.dart`
+  - Images: `lib/utils/constants/image_strings.dart`
+- **Never hardcode** colors, sizes, or strings inline
+- Add new constants to the appropriate file when needed
+
+### Common Widgets
+- **Track reusable patterns** in `lib/common/widgets/`
+- When similar code appears in multiple places, extract to common widget
+- Current common widgets include:
+  - `primary_button.dart` - Primary, secondary, text buttons
+  - `custom_card.dart` - Card variants
+  - `skeleton_loader.dart` - Loading states
+  - `empty_state.dart` - Empty state displays
+  - `error_state.dart` - Error state with retry
+  - `section_header.dart` - Section headers with "Ver mais"
+  - `charts/` - Chart components (line, pie, bar, legends)
+
+### Code Quality Checklist
+Before committing code, verify:
+- [ ] No `print()` statements (use `log()` instead)
+- [ ] No hardcoded colors (use `FinColors.*`)
+- [ ] No hardcoded sizes (use `FinSizes.*`)
+- [ ] No hardcoded strings for UI text
+- [ ] Widgets are small and composable
+- [ ] Flex values used instead of fixed sizes where appropriate
+- [ ] Similar code extracted to common widgets
+- [ ] Follows screen/controller/widgets structure
+
 ## Important Notes
 
 - Backend API expected on port 5001 (not 3000 despite .env.example)

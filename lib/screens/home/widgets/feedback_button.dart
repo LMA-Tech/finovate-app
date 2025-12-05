@@ -37,8 +37,8 @@ class FeedbackButton extends StatelessWidget {
                 const Text(
                   'Enviar Feedback',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
                     fontWeight: FontWeight.w500,
                     height: 1.5,
                   ),
@@ -47,7 +47,7 @@ class FeedbackButton extends StatelessWidget {
                 // Arrow icon
                 const Icon(
                   Icons.arrow_forward,
-                  color: Colors.white,
+                  color: FinColors.textWhite,
                   size: 24,
                 ),
               ],
