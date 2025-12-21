@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Finovate is a cross-platform Flutter investment app with AI assistant (SofIA). Built with GetX for state management, Supabase for authentication, and a custom Node.js backend for AI features.
 
-**Stack:** Flutter 3.5.4, Dart, GetX, Supabase Auth, Custom Node.js API (localhost:5001)
+**Stack:** Flutter 3.5.4, Dart, GetX, Supabase Auth, Custom Node.js API (api.finovate.com.br)
 
 A complete plan for the project has been written to @plan.md.
 
@@ -53,9 +53,7 @@ flutter doctor              # Check Flutter setup
    - `API_BASE_URL` - Backend API URL (default: `http://localhost:3000`)
    - `ALLOW_BIOMETRIC_TEST_MODE` - Enable biometric testing (dev only)
 
-3. Backend API runs on port 5001 by default (see `finovate_api_service.dart:28`)
-   - Android emulator: Uses `http://10.0.2.2:5001/api/v1`
-   - Other platforms: Uses `http://localhost:5001/api/v1`
+3. Backend API: `https://api.finovate.com.br/api/v1` (see `finovate_api_service.dart:17`)
 
 ## Architecture
 
@@ -144,7 +142,8 @@ lib/
 │   ├── login/                   # ✅ Functional (has bugs)
 │   ├── signup/                  # ✅ Functional (has bugs)
 │   ├── sofia/                   # 🚧 In Progress (AI chat)
-│   ├── home/                    # 📋 Mocked
+│   ├── home/                    # ✅ Functional (API integrated)
+│   ├── stocks/                  # ✅ Functional (list + detail screens)
 │   ├── carteira/                # 📋 Mocked (Portfolio)
 │   ├── conjuntura/              # 📋 Mocked (Economy)
 │   └── perfil/                  # 📋 Mocked (Profile)
@@ -179,7 +178,8 @@ lib/
 ### API Communication
 - All requests include correlation ID for tracing
 - Auth token from Supabase session automatically included
-- See `finovate_api_service.dart:39-54` for header pattern
+- 30-second timeout on all API calls
+- See `finovate_api_service.dart` for header pattern and timeout configuration
 
 ## Common Patterns
 
@@ -222,8 +222,9 @@ final response = await FinovateApiService.post(
 ## Feature Status Reference
 
 - **✅ Functional (with bugs):** Splash, Onboarding, Login, Signup, Session management, Activity tracking
+- **✅ Functional (API integrated):** Home (dashboard summary), Stocks (list + detail with chart, indicators, company info)
 - **🚧 In Progress:** SofIA AI Chat (backend integration)
-- **📋 Mocked (no backend):** Home widgets, Portfolio, Economy, Profile
+- **📋 Mocked (no backend):** Portfolio, Economy, Profile
 
 ## Code Style Guidelines
 
@@ -270,10 +271,16 @@ final response = await FinovateApiService.post(
 - Current common widgets include:
   - `primary_button.dart` - Primary, secondary, text buttons
   - `custom_card.dart` - Card variants
-  - `skeleton_loader.dart` - Loading states
+  - `skeleton_loader.dart` - Skeleton loading placeholders
+  - `loading_state.dart` - Centered loading spinner (uses `loading_indicator` package with `ballSpinFadeLoader`)
   - `empty_state.dart` - Empty state displays
   - `error_state.dart` - Error state with retry
   - `section_header.dart` - Section headers with "Ver mais"
+  - `scrollable_header.dart` - Header with back button for scrollable screens (unlike `custom_appbar.dart` which is fixed)
+  - `segmented_tabs.dart` - Segmented tab control with pop-out effect
+  - `info_bottom_sheet.dart` - Info icon button with bottom sheet modal
+  - `stock_logo.dart` - Stock logo with network image support and fallback
+  - `trend_change_pill.dart` - Price change pill with positive/negative styling
   - `charts/` - Chart components (line, pie, bar, legends)
 
 ### Code Quality Checklist
@@ -289,8 +296,10 @@ Before committing code, verify:
 
 ## Important Notes
 
-- Backend API expected on port 5001 (not 3000 despite .env.example)
+- Backend API: `https://api.finovate.com.br/api/v1` (hosted on Railway)
 - GetX dependency injection used throughout - controllers are singletons
 - All user-facing strings should go in `utils/constants/text_strings.dart`
 - Theme colors defined in `utils/constants/colors.dart`
 - Navigation should always use `Get.to()` pattern, not named routes
+- Please remember to use @lib/utils/ directory and @lib/common/ for reuseable widgets
+- remember not to use in line text use fintexts and if not there add it in organized manner

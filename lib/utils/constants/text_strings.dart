@@ -1,8 +1,11 @@
-
-/// This class contains all the App Text in String formats
+/// This class contains all the App Text in String formats.
+///
+/// Organized by screen/feature for easy navigation.
+/// All user-facing strings should be in Portuguese (pt-BR).
 class FinTexts {
-
-  // -- GLOBAL Texts
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GLOBAL TEXTS
+  // ═══════════════════════════════════════════════════════════════════════════
   static const String and = "and";
   static const String skip = "Pular";
   static const String appName = "Finovate";
@@ -106,16 +109,13 @@ class FinTexts {
   // -- Sign Up Screen 3
   static const String cpf = "CPF";
   static const String birthDate = "Sua data de nascimento";
-  static const String newPassword = "New Password";
   static const String phoneNo = "Numero do seu celular";
   // Disclaimer
   static const String identityDocumentDisclaimer2 = "Digite seu nome completo exatamente como consta em seu documento de identidade oficial.";
 
   // -- Sign Up Screen 4
   static const String signupTitle3 = "Vamos verificar sua conta";
-  static const String verificationCode = "verificationCode";
-  static const String resendEmail = "Resend Email";
-  static const String resendEmailIn = "Resend email in";
+  static const String verificationCode = "Código de verificação";
 
 // ═══════════════════════════════════════════════════════════════════════════════════════
 // ONBOARDING QUESTIONNAIRE
@@ -229,16 +229,6 @@ class FinTexts {
   static const String extendSession = "Estender Sessão";
   static const String sessionExtended = "Sessão estendida com sucesso";
 
-  // -- Authentication Headings
-  static const String forgetPasswordSubTitle = "Don’t worry sometimes people can forget too, enter your email and we will send you a password reset link.";
-  static const String changeYourPasswordTitle = "Password Reset Email Sent";
-  static const String changeYourPasswordSubTitle = "Your Account Security is Our Priority! We've Sent You a Secure Link to Safely Change Your Password and Keep Your Account Protected.";
-  static const String confirmEmail = "Verify your email address!";
-  static const String confirmEmailSubTitle = "Congratulations! Your Account Awaits: Verify Your Email to Start Shopping and Experience a World of Unrivaled Deals and Personalized Offers.";
-  static const String emailNotReceivedMessage = "Didn’t get the email? Check your junk/spam or resend it.";
-  static const String yourAccountCreatedTitle = "Your account successfully created!";
-  static const String yourAccountCreatedSubTitle = "Welcome to Your Ultimate Shopping Destination: Your Account is Created, Unleash the Joy of Seamless Online Shopping!";
-
   // -- SofIA AI Assistant
   static const String sofiaScreenTitle = "SofIA";
   static const String sofiaGreetingHello = "Olá";
@@ -290,14 +280,123 @@ class FinTexts {
   static const String sofiaResponseFrequentes = "Aqui estão algumas perguntas frequentes:\n\n• Como diversificar minha carteira?\n• Qual a diferença entre ações e FIIs?\n• Como calcular o risco de um investimento?\n• Quando devo rebalancear minha carteira?";
   static const String sofiaResponseDefault = "Entendi sua pergunta sobre investimentos. Como assistente especializada em finanças, posso ajudar com análises de ativos, gestão de risco, e estratégias de investimento. Pode me dar mais detalhes sobre o que você gostaria de saber?";
 
-  // Debug and logging messages
-  static const String sofiaDebugControllerInit = "SofiaController initialized";
-  static const String sofiaDebugControllerDisposed = "SofiaController disposed";
-  static const String sofiaDebugUserInit = "User initialized";
-  static const String sofiaDebugErrorInit = "Error initializing user";
-  static const String sofiaDebugUserMessageAdded = "User message added";
-  static const String sofiaDebugErrorSending = "Error sending message";
-  static const String sofiaDebugSuggestionTapped = "Suggestion tapped";
-  static const String sofiaDebugAIResponseAdded = "AI response added";
-  static const String sofiaDebugChatCleared = "Chat cleared";
+  // -- Home Screen
+  static const String homeErrorTitle = "Erro ao carregar dados";
+  static const String homeErrorMessage = "Não foi possível carregar as informações. Verifique sua conexão e tente novamente.";
+
+  // -- Perfil Screen
+  static const String perfilScreenTitle = "Meu perfil";
+  static const String perfilTabMeuPlano = "Meu plano";
+  static const String perfilTabPerfil = "Perfil";
+  static const String perfilTabPreferencias = "Preferências";
+
+  // Perfil - Personal Info Fields (Conta tab)
+  static const String perfilNomeCompleto = "Nome";
+  static const String perfilApelido = "Apelido";
+  static const String perfilEmail = "E-mail";
+  static const String perfilTelefone = "Número do seu celular";
+  static const String perfilCpf = "Seu CPF/CNPJ";
+  static const String perfilDataNascimento = "Sua data de nascimento";
+  static const String perfilEditar = "Editar";
+  static const String perfilSecurityNotice = "Para proteger sua conta, algumas informações são ocultadas.";
+
+  // Perfil - Meu Plano Tab (With Plan)
+  static const String perfilPlanoGeral = "Geral";
+  static const String perfilPlanoStatus = "Status";
+  static const String perfilPlanoStatusActive = "Ativo";
+  static const String perfilPlanoComeouEm = "Começou em";
+  static const String perfilPlanoProximoPagamento = "Próximo pagamento";
+  static const String perfilPlanoPagamento = "Pagamento";
+  static const String perfilPlanoPrecoAnual = "Preço anual";
+  static const String perfilPlanoMetodo = "Método";
+  static const String perfilPlanoMudar = "Mudar meu plano";
+
+  // Perfil - Meu Plano Tab (Without Plan)
+  static const String perfilPlanoMaximize = "Maximize seu potencial de investimento.";
+  static const String perfilPlanoAssineAgora = "Assine agora";
+  static const String perfilPlanoAssineDesc = " e tenha acesso a ferramentas e insights exclusivos.";
+  static const String perfilPlanoVerPlanos = "Ver planos";
+
+  // Perfil - Preferências Tab (Geral section)
+  static const String perfilGeral = "Geral";
+  static const String perfilAparencia = "Aparência";
+  static const String perfilAparenciaValue = "Escura";
+  static const String perfilBiometria = "Biometria";
+  static const String perfilNotificacoes = "Notificações";
+
+  // Perfil - Preferências Tab (Conectividade e suporte section)
+  static const String perfilConectividadeSuporte = "Conectividade e suporte";
+  static const String perfilContasConectadas = "Contas conectadas";
+  static const String perfilConectarB3 = "Conecte sua conta B3 para aproveitar todos os recursos.";
+  static const String perfilPoliticaPrivacidade = "Política de privacidade";
+  static const String perfilAjuda = "Ajuda";
+
+  // Perfil - Preferências Tab (Notifications messages)
+  static const String perfilNotificacoesOff = "Fique por dentro do mercado! Ative as notificações.";
+  static const String perfilNotificacoesOn = "Agora você acompanha tudo em tempo real!";
+
+  // Perfil - Actions
+  static const String perfilSairConta = "Sair da Conta";
+  static const String perfilSairConfirmTitle = "Sair da Conta";
+  static const String perfilSairConfirmMessage = "Tem certeza que deseja sair da sua conta?";
+
+  // Common Actions
+  static const String save = "Salvar";
+  static const String profileUpdated = "Perfil atualizado com sucesso";
+  static const String perfilContaVerificada = "Conta Verificada";
+
+  // Email Change
+  static const String emailChangeTitle = "Alterar e-mail";
+  static const String emailVerifyTitle = "Verificar e-mail";
+  static const String emailChangeSubtitle = "Digite seu novo endereço de e-mail";
+  static const String emailVerifySubtitle = "Digite o código enviado para";
+  static const String emailNewLabel = "Novo e-mail";
+  static const String emailOtpLabel = "Código de verificação";
+  static const String emailResendCode = "Reenviar código";
+  static const String emailResendSuccess = "Código reenviado com sucesso";
+  static const String emailSendCode = "Enviar código";
+  static const String emailVerify = "Verificar";
+  static const String emailBack = "Voltar";
+
+  // Support
+  static const String supportEmail = "suporte@finovate.com.br";
+  static const String supportEmailSubject = "Ajuda - Finovate App";
+
+  // -- Risk Gauge
+  static const String riskLevelLow = "Baixo";
+  static const String riskLevelModerate = "Moderado";
+  static const String riskLevelHigh = "Alto";
+  static const String riskVolatilityLabel = "Volatilidade:";
+  static const String riskCalculationExplanation = "Risco calculado com base na volatilidade do período";
+
+  // -- Chart/Data Empty States
+  static const String dataNotAvailable = "Dados não disponíveis";
+  static const String riskDataNotAvailable = "Dados de risco não disponíveis";
+
+  // -- Stocks Screen
+  static const String stocksScreenTitle = "Ações";
+  static const String stocksSearchPlaceholder = "Encontre uma ação ou empresa";
+  static const String stocksFilterAll = "Todas";
+  static const String stocksFilterTopGainers = "Maiores altas";
+  static const String stocksFilterTopLosers = "Maiores baixas";
+  static const String stocksEmptyTitle = "Nenhuma ação encontrada";
+  static const String stocksEmptySubtitle = "Tente buscar por outro termo";
+  static const String stocksPaginationPrevious = "Anterior";
+  static const String stocksPaginationNext = "Próxima";
+  static const String stocksPaginationPage = "Página";
+  static const String stocksPaginationOf = "de";
+
+  // -- Stock Detail Screen
+  static const String stockDetailChartTitle = "Gráfico do histórico de preços";
+  static const String stockDetailLastUpdate = "Última atualização:";
+  static const String stockDetailAboutCompany = "Sobre a empresa";
+  static const String stockDetailIndicators = "Indicadores financeiros";
+  static const String stockDetailIndicatorsInfo = "Os indicadores financeiros ajudam a avaliar a saúde financeira e o desempenho de uma empresa. Use-os para comparar empresas do mesmo setor.";
+  static const String stockDetailSeeMore = "Ver mais";
+  static const String stockDetailSeeLess = "Ver menos";
+  static const String stockDetailFavoriteAdded = "Ação adicionada aos favoritos.";
+  static const String stockDetailFavoriteRemoved = "Ação retirada dos favoritos.";
+  static const String stockDetailLoadError = "Erro ao carregar dados da ação";
+  static const String stockDetailChartInfoTitle = "Gráfico de Preços";
+  static const String stockDetailChartInfoDescription = "Arraste o dedo sobre o gráfico para ver o preço e a data em diferentes pontos no tempo.";
 }

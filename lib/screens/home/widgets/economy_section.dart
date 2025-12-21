@@ -71,7 +71,7 @@ class EconomyIndicatorCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isPositive
                             ? FinColors.trendPositiveBg
-                            : FinColors.trendNegativeBg,
+                            : FinColors.trendNegativeIconBg,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
@@ -185,30 +185,50 @@ class EconomySection extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // Indicators horizontal list
+        // Indicators horizontal list or empty state
         SizedBox(
           height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
-            itemCount: indicators.length,
-            itemBuilder: (context, index) {
-              final indicator = indicators[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  right: index < indicators.length - 1 ? 12 : 0,
+          child: indicators.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: FinColors.cardBackground,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Não foi possível carregar os indicadores',
+                        style: TextStyle(
+                          color: FinColors.textGray300,
+                          fontSize: FinSizes.fontSizeSm,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+                  itemCount: indicators.length,
+                  itemBuilder: (context, index) {
+                    final indicator = indicators[index];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: index < indicators.length - 1 ? 12 : 0,
+                      ),
+                      child: EconomyIndicatorCard(
+                        title: indicator.title,
+                        value: indicator.value,
+                        change: indicator.change,
+                        changePercent: indicator.changePercent,
+                        isPositive: indicator.isPositive,
+                        onTap: indicator.onTap,
+                      ),
+                    );
+                  },
                 ),
-                child: EconomyIndicatorCard(
-                  title: indicator.title,
-                  value: indicator.value,
-                  change: indicator.change,
-                  changePercent: indicator.changePercent,
-                  isPositive: indicator.isPositive,
-                  onTap: indicator.onTap,
-                ),
-              );
-            },
-          ),
         ),
       ],
     );

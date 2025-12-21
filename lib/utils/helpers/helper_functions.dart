@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../constants/sizes.dart';
+import '../constants/text_strings.dart';
 
 class FinHelperFunctions {
 
@@ -153,5 +154,40 @@ class FinHelperFunctions {
       return const EdgeInsets.all(basePadding * 1.25);
     }
     return const EdgeInsets.all(basePadding);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+  // ERROR MESSAGE HELPERS
+  // Convert exceptions to user-friendly error messages
+  // ═══════════════════════════════════════════════════════════════════════════════════════
+
+  /// Converts an exception to a user-friendly error message
+  /// Use this in catch blocks to display meaningful messages to users
+  static String getErrorMessage(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+
+    // Connection errors (server down, no internet, etc.)
+    if (errorString.contains('socketexception') ||
+        errorString.contains('connection refused') ||
+        errorString.contains('network is unreachable') ||
+        errorString.contains('no address associated') ||
+        errorString.contains('failed host lookup')) {
+      return FinTexts.loginErrorNetwork;
+    }
+
+    // Timeout errors
+    if (errorString.contains('timeout') ||
+        errorString.contains('timed out')) {
+      return FinTexts.loginErrorNetwork;
+    }
+
+    // Certificate/SSL errors
+    if (errorString.contains('certificate') ||
+        errorString.contains('handshake')) {
+      return FinTexts.loginErrorNetwork;
+    }
+
+    // Generic fallback
+    return FinTexts.loginErrorUnknown;
   }
 }

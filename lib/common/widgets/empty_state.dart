@@ -83,6 +83,22 @@ class EmptyState extends StatelessWidget {
     );
   }
 
+  /// Factory for stock data not available state
+  factory EmptyState.stockDataUnavailable({
+    String? ticker,
+    VoidCallback? onGoBack,
+  }) {
+    return EmptyState(
+      icon: Icons.trending_up_outlined,
+      title: 'Dados indisponíveis',
+      subtitle: ticker != null
+          ? 'Não foi possível carregar os dados de $ticker no momento. Tente novamente mais tarde.'
+          : 'Os dados desta ação não estão disponíveis no momento.',
+      buttonText: 'Voltar',
+      onButtonPressed: onGoBack,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(

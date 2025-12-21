@@ -45,21 +45,21 @@ class PortfolioSection extends StatelessWidget {
             onTabChanged: (index) => onTabChanged?.call(index),
           ),
 
-          const SizedBox(height: 24),
-
-          // Period filter buttons using TimePeriodSelector
-          // Using non-scrollable layout to match Figma (justify-between)
-          TimePeriodSelector(
-            periods: const [
-              TimePeriod(label: 'Semana', value: '1w'),
-              TimePeriod(label: 'No mês', value: 'mtd'),
-              TimePeriod(label: '1 mês', value: '1m'),
-              TimePeriod(label: '12 meses', value: '12m'),
-            ],
-            selectedIndex: selectedPeriod,
-            onPeriodChanged: (index) => onPeriodChanged?.call(index),
-            scrollable: false,
-          ),
+          // Period filter buttons - only show for Rentabilidade and Risco tabs (not Composição)
+          if (selectedTab != 2) ...[
+            const SizedBox(height: 24),
+            TimePeriodSelector(
+              periods: const [
+                TimePeriod(label: 'Semana', value: 'week'),
+                TimePeriod(label: '1 mês', value: 'month'),
+                TimePeriod(label: '3 meses', value: 'three_months'),
+                TimePeriod(label: '12 meses', value: 'twelve_months'),
+              ],
+              selectedIndex: selectedPeriod,
+              onPeriodChanged: (index) => onPeriodChanged?.call(index),
+              scrollable: false,
+            ),
+          ],
         ],
       ),
     );

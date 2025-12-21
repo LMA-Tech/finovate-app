@@ -23,22 +23,22 @@ class AuthService {
     }
   }
 
-  /// Check if CPF already exists by querying the users table
-  Future<bool> checkCpfExists(String cpf) async {
+  /// Check if tax ID (CPF/CNPJ) already exists by querying the users table
+  Future<bool> checkTaxIdExists(String taxId) async {
     try {
-      // Remove formatting from CPF (keep only numbers)
-      final cleanCpf = cpf.replaceAll(RegExp(r'[^\d]'), '');
+      // Remove formatting (keep only numbers)
+      final cleanTaxId = taxId.replaceAll(RegExp(r'[^\d]'), '');
 
       final response = await _supabase
           .from('users')
-          .select('cpf')
-          .eq('cpf', cleanCpf)
+          .select('tax_id')
+          .eq('tax_id', cleanTaxId)
           .maybeSingle();
 
       return response != null;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error checking CPF: $e');
+        debugPrint('Error checking tax ID: $e');
       }
       return false;
     }
@@ -222,7 +222,7 @@ class AuthService {
     String? lastName,
     String? middleName,
     DateTime? birthdate,
-    String? cpf,
+    String? taxId,
     String? phoneNumber,
   }) async {
     try {
@@ -237,7 +237,7 @@ class AuthService {
       if (lastName != null) updates['last_name'] = lastName.trim();
       if (middleName != null) updates['middle_name'] = middleName.trim();
       if (birthdate != null) updates['birthdate'] = birthdate.toIso8601String().split('T')[0]; // Date only
-      if (cpf != null) updates['cpf'] = cpf.trim();
+      if (taxId != null) updates['tax_id'] = taxId.trim();
       if (phoneNumber != null) updates['phone_number'] = phoneNumber.trim();
 
       await _supabase
@@ -246,6 +246,118 @@ class AuthService {
           .eq('auth_id', userId);
     } catch (e) {
       throw 'Failed to update profile: $e';
+    }
+  }
+
+  /// Update user metadata in Supabase auth (for immediate UI updates)
+  /// Also updates the custom users table for data consistency
+  Future<void> updateUserMetadata({
+    String? firstName,
+    String? lastName,
+    String? nickname,
+    String? phoneNumber,
+    DateTime? birthdate,
+  }) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) throw 'User not authenticated';
+
+      // Build metadata updates
+      final metadata = <String, dynamic>{};
+      if (firstName != null) metadata['first_name'] = firstName.trim();
+      if (lastName != null) metadata['last_name'] = lastName.trim();
+      if (nickname != null) metadata['nickname'] = nickname.trim();
+      if (phoneNumber != null) metadata['phone_number'] = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+      if (birthdate != null) metadata['birthdate'] = birthdate.toIso8601String();
+
+      if (metadata.isNotEmpty) {
+        // Update auth metadata
+        await _supabase.auth.updateUser(
+          UserAttributes(data: metadata),
+        );
+
+        // Also update users table for consistency
+        await updateUserProfile(
+          firstName: firstName,
+          lastName: lastName,
+          phoneNumber: phoneNumber,
+          birthdate: birthdate,
+        );
+      }
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Falha ao atualizar perfil: $e';
+    }
+  }
+
+  /// Updates a single user preference in metadata
+  Future<void> updateUserPreference(String key, String value) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) throw 'User not authenticated';
+
+      await _supabase.auth.updateUser(
+        UserAttributes(data: {key: value}),
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Failed to update preference: $e';
+    }
+  }
+
+  /// Request email change - sends OTP to new email
+  Future<void> requestEmailChange(String newEmail) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) throw 'Usuário não autenticado';
+
+      // Check if new email already exists
+      final exists = await checkEmailExists(newEmail);
+      if (exists) {
+        throw 'Este e-mail já está em uso';
+      }
+
+      // Supabase sends verification email to the new address
+      await _supabase.auth.updateUser(
+        UserAttributes(email: newEmail.trim().toLowerCase()),
+      );
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      if (e is String) rethrow;
+      throw 'Falha ao solicitar alteração de e-mail: $e';
+    }
+  }
+
+  /// Verify email change OTP
+  Future<void> verifyEmailChangeOTP({
+    required String newEmail,
+    required String token,
+  }) async {
+    try {
+      await _supabase.auth.verifyOTP(
+        type: OtpType.emailChange,
+        token: token,
+        email: newEmail.trim().toLowerCase(),
+      );
+
+      // Update users table with new email
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId != null) {
+        await _supabase
+            .from('users')
+            .update({
+              'email': newEmail.trim().toLowerCase(),
+              'updated_at': DateTime.now().toIso8601String(),
+            })
+            .eq('auth_id', userId);
+      }
+    } on AuthException catch (e) {
+      throw _getErrorMessage(e.message);
+    } catch (e) {
+      throw 'Código inválido ou expirado';
     }
   }
 
@@ -281,8 +393,8 @@ class AuthService {
       return 'Email already exists';
     } else if (error.contains('duplicate key value violates unique constraint "users_email_key"')) {
       return 'This email is already registered';
-    } else if (error.contains('duplicate key value violates unique constraint "users_cpf_key"')) {
-      return 'This CPF is already registered';
+    } else if (error.contains('duplicate key value violates unique constraint "users_tax_id_key"')) {
+      return 'This CPF/CNPJ is already registered';
     } else {
       return error;
     }

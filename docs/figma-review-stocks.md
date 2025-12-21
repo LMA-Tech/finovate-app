@@ -19,8 +19,7 @@ The Stocks section provides a searchable list of stocks with filtering capabilit
 |---------|--------------|
 | Title | "Ações" |
 | Title Size | 24px, Weight 600, Color: White |
-| Back Button | Left arrow icon |
-| Close Button | X icon (top right) |
+| Back Button | Left arrow icon (returns to Home) |
 
 ### Search Bar
 | Property | Value |
@@ -78,15 +77,17 @@ Each stock row contains:
 | Chevron | Right arrow, #7C7C83, for navigation |
 
 ### Sample Stock Data
+**Note:** Figma mockups showed US stocks as examples. The app displays Brazilian stocks from B3.
+
 | Symbol | Company | Price | Change |
 |--------|---------|-------|--------|
-| MSFT | Microsoft Corp. | R$ 2.002,42 | +1,88% |
-| AAPPL | Apple Inc. | R$ 1.171,00 | +1,75% |
-| SPOT | Adobe Inc | R$ 2.992,91 | +1,62% |
-| GOOGL | Alphabet Inc. | R$ 833,46 | +3,65% |
-| AMZN | Amazon Inc. | R$ 1.031,37 | +5,69% |
-| LYFT | Lyft Inc. | R$ 67,08 | +5,48% |
-| ADBE | Adobe Inc. | R$ 2.017,60 | +0,58% |
+| PETR4 | Petrobras PN | R$ 38,20 | +1,25% |
+| VALE3 | Vale ON | R$ 62,30 | -0,75% |
+| ITUB4 | Itaú Unibanco PN | R$ 32,45 | +0,85% |
+| BBDC4 | Bradesco PN | R$ 12,45 | +2,10% |
+| ABEV3 | Ambev ON | R$ 11,80 | -0,42% |
+| WEGE3 | WEG ON | R$ 52,30 | +1,15% |
+| RENT3 | Localiza ON | R$ 45,60 | +0,92% |
 
 ### Load More Button
 | Property | Value |
@@ -428,13 +429,16 @@ class FinancialIndicatorRow extends StatelessWidget {
 Home Screen
 └── "Bolsa" section → "Ver mais"
     └── Stocks List Screen ("Ações")
+        ├── Back button → Return to Home
         └── Tap stock row
-            └── Stock Detail Screen
+            └── Stock Detail Screen (future)
                 ├── Tap bookmark → Toggle favorite (show toast)
                 ├── Tap (ⓘ) on chart → Show info bottom sheet
                 ├── Tap (ⓘ) on indicators → Show info bottom sheet
                 └── Tap back → Return to list
 ```
+
+**Entry Point:** Only accessible from Home screen "Bolsa" section "Ver mais" link.
 
 ---
 

@@ -129,6 +129,8 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
+  final bool enabled;
+  final bool autofocus;
 
   const CustomTextField({
     super.key,
@@ -141,6 +143,8 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.inputFormatters,
     this.validator,
+    this.enabled = true,
+    this.autofocus = false,
   });
 
   @override
@@ -169,6 +173,8 @@ class CustomTextField extends StatelessWidget {
           textInputAction: textInputAction,
           inputFormatters: inputFormatters,
           validator: validator,
+          enabled: enabled,
+          autofocus: autofocus,
           style: const TextStyle(
             color: FinColors.white,
             fontSize: 16,

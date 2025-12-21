@@ -36,6 +36,13 @@ class AppRoutes {
   static const String home = '/home';
 
   // ═══════════════════════════════════════════════════════════════
+  // STOCKS SCREENS
+  // ═══════════════════════════════════════════════════════════════
+
+  /// Stocks list screen (Ações) - accessed from Home "Bolsa" section
+  static const String stocks = '/stocks';
+
+  // ═══════════════════════════════════════════════════════════════
   // BOTTOM NAVIGATION SCREENS
   // Accessible via bottom navigation bar from home
   // ═══════════════════════════════════════════════════════════════
@@ -85,6 +92,7 @@ class AppRoutes {
     signup,
     forgotPassword,
     home,
+    stocks,
     carteira,
     conjuntura,
     perfil,
@@ -106,6 +114,7 @@ class AppRoutes {
   /// Routes that require authentication
   static const List<String> protectedRoutes = [
     home,
+    stocks,
     carteira,
     conjuntura,
     perfil,

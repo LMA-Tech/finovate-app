@@ -553,6 +553,12 @@ class SessionManager extends GetxController {
     final metadata = currentUser.value?.userMetadata;
     return metadata?['avatar_url'] as String? ?? metadata?['photo_url'] as String?;
   }
+
+  /// Refreshes the current user data from Supabase
+  /// Call this after updating user metadata to get the latest values
+  void refreshCurrentUser() {
+    currentUser.value = _supabase.auth.currentUser;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════

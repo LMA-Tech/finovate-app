@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/constants/colors.dart';
+import '../../utils/constants/sizes.dart';
 
 /// Shows a simple info bottom sheet with title and description.
-///
-/// Use this anywhere in the app where (ⓘ) icon or "O que é X?" links appear.
-/// Based on Figma design specs from docs/global-components.md
 void showInfoBottomSheet({
   required BuildContext context,
   required String title,
@@ -13,12 +11,12 @@ void showInfoBottomSheet({
 }) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: FinColors.dialogBackground,
+    backgroundColor: FinColors.cardBackground,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(FinSizes.borderRadiusLg)),
     ),
     builder: (context) => Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(FinSizes.lg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,22 +24,22 @@ void showInfoBottomSheet({
           Text(
             title,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: FinSizes.fontSizeLg,
               fontWeight: FontWeight.w600,
               color: FinColors.textWhite,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: FinSizes.sm),
           Text(
             description,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: FinSizes.fontSizeSm,
               fontWeight: FontWeight.w400,
               color: FinColors.textGray200,
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 24), // Bottom safe area padding
+          const SizedBox(height: FinSizes.lg),
         ],
       ),
     ),
@@ -58,7 +56,7 @@ class InfoIconButton extends StatelessWidget {
   const InfoIconButton({
     required this.title,
     required this.description,
-    this.size = 20,
+    this.size = FinSizes.iconMd,
     this.color,
     super.key,
   });
@@ -106,15 +104,15 @@ class WhatIsLink extends StatelessWidget {
         children: [
           const Icon(
             Icons.info_outline,
-            size: 16,
+            size: FinSizes.iconSm,
             color: FinColors.iconGray,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: FinSizes.sm),
           Text(
             'O que é $subject?',
             style: const TextStyle(
               color: FinColors.iconGray,
-              fontSize: 13,
+              fontSize: FinSizes.fontSizeS,
             ),
           ),
         ],

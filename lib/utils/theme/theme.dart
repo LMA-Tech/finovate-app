@@ -15,7 +15,7 @@ class FinAppTheme {
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: 'DMSans',
+    fontFamily: 'PlusJakartaSans',
     disabledColor: FinColors.grey,
     brightness: Brightness.light,
     primaryColor: FinColors.primary,
@@ -32,7 +32,7 @@ class FinAppTheme {
 
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: 'DMSans',
+    fontFamily: 'PlusJakartaSans',
     disabledColor: FinColors.grey,
     brightness: Brightness.dark,
     primaryColor: FinColors.primary,

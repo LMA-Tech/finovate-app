@@ -138,10 +138,10 @@ class SignupController extends GetxController {
 
     // Step 2: Personal Details
     step3Form = FormGroup({
-      'cpf': FormControl<String>(
+      'taxId': FormControl<String>(
         validators: [
           Validators.required,
-          Validators.pattern(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$'),
+          Validators.minLength(14), // Minimum: CPF formatted (14 chars: 000.000.000-00)
         ],
       ),
       'phone': FormControl<String>(
@@ -265,12 +265,12 @@ class SignupController extends GetxController {
       }
     }
 
-    // Step 2: Check if CPF exists
+    // Step 2: Check if tax ID (CPF/CNPJ) exists
     if (currentStep.value == 2) {
-      final cpf = step3Form.control('cpf').value;
-      if (cpf != null && cpf.isNotEmpty) {
-        final cpfExists = await _auth.checkCpfExists(cpf);
-        if (cpfExists) {
+      final taxId = step3Form.control('taxId').value;
+      if (taxId != null && taxId.isNotEmpty) {
+        final taxIdExists = await _auth.checkTaxIdExists(taxId);
+        if (taxIdExists) {
           await AppDialogs.showError(
             title: FinTexts.signupErrorTitle,
             message: FinTexts.signupErrorCpfExists,
@@ -456,7 +456,7 @@ class SignupController extends GetxController {
           birthdate: userData['birthdate'] != null
               ? DateTime.parse(userData['birthdate'])
               : null,
-          cpf: userData['cpf'],
+          taxId: userData['tax_id'],
           phoneNumber: userData['phone_number'],
         );
 
@@ -581,9 +581,9 @@ class SignupController extends GetxController {
       'email': step1Form.control('email').value.trim().toLowerCase(),
     };
 
-    final cpf = step3Form.control('cpf').value;
-    if (cpf != null && cpf.isNotEmpty) {
-      userData['cpf'] = cpf.replaceAll(RegExp(r'[^\d]'), '');
+    final taxId = step3Form.control('taxId').value;
+    if (taxId != null && taxId.isNotEmpty) {
+      userData['tax_id'] = taxId.replaceAll(RegExp(r'[^\d]'), '');
     }
 
     final phone = step3Form.control('phone').value;

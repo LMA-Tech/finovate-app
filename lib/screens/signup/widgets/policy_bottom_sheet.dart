@@ -62,40 +62,16 @@ class PolicyBottomSheet extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Drag handle
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(top: 12),
-            decoration: BoxDecoration(
-              color: FinColors.textWhite.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Header with title and close button
+          // Header with title
           Padding(
             padding: const EdgeInsets.all(FinSizes.defaultSpace),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: FinColors.textWhite,
-                    fontSize: FinSizes.fontSizeXLg,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(
-                    Icons.close,
-                    color: FinColors.textWhite,
-                    size: 24,
-                  ),
-                ),
-              ],
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: FinColors.textWhite,
+                fontSize: FinSizes.fontSizeXLg,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
 

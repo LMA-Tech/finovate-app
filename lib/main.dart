@@ -10,11 +10,13 @@ import 'package:finovate_app/screens/login/login_screen.dart';
 import 'package:finovate_app/screens/onboarding/onboarding_screen.dart';
 import 'package:finovate_app/screens/perfil/perfil_screen.dart';
 import 'package:finovate_app/screens/signup/signup_screen.dart';
+import 'package:finovate_app/screens/stocks/stocks_screen.dart';
 import 'package:finovate_app/screens/sofia/sofia_chat_screen.dart';
 import 'package:finovate_app/screens/sofia/sofia_home_screen.dart';
 import 'package:finovate_app/screens/splash/splash_screen.dart';
 import 'package:finovate_app/services/activity_tracker.dart';
 import 'package:finovate_app/services/asset_cache_manager.dart';
+import 'package:finovate_app/services/auth_service.dart';
 import 'package:finovate_app/services/session_manager.dart';
 import 'package:finovate_app/controllers/bottom_navigation_controller.dart';
 import 'package:finovate_app/utils/constants/routes.dart';
@@ -118,6 +120,14 @@ class FinovateApp extends StatelessWidget {
         ),
 
         // ═══════════════════════════════════════════════════════════════
+        // STOCKS SCREENS
+        // ═══════════════════════════════════════════════════════════════
+        GetPage(
+          name: AppRoutes.stocks,
+          page: () => const StocksScreen(),
+        ),
+
+        // ═══════════════════════════════════════════════════════════════
         // BOTTOM NAVIGATION SCREENS
         // Accessible via HomeScreen's bottom navigation bar
         // ═══════════════════════════════════════════════════════════════
@@ -163,6 +173,7 @@ class FinovateApp extends StatelessWidget {
       // Initialize global controllers
       initialBinding: BindingsBuilder(() {
         // Core services that persist throughout app lifecycle
+        Get.put(AuthService(), permanent: true);
         Get.put(SessionManager(), permanent: true);
         Get.put(ActivityTracker(), permanent: true);
         Get.put(BottomNavigationController(), permanent: true);

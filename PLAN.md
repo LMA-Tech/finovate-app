@@ -59,11 +59,13 @@ This plan covers all requirements from `specs/initial-requirements.md`, organize
 - Current common widgets:
   - `primary_button.dart` - Primary, secondary, text buttons
   - `custom_card.dart` - Card variants
-  - `skeleton_loader.dart` - Loading states
+  - `skeleton_loader.dart` - Skeleton loading placeholders
+  - `loading_state.dart` - Centered loading spinner (uses `loading_indicator` package with `ballSpinFadeLoader`)
   - `empty_state.dart` - Empty state displays
   - `error_state.dart` - Error state with retry
   - `section_header.dart` - Section headers with "Ver mais"
-  - `segmented_tabs.dart` - Tab navigation
+  - `scrollable_header.dart` - Header with back button for scrollable screens (unlike `custom_appbar.dart` which is fixed)
+  - `segmented_tabs.dart` - Tab navigation with pop-out effect
   - `toast_notification.dart` - Toast messages
   - `info_bottom_sheet.dart` - Info sheets
   - `charts/` - Chart components (line, pie, bar, legends)
@@ -443,18 +445,19 @@ Screens with proper structure ✅:
 ## Phase 3: Home Screen Implementation
 
 ### 3.1 Home Screen - Data Integration
-**Status:** ⚠️ 85% Complete - UI complete, needs real data integration
+**Status:** ✅ 97% Complete - UI and API integration done, pull-to-refresh and error states added
 
 **Current State:**
-- All UI sections built with mocked data
+- All UI sections built and integrated with backend API
 - **Refactored:** Home widgets now use common chart components (fl_chart)
 - **Refactored:** PortfolioSection uses SectionHeader, SegmentedTabs, TimePeriodSelector
 - **Refactored:** PortfolioChart uses CustomLineChart with proper legends
 - **Refactored:** StockCard and EconomySection use common components
 - **Added:** Skeleton loading states for all sections
 - **Added:** "Ver mais" navigation to appropriate tabs
-- **Added:** 3-screen feedback flow (category → message → success)
-- No API integration yet
+- **Added:** 4-screen feedback flow (rating → focus areas → comments → success)
+- **Integrated:** Dashboard API providing stocks, indicators, indices, portfolio data
+- **Models:** Stock, MarketIndicator, MarketIndex, DashboardSummary created in lib/models/
 
 **Tasks:**
 
@@ -486,28 +489,30 @@ Screens with proper structure ✅:
 - [✅] Replace CustomPaint chart with fl_chart LineChart - **DONE**
 - [✅] Add interactive tooltips on hover/tap - **DONE** (via CustomLineChart)
 - [✅] Chart legend with proper colors - **DONE** (ChartLegend component)
-- [ ] Fetch real portfolio performance data from backend
-- [ ] Fetch benchmark data (IBOV) from ETL Gold layer
-- [ ] Implement time period filtering (Semana, No mês, 1 mês, 12 meses)
+- [✅] Fetch real portfolio performance data from backend - **DONE** (via /dashboard/summary)
+- [✅] Fetch benchmark data (IBOV) from API - **DONE** (real IBOV data from brapi.dev)
+- [✅] Wire PortfolioChart to use API data - **DONE**
+- [ ] Implement time period filtering with /portfolio/performance endpoint
 - [ ] Show percentage labels on chart
 
 #### 3.1.5 Stock Cards Section
 - [✅] Stock card UI - Refactored with common styling
 - [✅] Connect "Ver mais" to Conjuntura tab navigation - **DONE**
-- [ ] Replace mock stock data with real market data
-- [ ] Fetch from ETL Gold layer via backend API
-- [ ] Implement horizontal scroll with 2+ visible cards
-- [ ] Add real-time price updates (D-1 acceptable for MVP)
+- [✅] Replace mock stock data with real market data - **DONE** (from brapi.dev via /dashboard/summary)
+- [✅] Fetch from backend API - **DONE** (/market/stocks endpoint)
+- [✅] Implement horizontal scroll with 2+ visible cards - **DONE**
+- [✅] Show real stock prices (D-1 data from brapi.dev) - **DONE**
+- [ ] Show logo_url from API response
 - [ ] Show trending stocks based on user portfolio/preferences
 
 #### 3.1.6 Economy Indicators Section
 - [✅] Economy section UI - Refactored with common styling
 - [✅] Connect "Ver mais" to Conjuntura tab navigation - **DONE**
-- [ ] Fetch real indicators from backend (Dólar, SELIC, IPCA)
-- [ ] Source from ETL Gold layer
-- [ ] Implement horizontal scroll
+- [✅] Fetch real indicators from backend (Dólar, EUR, SELIC, IPCA) - **DONE** (from brapi.dev)
+- [✅] Implement horizontal scroll - **DONE**
+- [✅] Add skeleton loading states - **DONE**
 - [ ] Add last updated timestamp per indicator
-- [ ] Add skeleton loading states
+- [ ] Show indicator source attribution
 
 #### 3.1.7 Feedback Button
 - [✅] Implement 4-screen feedback flow - **DONE** (restructured to match Figma)
@@ -529,9 +534,9 @@ Screens with proper structure ✅:
 - [ ] Add backend API endpoint for feedback submission
 
 #### 3.1.8 General Home Improvements
-- [ ] Add pull-to-refresh for all sections
+- [✅] Add pull-to-refresh for all sections - **DONE** (RefreshIndicator wrapping content)
 - [✅] Implement skeleton loading states for each section - **DONE**
-- [ ] Add error states with retry buttons
+- [✅] Add error states with retry buttons - **DONE** (ErrorState component with FinTexts)
 - [ ] Optimize data refresh on app foreground
 - [ ] Cache data locally for offline viewing
 
@@ -551,9 +556,460 @@ Screens with proper structure ✅:
 
 ---
 
-## Phase 4: Carteira (Portfolio) Screen Implementation
+## Phase 4: Perfil (Profile) Screen Implementation
 
-### 4.1 Carteira Screen - Complete Rebuild
+### 4.1 Perfil Screen - Functionality Implementation
+**Status:** ✅ 90% Complete - UI done, core features implemented
+
+**Current State:**
+- 3-tab structure: Meu Plano, Perfil, Preferências
+- Profile info with masked values (email, phone, CPF/CNPJ)
+- Edit functionality for name, nickname, phone (via bottom sheet) - empty initial value
+- Biometric toggle with availability check and SharedPreferences + metadata dual storage
+- Notification toggle with SharedPreferences + metadata dual storage
+- Support email integration (mailto link to suporte@finovate.com.br)
+- Logout with confirmation dialog
+- Gradient tab styling based on subscription status (Free/Pro)
+- Plan type display (currently set to 'free' for testing)
+
+**Tasks:**
+
+#### 4.1.1 Profile Information Display
+- [✅] User name - Implemented with masked display
+- [✅] Email - Implemented with masked display
+- [✅] Phone - Implemented with masked display
+- [✅] CPF/CNPJ - Implemented with masked display (auto-detects 11 or 14 digits)
+- [✅] Birth date - Displayed (not editable by design)
+- [✅] Nickname/Apelido - Editable via bottom sheet
+- [ ] Add profile photo upload functionality
+- [ ] Show subscription tier badge (Free/Pro) - UI ready, needs backend
+
+#### 4.1.2 Account Settings - Personal Information
+- [✅] Created edit bottom sheet with field validation (empty initial value)
+- [✅] Display: Full name, Nickname, Email (masked), Phone (masked), CPF/CNPJ (masked), Birth date
+- [✅] Allow name editing with validation
+- [✅] Allow nickname editing with validation
+- [✅] Allow phone editing with Brazilian format validation
+- [✅] Save changes to Supabase auth metadata + users table
+- [✅] Show success toast feedback
+- [✅] Email change flow (OTP) - UI ready, deferred until Supabase email link configured
+- [✅] CPF/CNPJ not editable (by design)
+- [✅] Birth date not editable (by design)
+
+#### 4.1.3 Account Settings - Security
+- [ ] Create "Segurança" screen
+- [ ] Implement change password flow:
+  - Current password verification
+  - New password + confirmation
+  - Strength indicator
+- [ ] Add 2FA setup (future enhancement)
+- [ ] Show last login information
+- [ ] Add session management (view active sessions)
+
+#### 4.1.4 Account Settings - Bank Accounts
+- [ ] Create "Contas Bancárias" screen
+- [ ] Display linked B3 accounts
+- [ ] Add "Connect B3" button
+- [ ] Show connection status
+- [ ] Allow disconnection with confirmation
+- [ ] Display last sync timestamp
+
+#### 4.1.5 Account Settings - Transaction History
+- [ ] Create "Histórico de Transações" screen
+- [ ] Fetch transaction data from backend
+- [ ] Display: date, type, asset, quantity, price
+- [ ] Add filters: date range, transaction type
+- [ ] Add export to CSV functionality
+- [ ] Implement pagination for long history
+
+#### 4.1.6 App Settings - Notifications
+- [ ] Implement notification preferences toggle
+- [ ] Create notification categories:
+  - Portfolio changes
+  - Market alerts
+  - Sofia responses
+  - System updates
+- [ ] Save preferences to backend
+- [ ] Connect to push notification system (future)
+
+#### 4.1.7 App Settings - Theme
+- [ ] If keeping both themes: Implement theme toggle
+- [ ] If dark-only: Remove theme option entirely
+- [ ] Persist theme preference locally
+- [ ] Apply theme change immediately
+
+#### 4.1.8 App Settings - Language
+- [ ] Add language selector (Portuguese only for MVP)
+- [ ] Prepare i18n structure for future languages
+- [ ] Keep UI as placeholder for now
+
+#### 4.1.9 App Settings - Biometric Toggle
+- [✅] Implement functional biometric enable/disable toggle
+- [✅] Check device capability before showing option
+- [✅] Save preference to SharedPreferences (local) + Supabase metadata (backup)
+- [✅] Authenticate user when enabling biometric
+- [ ] Show setup instructions if biometric not enrolled
+
+#### 4.1.10 Support Section
+- [ ] Create "Central de Ajuda" screen with FAQ
+- [ ] Add help topics: Account, Portfolio, Sofia, Subscriptions
+- [ ] Create "Fale Conosco" contact form
+- [✅] Implement "Ajuda" - Opens mailto link (suporte@finovate.com.br)
+- [ ] Add "Avaliar App" deep link to App Store/Play Store
+- [ ] Create "Sobre" screen with:
+  - App version
+  - Terms of Service link
+  - Privacy Policy link
+  - Open source licenses
+
+#### 4.1.11 Subscription Management
+- [ ] Add "Upgrade to Pro" card (when on Free tier)
+- [ ] Display subscription benefits comparison
+- [ ] Show current plan status
+- [ ] Display next billing date (when Pro)
+- [ ] Add cancel subscription option (future)
+- [ ] Implement upgrade flow (manual for MVP)
+
+#### 4.1.12 Account Deletion (LGPD Compliance)
+- [ ] Add "Excluir Conta" option in settings
+- [ ] Show confirmation dialog with warnings
+- [ ] Require password verification
+- [ ] Create backend endpoint for account deletion
+- [ ] Delete all user data from Supabase
+- [ ] Send confirmation email
+- [ ] Logout and clear local data
+
+**Files Created:**
+- ✅ `lib/screens/perfil/perfil_controller.dart` - State management, preferences, user data
+- ✅ `lib/screens/perfil/perfil_screen.dart` - Main screen with 3 tabs
+- ✅ `lib/screens/perfil/widgets/perfil_info_tab.dart` - Personal info display with edit
+- ✅ `lib/screens/perfil/widgets/preferencias_tab.dart` - Biometric/notifications toggles
+- ✅ `lib/screens/perfil/widgets/meu_plano_tab.dart` - Subscription status display
+- ✅ `lib/screens/perfil/widgets/edit_field_bottom_sheet.dart` - Edit modal for fields
+- ✅ `lib/screens/perfil/widgets/email_change_bottom_sheet.dart` - OTP email change (deferred)
+- ✅ `lib/common/widgets/gradient_border_box.dart` - Reusable gradient border widget
+- ✅ `lib/utils/helpers/data_masking.dart` - Masking utilities (email, phone, CPF/CNPJ)
+- ✅ `lib/services/auth_service.dart` - Added updateUserPreference method
+
+**Files Still Needed:**
+- `lib/screens/perfil/screens/security_screen.dart`
+- `lib/screens/perfil/screens/bank_accounts_screen.dart`
+- `lib/screens/perfil/screens/transaction_history_screen.dart`
+- `lib/screens/perfil/screens/help_center_screen.dart`
+- `lib/screens/perfil/screens/about_screen.dart`
+- `lib/screens/perfil/widgets/subscription_card.dart`
+
+---
+
+## Phase 5: Sofia (AI Assistant) Screen Enhancement
+
+### 5.1 Sofia Screen - Polish & Features
+**Status:** ⚠️ 75% Complete - Core works, needs rework
+
+**Current State:**
+- Chat interface functional
+- Real backend integration working
+- Missing conversation persistence and some UI features
+- **Needs rework** per user request
+
+**Tasks:**
+
+#### 5.1.1 Sofia Home Screen
+- [✅] Welcome section - Already implemented
+- [✅] Suggestion cards - Already implemented
+- [ ] Load suggestions from text_strings.dart
+- [ ] Implement "Limpar histórico" functionality
+- [ ] Add conversation history preview cards
+
+#### 5.1.2 Sofia Chat Screen
+- [✅] Message display - Already implemented
+- [✅] Streaming responses - Already implemented
+- [✅] Session management - Already implemented
+- [ ] Add copy message functionality
+- [ ] Improve typing indicator (replace spinner) if needed
+- [ ] Add message timestamps toggle if in Figma design
+- **Note:** Conversation history persistence will use Zep for chat memory (future implementation)
+- **Note:** Message search functionality not needed for MVP
+
+#### 5.1.3 Prompt Limit Tracking
+- [ ] Track daily prompt count per user
+- [ ] Create backend endpoint for prompt tracking
+- [ ] Display remaining prompts for free users
+- [ ] Show "X/5 prompts used today" indicator
+- [ ] On 6th prompt: Show upgrade dialog (not enforced for MVP)
+- [ ] Reset counter daily at midnight
+
+#### 5.1.4 Educational Disclaimer
+- [ ] Add footer disclaimer: "SofIA provides educational information only, not financial advice"
+- [ ] Display in chat screen (sticky footer)
+- [ ] Add info icon with expanded explanation
+
+#### 5.1.5 Personality & Tone
+- [ ] Review sample responses for tone consistency
+- [ ] Ensure first-person communication ("Deixa comigo!")
+- [ ] Add personality to error messages
+- [ ] Test Portuguese language quality
+
+#### 5.1.6 Data Integration (Future)
+- [ ] Connect to Gold layer for real-time market data
+- [ ] Integrate user's B3 portfolio for personalized insights
+- [ ] Add RAG system for Brazilian tax rules
+- [ ] Implement context-aware responses
+
+**Files to Modify:**
+- `lib/screens/sofia/sofia_chat_screen.dart`
+- `lib/screens/sofia/sofia_home_screen.dart`
+- `lib/screens/sofia/controllers/sofia_chat_controller.dart`
+- Create: `lib/services/sofia_prompt_tracker.dart`
+
+---
+
+## Phase 6: Conjuntura (Market Intelligence) Screen Implementation
+
+### 6.1 Conjuntura Screen - Major Rebuild Required
+**Status:** ❌ 30% Complete - Missing 5 of 6 sections
+
+**Current State:**
+- Basic structure with 3 mocked indicators
+- No sectional organization
+- No charts
+- No ETL integration
+
+**Reference Documents:**
+- Variable Dictionary: `specs/dicionario_variaveis_conjuntura.md` (48 variables)
+- Figma Review: `docs/figma-review-conjuntura.md` (UI specifications)
+
+**Tasks:**
+
+#### 5.1.1 Navigation Structure
+- [ ] Implement 6-tab horizontal pill navigation (per Figma)
+- [ ] Tabs: Expectativas | Desempenho econômico | Inflação | Mercado Internacional | Mercados Financeiros | Setor público
+- [ ] Horizontal scroll for tab bar
+- [ ] Each tab has dropdown for subsection/variable selection
+- [ ] Premium paywall for free plan users
+
+#### 5.1.2 Tab 1: Expectativas (5 variables)
+**UI Pattern:** Dropdown selector → Multi-year line chart (2025, 2026, 2027) + year comparison table
+
+**Variables:**
+| Variable | KPIs |
+|----------|------|
+| Expectativas IPCA | 3-year projections; Variação 1 semana; Variação 1 mês |
+| Expectativas PIB | 3-year projections; Variação 1 semana; Variação 1 mês |
+| Expectativas Taxa de Desemprego | 3-year projections; Variação 1 semana; Variação 1 mês |
+| Expectativas IGPM | 3-year projections; Variação 1 semana; Variação 1 mês |
+| Expectativa Dólar | 3-year projections; Variação 1 semana; Variação 1 mês |
+
+**Tasks:**
+- [ ] Create dropdown with 5 expectation variables
+- [ ] Implement multi-series line chart (fl_chart) with 3 years
+- [ ] Year comparison table with status icons (✓/✗)
+- [ ] Info link: "O que é [variable name]?"
+- [ ] Source: Banco Central
+
+#### 5.1.3 Tab 2: Desempenho Econômico (12 variables)
+**UI Pattern:** Dropdown for subsection → Expandable indicator list → Detail modal with chart
+
+**Subsection: Atividade Econômica (9 variables)**
+| Variable | KPIs |
+|----------|------|
+| PIB | Valor atual; Variação período; Variação YoY |
+| PIB Serviços | Valor atual; Variação período; Variação YoY |
+| PIB Indústria | Valor atual; Variação período; Variação YoY |
+| PIB Comércio | Valor atual; Variação período; Variação YoY |
+| PIB Agro | Valor atual; Variação período; Variação YoY |
+| Formação Bruta de Capital Fixo (FBCF) | Valor atual; Variação período; Variação YoY |
+| Consumo das famílias | Valor atual; Variação período; Variação YoY |
+| Consumo do Governo | Valor atual; Variação período; Variação YoY |
+| Taxa de Desemprego | Valor atual; Variação período; Variação YoY |
+
+**Subsection: Setores (3 variables)**
+| Variable | KPIs |
+|----------|------|
+| Volume de vendas nos Serviços | Valor atual; Variação período; Variação YoY |
+| Volume de Vendas no Comércio | Valor atual; Variação período; Variação YoY |
+| Produção Industrial | Valor atual; Variação período; Variação YoY |
+
+**Tasks:**
+- [ ] Create dropdown with 2 subsections (Atividade econômica, Setores)
+- [ ] Expandable indicator list with name, value, change %
+- [ ] Detail modal with: title, value, change badge, line chart, YTD/YoY/MoM variations
+- [ ] Info link: "O que é Atividade econômica?" / "O que é Setores?"
+- [ ] Source: IBGE
+
+#### 5.1.4 Tab 3: Inflação (11 variables)
+**UI Pattern:** Sub-tabs (IGP-M | IPCA) → Date selectors → Charts
+
+**Sub-tab: IGP-M (1 variable)**
+| Variable | KPIs |
+|----------|------|
+| IGPM | Valor atual; Variação período; Variação YoY |
+
+**Sub-tab: IPCA (10 variables)**
+| Variable | KPIs |
+|----------|------|
+| IPCA cheio | Valor mês; Acumulado 12m; Variação mês anterior; Variação YoY mês; Variação acumulado YoY |
+| IPCA Alimentação e Bebidas | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Habitação | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Artigos de residência | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Vestuário | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Transportes | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Saúde e cuidados pessoais | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Despesas pessoais | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Educação | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+| IPCA Comunicação | Valor mês; Representatividade; Acumulado 12m; Variações múltiplas |
+
+**Tasks:**
+- [ ] Sub-tabs toggle (IGP-M / IPCA)
+- [ ] IGP-M: Line chart + month/year selectors + YTD/YoY/MoM variations
+- [ ] IPCA: Donut chart with 9 category segments
+- [ ] Category legend (2 columns, tappable for details)
+- [ ] Side panel showing selected category's YTD/YoY/MoM
+- [ ] Month picker modal (12 months grid)
+- [ ] Year picker modal (year grid)
+- [ ] Variações info modal (explains YTD/YoY/MoM)
+- [ ] Info links: "O que é IGP-M?" / "O que é IPCA?"
+- [ ] Source: IBGE, FGV
+
+#### 5.1.5 Tab 4: Mercado Internacional (6 variables)
+**UI Pattern:** Currency list with flags → Expandable detail modal with chart + time filters
+
+**Variables:**
+| Variable | KPIs |
+|----------|------|
+| Importações | Valor atual; Variação período; Variação YoY |
+| Exportações | Valor atual; Variação período; Variação YoY |
+| USD | Valor atual; Variação período; Variação YoY |
+| EUR | Valor atual; Variação período; Variação YoY |
+| GBP | Valor atual; Variação período; Variação YoY |
+| JPY | Valor atual; Variação período; Variação YoY |
+
+**Tasks:**
+- [ ] Dropdown for "Importações e Exportações" section
+- [ ] Currency list with flag emoji, code, BRL value, change %
+- [ ] Detail modal: value, change badge, line chart, time period filters (Semana, No mês, 1 mês, 12 meses)
+- [ ] YTD/YoY/MoM variations in detail modal
+- [ ] Info link: "O que é o Mercado Internacional?"
+- [ ] Source: BACEN, MDIC
+
+#### 5.1.6 Tab 5: Mercados Financeiros (10 variables)
+**UI Pattern:** Two-section list (rates + indices) → Expandable detail modals
+
+**Section: Taxas de Juros (3 variables)**
+| Variable | KPIs |
+|----------|------|
+| Taxa de Juros Brasil (SELIC) | Valor atual; Variação período; Variação YoY |
+| Taxa de Juros EUA | Valor atual; Variação período; Variação YoY |
+| Taxa de Juros EURO | Valor atual; Variação período; Variação YoY |
+
+**Section: Principais índices de mercado (7 variables)**
+| Variable | KPIs |
+|----------|------|
+| IBOV (IBOVESPA) | Valor atual; Variação período; Variação YoY |
+| IFIX | Valor atual; Variação período; Variação YoY |
+| NASDAQ | Valor atual; Variação período; Variação YoY |
+| DOW JONES | Valor atual; Variação período; Variação YoY |
+| S&P 500 | Valor atual; Variação período; Variação YoY |
+| DAX | Valor atual; Variação período; Variação YoY |
+| FTSE 100 | Valor atual; Variação período; Variação YoY |
+
+**Tasks:**
+- [ ] Section headers: "Taxas de Juros" and "Principais índices de mercado"
+- [ ] Rate items with country flag, code, rate %
+- [ ] Index items with colored icon, name, change %
+- [ ] Detail modal: icon, value, line chart, YTD/YoY/MoM
+- [ ] Info link: "O que é Mercados Financeiros?"
+- [ ] Source: B3, BACEN
+
+#### 5.1.7 Tab 6: Setor Público (4 variables)
+**UI Pattern:** Indicator list → Expandable detail modal with chart
+
+**Variables:**
+| Variable | KPIs |
+|----------|------|
+| Déficit Primário | Valor atual; Variação período; Variação YoY |
+| Déficit Nominal | Valor atual; Variação período; Variação YoY |
+| Juros da Dívida | Valor atual; Variação período; Variação YoY |
+| Relação Dívida PIB | Valor atual; Variação período; Variação YoY |
+
+**Tasks:**
+- [ ] Dropdown for "Indicadores Fiscais"
+- [ ] Indicator list with name, value (R$ bilhões/trilhões), change %
+- [ ] Note: Dívida/PIB shows % as main value instead of R$
+- [ ] Detail modal: title, value, change, line chart, YTD/YoY/MoM
+- [ ] Info link: "O que é o Setor público?"
+- [ ] Source: Tesouro Nacional, BACEN
+
+#### 5.1.8 Common Features Across All Sections
+- [ ] Time period filters where applicable (Semana, No mês, 1 mês, 12 meses)
+- [ ] "Data da última variação: X de Mês" timestamp per indicator
+- [ ] "Fonte: [source]" attribution clearly visible
+- [ ] Skeleton loading states
+- [ ] Error states with retry
+- [ ] Pull-to-refresh functionality
+- [ ] Offline mode with cached data
+- [ ] Info icon (ⓘ) with InfoBottomSheet for explanations
+
+#### 5.1.9 Subscription Trial Tracking
+- [ ] Track 7-day trial start date
+- [ ] Show trial countdown in UI
+- [ ] Display "X days remaining" badge
+- [ ] On day 8: Show upgrade prompt (not enforced for MVP)
+- [ ] Add "Upgrade to Pro" button in section
+- [ ] Premium paywall screen for free users
+
+#### 5.1.10 Data Integration
+- [ ] Create backend API endpoints for all 6 tabs
+- [ ] Connect to ETL Gold layer tables
+- [ ] Implement data refresh schedule (daily EOD)
+- [ ] Handle D-1 data lag messaging
+- [ ] Create Supabase tables for 48 indicator variables
+- [ ] Implement caching strategy
+
+**Variable Summary:**
+| Tab | Variables |
+|-----|-----------|
+| Expectativas | 5 |
+| Desempenho Econômico | 12 (9 Atividade + 3 Setores) |
+| Inflação | 11 (1 IGP-M + 10 IPCA) |
+| Mercado Internacional | 6 |
+| Mercados Financeiros | 10 (3 rates + 7 indices) |
+| Setor Público | 4 |
+| **Total** | **48** |
+
+**New Files Needed:**
+- `lib/screens/conjuntura/conjuntura_controller.dart`
+- `lib/screens/conjuntura/conjuntura_paywall_screen.dart`
+- `lib/screens/conjuntura/widgets/pill_tab_bar.dart`
+- `lib/screens/conjuntura/widgets/indicator_dropdown.dart`
+- `lib/screens/conjuntura/widgets/indicator_list_item.dart`
+- `lib/screens/conjuntura/widgets/indicator_detail_modal.dart`
+- `lib/screens/conjuntura/widgets/expectations_chart.dart`
+- `lib/screens/conjuntura/widgets/year_comparison_row.dart`
+- `lib/screens/conjuntura/widgets/variation_row.dart`
+- `lib/screens/conjuntura/widgets/inflation_sub_tabs.dart`
+- `lib/screens/conjuntura/widgets/donut_chart.dart`
+- `lib/screens/conjuntura/widgets/category_legend.dart`
+- `lib/screens/conjuntura/widgets/date_selector_row.dart`
+- `lib/screens/conjuntura/widgets/month_picker_modal.dart`
+- `lib/screens/conjuntura/widgets/year_picker_modal.dart`
+- `lib/screens/conjuntura/widgets/currency_list_item.dart`
+- `lib/screens/conjuntura/widgets/rate_index_list_item.dart`
+- `lib/screens/conjuntura/widgets/time_period_filters.dart`
+- `lib/screens/conjuntura/widgets/variacoes_info_modal.dart`
+- `lib/screens/conjuntura/models/economic_indicator.dart`
+- `lib/screens/conjuntura/models/time_series_point.dart`
+- `lib/screens/conjuntura/models/inflation_category.dart`
+- `lib/screens/conjuntura/models/currency_rate.dart`
+- `lib/screens/conjuntura/models/market_index.dart`
+- `lib/screens/conjuntura/models/fiscal_indicator.dart`
+- `lib/services/conjuntura_service.dart`
+
+---
+
+## Phase 7: Carteira (Portfolio) Screen Implementation
+
+### 7.1 Carteira Screen - Complete Rebuild
 **Status:** ❌ 60% Complete - UI stub only, needs full implementation
 
 **Current State:**
@@ -564,7 +1020,7 @@ Screens with proper structure ✅:
 
 **Tasks:**
 
-#### 4.1.1 Portfolio Summary Header
+#### 7.1.1 Portfolio Summary Header
 - [✅] Total patrimony display - Already implemented UI
 - [✅] Daily change indicator - Already implemented UI
 - [ ] Connect to real B3 portfolio data
@@ -572,13 +1028,13 @@ Screens with proper structure ✅:
 - [ ] Add manual refresh button
 - [ ] Show sync status (syncing/success/error)
 
-#### 4.1.2 Tab Navigation System
+#### 7.1.2 Tab Navigation System
 - [ ] Implement 4-tab system: Rentabilidade / Riscos / Composição / Proventos
 - [ ] Create tab bar with proper styling
 - [ ] Implement swipe-to-switch-tabs functionality
 - [ ] Maintain tab state across app sessions
 
-#### 4.1.3 Rentabilidade Tab (Performance)
+#### 7.1.3 Rentabilidade Tab (Performance)
 - [ ] Total portfolio value and P&L display
 - [ ] Performance chart comparing Portfolio vs IBOV/IFIX/IPCA/CDI
 - [ ] Implement time period filters: Semana, No mês, 1 mês, 12 meses
@@ -587,7 +1043,7 @@ Screens with proper structure ✅:
 - [ ] Display source attribution: "Fonte: B3 / Banco Central"
 - [ ] Implement fl_chart for performance visualization
 
-#### 4.1.4 Riscos Tab (Risk Analysis)
+#### 7.1.4 Riscos Tab (Risk Analysis)
 - [ ] Define risk metrics to display:
   - Portfolio volatility
   - Sharpe ratio (if data available)
@@ -598,7 +1054,7 @@ Screens with proper structure ✅:
 - [ ] Display sector concentration risk
 - [ ] Add explanatory tooltips for each metric
 
-#### 4.1.5 Composição Tab (Asset Allocation)
+#### 7.1.5 Composição Tab (Asset Allocation)
 - [ ] Implement interactive pie chart with fl_chart
 - [ ] Show breakdown by asset type:
   - Ações (Stocks)
@@ -611,7 +1067,7 @@ Screens with proper structure ✅:
 - [ ] Show top holdings list below chart
 - [ ] Add rebalancing suggestions (optional)
 
-#### 4.1.6 Proventos Tab (Dividends/Income)
+#### 7.1.6 Proventos Tab (Dividends/Income)
 - [ ] Filter dropdowns: "Classe de ativos" / "Produtos"
 - [ ] Implement stacked bar chart for income events
 - [ ] Toggle view: "Por ano" / "Por mês"
@@ -620,7 +1076,7 @@ Screens with proper structure ✅:
 - [ ] Add export to CSV functionality (optional)
 - [ ] Source: "Fonte: B3 / Banco Central"
 
-#### 4.1.7 Holdings List Enhancement
+#### 7.1.7 Holdings List Enhancement
 - [ ] Replace mock holdings with real B3 data
 - [ ] Display for each holding:
   - Ticker symbol
@@ -635,14 +1091,14 @@ Screens with proper structure ✅:
 - [ ] Add search/filter functionality
 - [ ] Implement pull-to-refresh
 
-#### 4.1.8 B3 Connection Status
+#### 7.1.8 B3 Connection Status
 - [ ] Add connection status indicator in AppBar
 - [ ] Show "Conectar B3" button when disconnected
 - [ ] Display empty state with CTA when not connected
 - [ ] Handle connection errors gracefully
 - [ ] Add reconnection flow
 
-#### 4.1.9 Data & API Integration
+#### 7.1.9 Data & API Integration
 **B3 Authorization:** OAuth 2.0 flow (B3 provides access package with OAuth sign-in link)
 
 - [ ] Implement B3 OAuth authorization flow:
@@ -672,315 +1128,6 @@ Screens with proper structure ✅:
 - `lib/screens/carteira/widgets/allocation_pie_chart.dart`
 - `lib/screens/carteira/widgets/income_bar_chart.dart`
 - `lib/services/b3_service.dart`
-
----
-
-## Phase 5: Conjuntura (Market Intelligence) Screen Implementation
-
-### 5.1 Conjuntura Screen - Major Rebuild Required
-**Status:** ❌ 30% Complete - Missing 5 of 6 sections
-
-**Current State:**
-- Basic structure with 3 mocked indicators
-- No sectional organization
-- No charts
-- No ETL integration
-
-**Tasks:**
-
-#### 5.1.1 Navigation Structure
-- [ ] Implement 6-section tab/card navigation system
-- [ ] Create section headers with icons
-- [ ] Add swipe-to-navigate between sections
-- [ ] Implement scroll-to-section from header tap
-
-#### 5.1.2 Section 1: Expectativas (Expectations)
-- [ ] SELIC projection display with source (BACEN Focus)
-- [ ] IPCA forecast (consensus)
-- [ ] GDP growth expectations
-- [ ] USD/BRL year-end forecast
-- [ ] Show institution sources
-- [ ] Display forecast ranges (min/max/average)
-- [ ] Add update timestamp
-
-#### 5.1.3 Section 2: Desempenho Econômico (Economic Performance)
-- [ ] GDP growth chart (quarterly/annual)
-- [ ] Unemployment rate tracker
-- [ ] Job creation metrics
-- [ ] Industrial production index chart
-- [ ] Retail sales performance chart
-- [ ] Time period filters for each metric
-- [ ] Source attribution (IBGE)
-
-#### 5.1.4 Section 3: Preços e Inflação (Prices & Inflation)
-- [ ] IPCA monthly/annual display with chart
-- [ ] IGPM index tracker
-- [ ] Producer price index (IPA)
-- [ ] Inflation breakdown by category:
-  - Food
-  - Housing
-  - Transport
-  - Health
-  - Education
-- [ ] Comparative bar chart for categories
-- [ ] Historical trend line chart
-- [ ] Source: IBGE, FGV
-
-#### 5.1.5 Section 4: Setor Externo (Foreign Sector)
-- [ ] USD/BRL exchange rate display (current)
-- [ ] Historical FX chart with time filters
-- [ ] Trade balance (exports vs imports)
-- [ ] International reserves display
-- [ ] Foreign direct investment flows chart
-- [ ] Commodity price tracking (oil, iron ore)
-- [ ] Source: BACEN, MDIC
-
-#### 5.1.6 Section 5: Mercados Financeiros (Financial Markets)
-- [ ] IBOV index with chart (current + historical)
-- [ ] Global indices section:
-  - S&P 500
-  - Dow Jones
-  - NASDAQ (optional)
-  - DAX (optional)
-- [ ] Major commodities:
-  - Oil (Brent)
-  - Gold
-  - Iron ore
-- [ ] Interest rate comparison (Brazil vs US vs EU)
-- [ ] Currency basket (EUR, GBP, JPY)
-- [ ] Source: B3, Yahoo Finance
-
-#### 5.1.7 Section 6: Finanças Públicas (Public Finance)
-- [ ] Federal debt as % of GDP (chart)
-- [ ] Primary fiscal balance tracker
-- [ ] Government revenue vs expenditure chart
-- [ ] Debt service costs display
-- [ ] Historical trend charts
-- [ ] Source: Tesouro Nacional, BACEN
-
-#### 5.1.8 Common Features Across All Sections
-- [ ] Time period filters: 1 month, 3 months, 1 year, All-time
-- [ ] "Last updated" timestamp per indicator
-- [ ] Data source attribution clearly visible
-- [ ] Skeleton loading states
-- [ ] Error states with retry
-- [ ] Pull-to-refresh functionality
-- [ ] Offline mode with cached data
-
-#### 5.1.9 Subscription Trial Tracking
-- [ ] Track 7-day trial start date
-- [ ] Show trial countdown in UI
-- [ ] Display "X days remaining" badge
-- [ ] On day 8: Show upgrade prompt (not enforced for MVP)
-- [ ] Add "Upgrade to Pro" button in section
-
-#### 5.1.10 Data Integration
-- [ ] Create backend API endpoints for all 6 sections
-- [ ] Connect to ETL Gold layer tables
-- [ ] Implement data refresh schedule (daily EOD)
-- [ ] Handle D-1 data lag messaging
-- [ ] Create Supabase tables for indicator data
-- [ ] Implement caching strategy
-
-**New Files Needed:**
-- `lib/screens/conjuntura/conjuntura_controller.dart`
-- `lib/screens/conjuntura/widgets/section_navigation.dart`
-- `lib/screens/conjuntura/widgets/expectativas_section.dart`
-- `lib/screens/conjuntura/widgets/desempenho_section.dart`
-- `lib/screens/conjuntura/widgets/precos_section.dart`
-- `lib/screens/conjuntura/widgets/setor_externo_section.dart`
-- `lib/screens/conjuntura/widgets/mercados_section.dart`
-- `lib/screens/conjuntura/widgets/financas_publicas_section.dart`
-- `lib/screens/conjuntura/widgets/indicator_card.dart`
-- `lib/screens/conjuntura/widgets/chart_with_filters.dart`
-- `lib/services/conjuntura_service.dart`
-
----
-
-## Phase 6: Sofia (AI Assistant) Screen Enhancement
-
-### 6.1 Sofia Screen - Polish & Features
-**Status:** ⚠️ 75% Complete - Core works, needs enhancements
-
-**Current State:**
-- Chat interface functional
-- Real backend integration working
-- Missing conversation persistence and some UI features
-
-**Tasks:**
-
-#### 6.1.1 Sofia Home Screen
-- [✅] Welcome section - Already implemented
-- [✅] Suggestion cards - Already implemented
-- [ ] Load suggestions from text_strings.dart
-- [ ] Implement "Limpar histórico" functionality
-- [ ] Add conversation history preview cards
-
-#### 6.1.2 Sofia Chat Screen
-- [✅] Message display - Already implemented
-- [✅] Streaming responses - Already implemented
-- [✅] Session management - Already implemented
-- [ ] Add copy message functionality
-- [ ] Improve typing indicator (replace spinner) if needed
-- [ ] Add message timestamps toggle if in Figma design
-- **Note:** Conversation history persistence will use Zep for chat memory (future implementation)
-- **Note:** Message search functionality not needed for MVP
-
-#### 6.1.3 Prompt Limit Tracking
-- [ ] Track daily prompt count per user
-- [ ] Create backend endpoint for prompt tracking
-- [ ] Display remaining prompts for free users
-- [ ] Show "X/5 prompts used today" indicator
-- [ ] On 6th prompt: Show upgrade dialog (not enforced for MVP)
-- [ ] Reset counter daily at midnight
-
-#### 6.1.4 Educational Disclaimer
-- [ ] Add footer disclaimer: "SofIA provides educational information only, not financial advice"
-- [ ] Display in chat screen (sticky footer)
-- [ ] Add info icon with expanded explanation
-
-#### 6.1.5 Personality & Tone
-- [ ] Review sample responses for tone consistency
-- [ ] Ensure first-person communication ("Deixa comigo!")
-- [ ] Add personality to error messages
-- [ ] Test Portuguese language quality
-
-#### 6.1.6 Data Integration (Future)
-- [ ] Connect to Gold layer for real-time market data
-- [ ] Integrate user's B3 portfolio for personalized insights
-- [ ] Add RAG system for Brazilian tax rules
-- [ ] Implement context-aware responses
-
-**Files to Modify:**
-- `lib/screens/sofia/sofia_chat_screen.dart`
-- `lib/screens/sofia/sofia_home_screen.dart`
-- `lib/screens/sofia/controllers/sofia_chat_controller.dart`
-- Create: `lib/services/sofia_prompt_tracker.dart`
-
----
-
-## Phase 7: Perfil (Profile) Screen Implementation
-
-### 7.1 Perfil Screen - Functionality Implementation
-**Status:** ⚠️ 70% Complete - UI done, most features are TODOs
-
-**Current State:**
-- Profile header displays user info
-- All settings are UI-only placeholders
-- Only logout works
-
-**Tasks:**
-
-#### 7.1.1 Profile Information Display
-- [✅] User name - Already implemented
-- [✅] Email - Already implemented
-- [ ] Add profile photo upload functionality
-- [ ] Display account creation date
-- [ ] Show subscription tier badge (Free/Pro)
-- [ ] Add verification status indicator
-
-#### 7.1.2 Account Settings - Personal Information
-- [ ] Create "Informações Pessoais" screen
-- [ ] Display: First name, Middle name, Last name
-- [ ] Display: CPF (masked), Phone, Birthdate
-- [ ] Allow name editing with validation
-- [ ] Allow phone editing with validation
-- [ ] Save changes to Supabase user table
-- [ ] Show success/error feedback
-
-#### 7.1.3 Account Settings - Security
-- [ ] Create "Segurança" screen
-- [ ] Implement change password flow:
-  - Current password verification
-  - New password + confirmation
-  - Strength indicator
-- [ ] Add 2FA setup (future enhancement)
-- [ ] Show last login information
-- [ ] Add session management (view active sessions)
-
-#### 7.1.4 Account Settings - Bank Accounts
-- [ ] Create "Contas Bancárias" screen
-- [ ] Display linked B3 accounts
-- [ ] Add "Connect B3" button
-- [ ] Show connection status
-- [ ] Allow disconnection with confirmation
-- [ ] Display last sync timestamp
-
-#### 7.1.5 Account Settings - Transaction History
-- [ ] Create "Histórico de Transações" screen
-- [ ] Fetch transaction data from backend
-- [ ] Display: date, type, asset, quantity, price
-- [ ] Add filters: date range, transaction type
-- [ ] Add export to CSV functionality
-- [ ] Implement pagination for long history
-
-#### 7.1.6 App Settings - Notifications
-- [ ] Implement notification preferences toggle
-- [ ] Create notification categories:
-  - Portfolio changes
-  - Market alerts
-  - Sofia responses
-  - System updates
-- [ ] Save preferences to backend
-- [ ] Connect to push notification system (future)
-
-#### 7.1.7 App Settings - Theme
-- [ ] If keeping both themes: Implement theme toggle
-- [ ] If dark-only: Remove theme option entirely
-- [ ] Persist theme preference locally
-- [ ] Apply theme change immediately
-
-#### 7.1.8 App Settings - Language
-- [ ] Add language selector (Portuguese only for MVP)
-- [ ] Prepare i18n structure for future languages
-- [ ] Keep UI as placeholder for now
-
-#### 7.1.9 App Settings - Biometric Toggle
-- [ ] Implement functional biometric enable/disable toggle
-- [ ] Check device capability before showing
-- [ ] Save preference to secure storage
-- [ ] Test biometric authentication on toggle
-- [ ] Show setup instructions if needed
-
-#### 7.1.10 Support Section
-- [ ] Create "Central de Ajuda" screen with FAQ
-- [ ] Add help topics: Account, Portfolio, Sofia, Subscriptions
-- [ ] Create "Fale Conosco" contact form
-- [ ] Implement email submission to support
-- [ ] Add "Avaliar App" deep link to App Store/Play Store
-- [ ] Create "Sobre" screen with:
-  - App version
-  - Terms of Service link
-  - Privacy Policy link
-  - Open source licenses
-
-#### 7.1.11 Subscription Management
-- [ ] Add "Upgrade to Pro" card (when on Free tier)
-- [ ] Display subscription benefits comparison
-- [ ] Show current plan status
-- [ ] Display next billing date (when Pro)
-- [ ] Add cancel subscription option (future)
-- [ ] Implement upgrade flow (manual for MVP)
-
-#### 7.1.12 Account Deletion (LGPD Compliance)
-- [ ] Add "Excluir Conta" option in settings
-- [ ] Show confirmation dialog with warnings
-- [ ] Require password verification
-- [ ] Create backend endpoint for account deletion
-- [ ] Delete all user data from Supabase
-- [ ] Send confirmation email
-- [ ] Logout and clear local data
-
-**New Files Needed:**
-- `lib/screens/perfil/perfil_controller.dart`
-- `lib/screens/perfil/screens/personal_info_screen.dart`
-- `lib/screens/perfil/screens/security_screen.dart`
-- `lib/screens/perfil/screens/bank_accounts_screen.dart`
-- `lib/screens/perfil/screens/transaction_history_screen.dart`
-- `lib/screens/perfil/screens/help_center_screen.dart`
-- `lib/screens/perfil/screens/contact_support_screen.dart`
-- `lib/screens/perfil/screens/about_screen.dart`
-- `lib/screens/perfil/widgets/subscription_card.dart`
 
 ---
 
@@ -1253,37 +1400,51 @@ Screens with proper structure ✅:
 
 ## Implementation Priority Order
 
-**Confirmed Approach:** Home → Sofia → Carteira → Conjuntura (builds from most to least complete)
+**Confirmed Approach:** Home → Perfil → Sofia → Conjuntura → Carteira
+
+**Development Workflow (UI-First Approach):**
+For each feature/screen, follow this order:
+1. **UI First** - Build/complete all UI components and screens
+2. **Models & Mappers** - Create data models and API response mappers
+3. **API Integration** - Add API service methods and connect to backend
+4. **Testing** - Manual testing to verify functionality
+5. **Done** - Feature complete when all above steps pass
+
+This approach allows:
+- Faster visual feedback during development
+- Parallel backend development without blocking UI work
+- Easier testing with mock data before real API integration
+- Clear separation between UI and data concerns
 
 **Iterative Process:**
-- Complete each phase/feature
-- Manual testing checkpoint
+- Complete each phase/feature following UI-first workflow
+- Manual testing checkpoint after each feature
 - Requirements may shift during integrations
 - Keep it simple, avoid overcomplication
 
 ### Priority 0 (Pre-Implementation):
-0. **Figma Design Review** (Phase 0.1) - MUST complete before any UI work
-1. **Force Dark Theme** (Phase 1.1) - Critical fix to prevent light mode issues
+0. **Figma Design Review** (Phase 0.1) - MUST complete before any UI work ✅
+1. **Force Dark Theme** (Phase 1.1) - Critical fix to prevent light mode issues ✅
 
 ### Priority 1 (Must Have for MVP):
-2. **Common UI Components** (Phase 1.2) - Needed for all screens, must match Figma
-3. **Chart Library Integration with fl_chart** (Phase 1.2.5) - Must match Figma chart designs exactly
-4. **Home Screen Data Integration** (Phase 3) - Main dashboard, already 70% complete
-5. **Sofia Enhancements** (Phase 6) - Key differentiator, already 75% complete (skip persistence/search)
-6. **Backend API Development** (Phase 8.1-8.4) - Required for data
-7. **Database Schema** (Phase 9) - Foundation for data storage
+2. **Common UI Components** (Phase 1.2) - Needed for all screens, must match Figma ✅
+3. **Chart Library Integration with fl_chart** (Phase 1.2.5) - Must match Figma chart designs exactly ✅
+4. **Home Screen Data Integration** (Phase 3) - Main dashboard ✅ 97% complete
+5. **Perfil Functionality** (Phase 4) - User management ✅ 90% complete
+6. **Sofia Rework** (Phase 5) - Key differentiator, needs rework
+7. **Backend API Development** (Phase 8.1-8.4) - Required for data
+8. **Database Schema** (Phase 9) - Foundation for data storage
 
 ### Priority 2 (Important for MVP):
-7. **Carteira Implementation** (Phase 4) - Core feature, requires B3 OAuth testing
-8. **Conjuntura Implementation** (Phase 5) - Core feature, most work needed
-9. **Perfil Functionality** (Phase 7) - User management
-10. **Auth Fixes** (Phase 2.2, 2.3) - Polish existing features
+9. **Conjuntura Implementation** (Phase 6) - Economic indicators, most work needed
+10. **Carteira Implementation** (Phase 7) - Portfolio, requires B3 OAuth testing
+11. **Auth Fixes** (Phase 2.2, 2.3) - Polish existing features
 
 ### Priority 3 (Post-MVP):
-11. **ETL Integration** (Phase 10) - Can use mock data initially
-12. **Subscription System** (Phase 11) - Manual workaround for MVP
-13. **Testing** (Phase 12) - Continuous throughout
-14. **Polish & Launch** (Phase 13) - Final touches
+12. **ETL Integration** (Phase 10) - Can use mock data initially
+13. **Subscription System** (Phase 11) - Manual workaround for MVP
+14. **Testing** (Phase 12) - Continuous throughout
+15. **Polish & Launch** (Phase 13) - Final touches
 
 ---
 
@@ -1342,21 +1503,28 @@ Screens with proper structure ✅:
 **Confirmed Decisions:**
 - ✅ Dark theme only for MVP (light theme kept in code for future, very low priority)
 - ✅ Use fl_chart for all charts
-- ✅ Priority: Home → Sofia → Carteira → Conjuntura
+- ✅ Priority: Home → Perfil → Sofia → Conjuntura → Carteira
 - ✅ B3 OAuth 2.0 flow (backend testing needed)
 
+**Completed Actions:**
+1. ~~Review all Figma designs using Figma MCP (Phase 0.1)~~ ✅ **100% COMPLETE**
+2. ~~Force dark theme in main.dart (Phase 1.1)~~ ✅ **COMPLETE**
+3. ~~Fix critical button color issue in colors.dart~~ ✅ **COMPLETE** (Primary: #1B6FFF)
+4. ~~Add fl_chart package to pubspec.yaml~~ ✅ **COMPLETE** (v0.69.2)
+5. ~~Create common UI components~~ ✅ **COMPLETE** (Phase 1.2 - 16 widget files created)
+6. ~~Build chart wrapper components~~ ✅ **COMPLETE** (LineChart, PieChart, BarChart + helpers)
+7. ~~Refactor Home widgets to use common components~~ ✅ **COMPLETE**
+8. ~~Connect Home screen to backend API~~ ✅ **COMPLETE** (dashboard, stocks, indicators)
+9. ~~Add pull-to-refresh to Home~~ ✅ **COMPLETE**
+10. ~~Add error state with retry to Home~~ ✅ **COMPLETE**
+
 **Immediate Actions:**
-1. ~~**FIRST:** Review all Figma designs using Figma MCP (Phase 0.1)~~ ✅ **100% COMPLETE**
-2. ~~**SECOND:** Force dark theme in main.dart (Phase 1.1)~~ ✅ **COMPLETE**
-3. ~~**THIRD:** Fix critical button color issue in colors.dart~~ ✅ **COMPLETE** (Primary: #1B6FFF)
-4. ~~**FOURTH:** Add fl_chart package to pubspec.yaml~~ ✅ **COMPLETE** (v0.69.2)
-5. ~~**FIFTH:** Create common UI components~~ ✅ **COMPLETE** (Phase 1.2 - 16 widget files created)
-6. ~~**SIXTH:** Build chart wrapper components~~ ✅ **COMPLETE** (LineChart, PieChart, BarChart + helpers)
-7. ~~**SEVENTH:** Refactor Home widgets to use common components~~ ✅ **COMPLETE** (PortfolioChart, PortfolioSection, StockCard, EconomySection)
-8. **NEXT:** Connect Home screen to backend API (portfolio data, stocks, economy indicators)
-9. Parallel: Backend API development for Home/Sofia/Carteira
-10. Test B3 OAuth flow in backend before frontend integration (reference `docs/figma-review-carteira.md` Part 3)
-11. **Decision needed:** Font family - keep DMSans or switch to Plus Jakarta Sans/General Sans
+1. **COMPLETED:** Phase 4 - Perfil screen functionality (90% complete)
+2. **NEXT:** Phase 4 remaining - Meu Plano screen (subscription display/management)
+3. **THEN:** Phase 5 - Sofia rework (needs redesign)
+4. Parallel: Backend API development for Sofia/Conjuntura
+5. Test B3 OAuth flow in backend before frontend integration
+6. **Decision needed:** Font family - keep DMSans or switch to Plus Jakarta Sans/General Sans
 
 **New Common Widget Files (Phase 1.2):**
 ```
@@ -1365,9 +1533,11 @@ lib/common/widgets/
 ├── empty_state.dart           # Empty state with factory constructors
 ├── error_state.dart           # Error state with retry button
 ├── info_bottom_sheet.dart     # Info sheets for (ⓘ) icons
+├── loading_state.dart         # Centered loading spinner (ballSpinFadeLoader)
 ├── primary_button.dart        # Primary, secondary, text buttons
+├── scrollable_header.dart     # Header with back button for scrollable screens
 ├── section_header.dart        # Section headers with "Ver mais"
-├── segmented_tabs.dart        # Tab navigation component
+├── segmented_tabs.dart        # Tab navigation with pop-out effect
 ├── skeleton_loader.dart       # Shimmer loading animations
 ├── toast_notification.dart    # Toast notifications
 ├── widgets.dart               # Export file
@@ -1390,7 +1560,50 @@ lib/utils/constants/
 - `docs/figma-color-verification.md` - Color palette with issues to fix
 
 **Implementation Approach:**
+- **UI-First Workflow:** Build UI → Models/Mappers → API Integration → Test → Done
 - **Iterative with manual testing:** Complete each phase and allow manual testing before proceeding
 - **Keep it simple:** Avoid overcomplication, focus on core functionality
 - **Figma-first:** All UI must match Figma designs exactly - always reference the docs before building
 - **Flexible:** Requirements may shift during integrations, plan will adapt
+
+---
+
+## Backend API Status
+
+**Reference:** `docs/api-contracts.md` (v2.1.0)
+
+### Implemented & Ready for Frontend Integration:
+
+| Phase | Endpoints | Backend Status | Frontend Status |
+|-------|-----------|----------------|-----------------|
+| **Phase 0: B3 OAuth** | `/b3/login`, `/b3/callback`, `/b3/status`, `/b3/disconnect` | ✅ Complete | ⏳ Not integrated |
+| **Phase 1: Home Screen** | `/dashboard/summary` (consolidated - includes featured_stocks, indicators), `/feedback` | ✅ Complete | ✅ Integrated |
+| **Phase 1.5: Market & Favorites** | `/market/stocks` (pagination, sorting, search, type, sector), `/market/stocks/search`, `/user/favorites` | ✅ Complete | ✅ Available (not used on home) |
+| **Phase 2: Portfolio** | `/portfolio/performance`, `/portfolio/allocation`, `/portfolio/income` | ✅ Complete | ⏳ Partial (needs period param) |
+
+### Pending Backend Implementation:
+
+| Phase | Endpoints | Status |
+|-------|-----------|--------|
+| **Phase 3: Conjuntura** | `/conjuntura/sections`, `/conjuntura/:sectionId` | ⏳ Defined |
+| **Phase 4: Sofia** | `/sofia/prompts/usage`, `/sofia/prompts/track` | ⏳ Defined |
+| **Phase 4: Preferences** | `/user/preferences` GET/PUT | ⏳ Defined |
+
+### Frontend Integration Details:
+
+**Home Screen API Pattern (Consolidated):**
+- **Before (v1.x):** 4 API calls (`/dashboard/summary` + `/user/favorites` + `/market/stocks` + `/market/indicators`)
+- **After (v2.1.0):** 1 API call (`/dashboard/summary` includes `featured_stocks` and `indicators`)
+
+**Models Created (lib/models/):**
+- ✅ `Stock` - with `logo_url`, pagination support
+- ✅ `MarketIndicator` - USD, EUR, SELIC, IPCA with formatting
+- ✅ `MarketIndex` - IBOV with Brazilian number formatting
+- ✅ `DashboardSummary` - consolidated: user, marketOverview, portfolio, composicao, notifications, **featuredStocks**, **indicators**
+
+**API Service (lib/services/finovate_api_service.dart):**
+- ✅ `getDashboardSummary()` - **Primary home screen endpoint** (single call for all home data)
+- ✅ `getMarketStocks()` - Stocks with full brapi.dev params (for stocks list screens, not home)
+- ✅ `getMarketIndices()` - Market indices (for detailed views)
+- ✅ `getMarketIndicators()` - Economic indicators (for conjuntura, not home)
+- ✅ `getUserFavorites()` / `addFavorite()` / `removeFavorite()` - Favorites CRUD (for favorites management)

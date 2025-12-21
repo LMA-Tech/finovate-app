@@ -1,507 +1,292 @@
-// lib/screens/perfil/perfil_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/widgets/app_background.dart';
-import '../../common/widgets/fin_bottom_navigation.dart';
+import '../../common/widgets/profile_avatar.dart';
+import '../../common/widgets/segmented_tabs.dart';
+import '../../common/widgets/toast_notification.dart';
 import '../../services/activity_tracker.dart';
-import '../../services/session_manager.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
+import '../../utils/constants/text_strings.dart';
+import '../signup/widgets/policy_bottom_sheet.dart';
+import 'perfil_controller.dart';
+import 'widgets/edit_field_bottom_sheet.dart';
+import 'widgets/email_change_bottom_sheet.dart';
+import 'widgets/meu_plano_tab.dart';
+import 'widgets/perfil_info_tab.dart';
+import 'widgets/preferencias_tab.dart';
 
 /// Perfil Screen - User profile and account settings
 ///
-/// This screen displays user information, account settings,
-/// preferences, and provides access to various app configurations.
+/// Features a 3-tab structure:
+/// - Meu plano: Subscription status and plan features
+/// - Perfil: Personal information with masked values
+/// - Preferências: App settings and preferences
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final activityTracker = Get.find<ActivityTracker>();
-    final sessionManager = Get.find<SessionManager>();
+
+    // Initialize controller if not already registered
+    final controller = Get.put(PerfilController());
 
     return GestureDetector(
       onTap: () => activityTracker.recordActivity(),
       child: AppBackground(
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Perfil'),
-            automaticallyImplyLeading: false, // No back button for main tabs
-            actions: [
-              IconButton(
-                onPressed: () {
-                  // TODO: Add profile settings
-                },
-                icon: const Icon(Icons.edit),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(FinSizes.defaultSpace),
+          body: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // User Profile Header
-                _UserProfileHeader(sessionManager: sessionManager),
+                // Header with title
+                _buildHeader(),
 
-                const SizedBox(height: FinSizes.spaceBtwSections),
+                const SizedBox(height: FinSizes.md),
 
-                // Account Section
-                const _SectionHeader(
-                  title: 'Conta',
-                  subtitle: 'Configurações da sua conta',
+                // Profile avatar and name
+                _buildProfileSection(controller),
+
+                const SizedBox(height: FinSizes.lg),
+
+                // Tab navigation
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: FinSizes.defaultSpace),
+                  child: Obx(() => SegmentedTabs(
+                    tabs: const [
+                      FinTexts.perfilTabMeuPlano,
+                      FinTexts.perfilTabPerfil,
+                      FinTexts.perfilTabPreferencias,
+                    ],
+                    selectedIndex: controller.selectedTabIndex.value,
+                    onTabChanged: controller.selectTab,
+                    // "Meu plano" tab (index 0) uses gradient based on subscription
+                    gradientTabIndex: 0,
+                    selectedGradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: controller.isPro
+                          ? const [FinColors.gradientRedStart, FinColors.gradientOrangeEnd]
+                          : const [FinColors.bannerGradientStart, FinColors.bannerGradientEnd],
+                      stops: const [0.01, 0.72],
+                    ),
+                  )),
                 ),
-                const SizedBox(height: FinSizes.spaceBtwItems),
-                const _AccountSettings(),
 
-                const SizedBox(height: FinSizes.spaceBtwSections),
+                const SizedBox(height: FinSizes.md),
 
-                // App Settings Section
-                const _SectionHeader(
-                  title: 'Configurações',
-                  subtitle: 'Preferências do aplicativo',
+                // Tab content
+                Expanded(
+                  child: Obx(() => _buildTabContent(context, controller)),
                 ),
-                const SizedBox(height: FinSizes.spaceBtwItems),
-                const _AppSettings(),
-
-                const SizedBox(height: FinSizes.spaceBtwSections),
-
-                // Support Section
-                const _SectionHeader(
-                  title: 'Suporte',
-                  subtitle: 'Ajuda e informações',
-                ),
-                const SizedBox(height: FinSizes.spaceBtwItems),
-                const _SupportSection(),
-
-                const SizedBox(height: FinSizes.spaceBtwSections),
-
-                // Logout Button
-                _LogoutButton(sessionManager: sessionManager),
-
-                const SizedBox(height: FinSizes.spaceBtwSections),
               ],
             ),
           ),
-          bottomNavigationBar: const FinBottomNavigation(),
+          // No bottom navigation - using back button instead
         ),
       ),
     );
   }
-}
 
-/// Section header widget for consistent styling
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: FinSizes.fontSizeXLg,
-            fontWeight: FontWeight.w600,
-            color: FinColors.textWhite,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: FinSizes.fontSizeSm,
-            color: FinColors.textWhite.withOpacity(0.7),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// User profile header with avatar and basic info
-class _UserProfileHeader extends StatelessWidget {
-  final SessionManager sessionManager;
-
-  const _UserProfileHeader({required this.sessionManager});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => Container(
-      padding: const EdgeInsets.all(FinSizes.lg),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            FinColors.primary.withOpacity(0.8),
-            FinColors.primary.withOpacity(0.6),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: FinSizes.md,
+        vertical: FinSizes.md,
       ),
       child: Row(
         children: [
-          // Avatar
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: FinColors.textWhite.withOpacity(0.2),
-            ),
+          // Back button
+          GestureDetector(
+            onTap: () => Get.back(),
             child: const Icon(
-              Icons.person,
-              size: 40,
+              Icons.chevron_left,
               color: FinColors.textWhite,
+              size: FinSizes.iconLg,
             ),
           ),
+          const Expanded(
+            child: Text(
+              FinTexts.perfilScreenTitle,
+              style: TextStyle(
+                fontSize: FinSizes.fontSizeXLg,
+                fontWeight: FontWeight.w600,
+                color: FinColors.textWhite,
+                height: 1.60,
+                letterSpacing: -0.40,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          // Spacer to balance the back button
+          const SizedBox(width: FinSizes.iconLg),
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(width: FinSizes.md),
+  Widget _buildProfileSection(PerfilController controller) {
+    return Obx(() => Column(
+      children: [
+        // Profile avatar with premium border for pro users
+        ProfileAvatar(
+          userName: controller.fullName,
+          photoUrl: controller.profilePhotoUrl,
+          size: FinSizes.avatarXl,
+          isPremium: controller.isPro,
+          showPremiumBadge: controller.isPro,
+        ),
 
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  sessionManager.currentUser.value?.email?.split('@')[0] ?? 'Usuário',
-                  style: const TextStyle(
-                    fontSize: FinSizes.fontSizeXLg,
-                    fontWeight: FontWeight.bold,
-                    color: FinColors.textWhite,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sessionManager.currentUser.value?.email ?? 'email@exemplo.com',
-                  style: TextStyle(
-                    fontSize: FinSizes.fontSizeMd,
-                    color: FinColors.textWhite.withOpacity(0.8),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: FinSizes.sm,
-                    vertical: FinSizes.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: FinColors.success.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(FinSizes.borderRadiusSm),
-                  ),
-                  child: const Text(
-                    'Conta Verificada',
-                    style: TextStyle(
-                      fontSize: FinSizes.md,
-                      fontWeight: FontWeight.w600,
-                      color: FinColors.success,
-                    ),
-                  ),
-                ),
-              ],
+        const SizedBox(height: FinSizes.md),
+
+        // User name
+        Text(
+          controller.fullName.isNotEmpty ? controller.fullName : controller.email,
+          style: const TextStyle(
+            fontSize: FinSizes.fontSizeSm,
+            fontWeight: FontWeight.w400,
+            color: FinColors.textWhite,
+            height: 1.29,
+            letterSpacing: -0.28,
+          ),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildTabContent(BuildContext context, PerfilController controller) {
+    switch (controller.selectedTabIndex.value) {
+      case 0:
+        return MeuPlanoTab(
+          hasPlan: controller.isPro,
+          status: controller.planStatus,
+          startDate: controller.planStartDate,
+          nextPaymentDate: controller.planNextPaymentDate,
+          annualPrice: controller.planAnnualPrice,
+          paymentMethodLast4: controller.paymentMethodLast4,
+          onViewPlansTap: () {
+            // TODO: Navigate to plans screen
+          },
+        );
+      case 1:
+        return PerfilInfoTab(
+          fullName: controller.fullName,
+          nickname: controller.nickname,
+          email: controller.email,
+          phone: controller.phone,
+          cpf: controller.cpf,
+          birthDate: controller.birthDate,
+          onEditField: (field) => _showEditFieldSheet(context, controller, field),
+          onLogoutTap: () => _showLogoutDialog(controller),
+        );
+      case 2:
+        return PreferenciasTab(
+          notificationsEnabled: controller.notificationsEnabled.value,
+          biometricEnabled: controller.biometricEnabled.value,
+          isPro: controller.isPro,
+          onNotificationsChanged: controller.toggleNotifications,
+          onBiometricChanged: controller.toggleBiometric,
+          onContasConectadasTap: () {
+            // TODO: Navigate to connected accounts
+          },
+          onConectarB3Tap: () {
+            // TODO: Navigate to B3 connection
+          },
+          onPoliticaPrivacidadeTap: () {
+            PolicyBottomSheet.showPrivacyPolicy(context);
+          },
+          onAjudaTap: () => _openSupportEmail(),
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Future<void> _showLogoutDialog(PerfilController controller) async {
+    final shouldLogout = await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: FinColors.cardBackground,
+        title: const Text(
+          FinTexts.perfilSairConfirmTitle,
+          style: TextStyle(color: FinColors.textWhite),
+        ),
+        content: const Text(
+          FinTexts.perfilSairConfirmMessage,
+          style: TextStyle(color: FinColors.textWhite),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: Text(
+              FinTexts.dialogCancel,
+              style: TextStyle(color: FinColors.textWhite.withValues(alpha: 0.7)),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FinColors.error,
+            ),
+            child: const Text(
+              FinTexts.perfilSairConta,
+              style: TextStyle(color: FinColors.textWhite),
             ),
           ),
         ],
       ),
-    ));
-  }
-}
-
-/// Account settings options
-class _AccountSettings extends StatelessWidget {
-  const _AccountSettings();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _SettingsItem(
-          icon: Icons.person_outline,
-          title: 'Informações Pessoais',
-          subtitle: 'Nome, CPF, telefone',
-          onTap: () {
-            // TODO: Navigate to personal info
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.security,
-          title: 'Segurança',
-          subtitle: 'Senha, autenticação em dois fatores',
-          onTap: () {
-            // TODO: Navigate to security settings
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.account_balance_outlined,
-          title: 'Contas Bancárias',
-          subtitle: 'Gerenciar contas vinculadas',
-          onTap: () {
-            // TODO: Navigate to bank accounts
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.receipt_long,
-          title: 'Histórico de Transações',
-          subtitle: 'Ver todas as movimentações',
-          onTap: () {
-            // TODO: Navigate to transaction history
-          },
-        ),
-      ],
     );
+
+    if (shouldLogout == true) {
+      await controller.signOut();
+    }
   }
-}
 
-/// App settings and preferences
-class _AppSettings extends StatelessWidget {
-  const _AppSettings();
+  Future<void> _showEditFieldSheet(
+    BuildContext context,
+    PerfilController controller,
+    String fieldKey,
+  ) async {
+    // Email has a special flow with OTP verification
+    if (fieldKey == 'email') {
+      final result = await EmailChangeBottomSheet.show(context);
+      if (result == true && context.mounted) {
+        ToastNotification.show(
+          context: context,
+          message: FinTexts.profileUpdated,
+          type: ToastType.success,
+        );
+      }
+      return;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _SettingsItem(
-          icon: Icons.notification_add_outlined,
-          title: 'Notificações',
-          subtitle: 'Alertas de mercado, dividendos',
-          onTap: () {
-            // TODO: Navigate to notification settings
-          },
-          trailing: Switch(
-            value: true,
-            onChanged: (value) {
-              // TODO: Toggle notifications
-            },
-            activeColor: FinColors.primary,
-          ),
-        ),
-        _SettingsItem(
-          icon: Icons.dark_mode_outlined,
-          title: 'Tema',
-          subtitle: 'Claro, escuro ou automático',
-          onTap: () {
-            // TODO: Show theme selection
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.language,
-          title: 'Idioma',
-          subtitle: 'Português (Brasil)',
-          onTap: () {
-            // TODO: Show language selection
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.fingerprint,
-          title: 'Biometria',
-          subtitle: 'Login com impressão digital',
-          onTap: () {
-            // TODO: Configure biometric settings
-          },
-          trailing: Switch(
-            value: false,
-            onChanged: (value) {
-              // TODO: Toggle biometric login
-            },
-            activeColor: FinColors.primary,
-          ),
-        ),
-      ],
+    final result = await EditFieldBottomSheet.show(
+      context: context,
+      fieldKey: fieldKey,
+      fieldLabel: controller.getFieldLabel(fieldKey),
+      currentValue: controller.getFieldValue(fieldKey),
+      onSave: (newValue) => controller.updateField(fieldKey, newValue),
     );
+
+    if (result == true && context.mounted) {
+      ToastNotification.show(
+        context: context,
+        message: FinTexts.profileUpdated,
+        type: ToastType.success,
+      );
+    }
   }
-}
 
-/// Support and help section
-class _SupportSection extends StatelessWidget {
-  const _SupportSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _SettingsItem(
-          icon: Icons.help_outline,
-          title: 'Central de Ajuda',
-          subtitle: 'FAQ e tutoriais',
-          onTap: () {
-            // TODO: Navigate to help center
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.chat_bubble_outline,
-          title: 'Fale Conosco',
-          subtitle: 'Entre em contato com o suporte',
-          onTap: () {
-            // TODO: Navigate to contact support
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.star_outline,
-          title: 'Avaliar App',
-          subtitle: 'Deixe sua avaliação na loja',
-          onTap: () {
-            // TODO: Open app store for rating
-          },
-        ),
-        _SettingsItem(
-          icon: Icons.info_outline,
-          title: 'Sobre',
-          subtitle: 'Versão 1.0.0',
-          onTap: () {
-            // TODO: Show about dialog
-          },
-        ),
-      ],
+  Future<void> _openSupportEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: FinTexts.supportEmail,
+      query: 'subject=${FinTexts.supportEmailSubject}',
     );
-  }
-}
 
-/// Logout button
-class _LogoutButton extends StatelessWidget {
-  final SessionManager sessionManager;
-
-  const _LogoutButton({required this.sessionManager});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () async {
-          // Show confirmation dialog
-          final shouldLogout = await Get.dialog<bool>(
-            AlertDialog(
-              backgroundColor: FinColors.cardBackground,
-              title: const Text(
-                'Sair da Conta',
-                style: TextStyle(color: FinColors.textWhite),
-              ),
-              content: const Text(
-                'Tem certeza que deseja sair da sua conta?',
-                style: TextStyle(color: FinColors.textWhite),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Get.back(result: false),
-                  child: Text(
-                    'Cancelar',
-                    style: TextStyle(color: FinColors.textWhite.withOpacity(0.7)),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => Get.back(result: true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FinColors.error,
-                  ),
-                  child: const Text(
-                    'Sair',
-                    style: TextStyle(color: FinColors.textWhite),
-                  ),
-                ),
-              ],
-            ),
-          );
-
-          if (shouldLogout == true) {
-            await sessionManager.signOut();
-          }
-        },
-        icon: const Icon(
-          Icons.logout,
-          color: FinColors.error,
-        ),
-        label: const Text(
-          'Sair da Conta',
-          style: TextStyle(
-            color: FinColors.error,
-            fontSize: FinSizes.fontSizeMd,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: FinColors.error),
-          padding: const EdgeInsets.symmetric(vertical: FinSizes.md),
-        ),
-      ),
-    );
-  }
-}
-
-/// Individual settings item widget
-class _SettingsItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final Widget? trailing;
-
-  const _SettingsItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: FinSizes.spaceBtwItems),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.all(FinSizes.md),
-        tileColor: FinColors.cardBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(FinSizes.borderRadiusLg),
-          side: BorderSide(
-            color: FinColors.textWhite.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: FinColors.primary.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: FinColors.primary,
-            size: 20,
-          ),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: FinSizes.fontSizeMd,
-            fontWeight: FontWeight.w600,
-            color: FinColors.textWhite,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: FinSizes.fontSizeSm,
-            color: FinColors.textWhite.withOpacity(0.7),
-          ),
-        ),
-        trailing: trailing ??
-            Icon(
-              Icons.chevron_right,
-              color: FinColors.textWhite.withOpacity(0.5),
-            ),
-      ),
-    );
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    }
   }
 }

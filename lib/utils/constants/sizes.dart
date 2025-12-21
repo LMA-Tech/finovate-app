@@ -1,4 +1,3 @@
-
 class FinSizes {
   // Padding and margin sizes
   static const double xs = 4.0;
@@ -6,6 +5,11 @@ class FinSizes {
   static const double md = 16.0;
   static const double lg = 24.0;
   static const double xl = 32.0;
+  static const double xxl = 48.0;
+
+  // Custom spacing (specific use cases)
+  static const double spacingMeuPlanoButton = 60.0;  // Space above "Ver planos" button
+  static const double spacingMeuPlanoTop = 62.0;     // Space from tabs to star icon
 
   // Icon sizes
   static const double iconXs = 12.0;
@@ -14,11 +18,32 @@ class FinSizes {
   static const double iconLg = 32.0;
 
   // Font sizes
+  static const double fontSizeXs = 11.0;
+  static const double fontSizeS = 13.0;
   static const double fontSizeSm = 14.0;
   static const double fontSizeMd = 16.0;
   static const double fontSizeLg = 18.0;
   static const double fontSizeXLg = 20.0;
   static const double fontSizeXXLg = 24.0;
+
+  // Avatar/Logo sizes
+  static const double avatarSm = 32.0;
+  static const double avatarMd = 40.0;
+  static const double avatarLg = 56.0;
+  static const double avatarXl = 80.0;
+
+  // List item heights
+  static const double listItemSm = 48.0;
+  static const double listItemMd = 56.0;
+  static const double listItemLg = 66.0;
+
+  // Tab/Pill sizes
+  static const double tabHeight = 48.0;
+  static const double tabHeightSelected = 54.0;
+  static const double tabPaddingSelected = 20.0;
+
+  // Search bar
+  static const double searchBarHeight = 56.0;
 
   // Button sizes
   static const double buttonHeight = 18.0;
@@ -43,6 +68,11 @@ class FinSizes {
   static const double borderRadiusSm = 4.0;
   static const double borderRadiusMd = 8.0;
   static const double borderRadiusLg = 12.0;
+  static const double borderRadiusXLg = 20.0;
+
+  // Border widths
+  static const double borderWidthSm = 1.0;
+  static const double borderWidthMd = 2.0;
 
   // Divider height
   static const double dividerHeight = 1.0;
@@ -72,6 +102,3 @@ class FinSizes {
   // Grid view spacing
   static const double gridViewSpacing = 16.0;
 }
-
-
-

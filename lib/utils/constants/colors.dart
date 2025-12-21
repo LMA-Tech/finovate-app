@@ -18,6 +18,7 @@ class FinColors {
   static const Color textPrimary = Color(0xFF333333);
   static const Color textSecondary = Color(0xFF6C757D);
   static const Color textWhite = Colors.white;
+  static const Color textDark = Color(0xFF19191C);  // Dark text (Neutral-gray-700)
 
   // Background colors (Dark)
   static const Color dark = Color(0xFF272727);
@@ -37,6 +38,7 @@ class FinColors {
   static const Color buttonPrimary = Color(0xFF1B6FFF);  // Figma: Primary button color
   static const Color buttonSecondary = Color(0xFF6C757D);
   static const Color buttonDisabled = Color(0xFFC4C4C4);
+  static const Color buttonLight = Color(0xFFE3EBFF);
 
   // Border colors
   static const Color borderPrimary = Color(0xFFD9D9D9);
@@ -51,6 +53,7 @@ class FinColors {
   // Card and container colors (Dark theme)
   static const Color cardBackground = Color(0xFF2D3245);  // Dark card background
   static const Color inputBackground = Color(0xFF2D3245);  // Input field background
+  static const Color stockItemBackground = Color(0xFF1B223E);  // Stock list item background
 
   // Border colors (Dark theme)
   static const Color borderMint = Color(0xFFBADBC1);  // Light mint/teal border (questionnaire options)
@@ -69,14 +72,18 @@ class FinColors {
   // Trend indicator colors (stocks/economy)
   static const Color trendPositive = Color(0xFF0CB97B);  // Positive trend green
   static const Color trendNegative = Color(0xFFE02244);  // Negative trend red
-  static const Color trendPositiveBg = Color(0xFFBADBC1);  // Positive trend background
-  static const Color trendNegativeBg = Color(0xFFFFD7DE);  // Negative trend background
+  static const Color trendPositiveBg = Color(0xFFBADBC1);  // Positive trend background (green pill)
+  static const Color trendNegativeBg = Color(0xFFE02244);  // Negative trend background (red pill)
+  static const Color trendNeutralBg = Color(0xFFE0E0E0);   // Neutral trend background (gray pill)
+  static const Color trendNegativeIconBg = Color(0xFFFFD7DE);  // Light red background for icon circles
 
   // Company name/subtitle text
   static const Color textSubtitle = Color(0xFFCAD7F8);  // Light blue subtitle text
 
   // Avatar border
-  static const Color avatarBorder = Color(0xFF39DDA2);  // Green avatar border
+  static const Color avatarBorder = Color(0xFFDFDFE0);  // Light gray for free users
+  // Premium avatar uses gradient: #E02244 (red) → #F3AD43 (orange) - see ProfileAvatar widget
+  static const Color starOrange = Color(0xFFF3AD43);  // Orange star badge
 
   // Banner colors
   static const Color bannerText = Color(0xFFF0F5EF);  // Light text for banners
@@ -111,8 +118,20 @@ class FinColors {
   static const Color segmentUnselectedText = Color(0xFFFEFEFE);  // Unselected segment text
   static const Color segmentShadow = Color(0x3D1A2F5C);  // Segment shadow (24% opacity)
 
+  // Notification message box
+  static const Color notificationMessageText = Color(0xFFE3EBFF);  // Light blue notification text
+
+  // Gradient colors (for use with LinearGradient)
+  static const Color gradientRedStart = Color(0xFFE02244);  // Premium/pro gradient start
+  static const Color gradientOrangeEnd = Color(0xFFF3AD43);  // Premium/pro gradient end
+  static const Color gradientBlueStart = Color(0xFF62B2FD);  // Free/info gradient start
+  static const Color gradientMintEnd = Color(0xFFBADBC1);  // Free/info gradient end
+
   // Chart tooltip background (same as card)
   static const Color tooltipBackground = Color(0xFF15254E);  // Dark blue tooltip
+
+  // Composicao chart colors
+  static const Color composicaoRendaFixa = Color(0xFFE4ECFF);  // Light blue for renda fixa
 
   // Neutral Shades
   static const Color black = Color(0xFF232323);
@@ -123,8 +142,4 @@ class FinColors {
   static const Color softGrey = Color(0xFFF4F4F4);
   static const Color lightGrey = Color(0xFFF9F9F9);
   static const Color white = Color(0xFFFFFFFF);
-
 }
-
-
-
