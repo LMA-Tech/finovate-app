@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
-import 'image_strings.dart';
+
+import 'colors.dart';
 
 class BackgroundDecorations {
   BackgroundDecorations._();
 
-  // Static decorations - created once, reused everywhere
+  // Dark background gradient (use AppBackground widget for full background with overlay)
   static const BoxDecoration darkBackground = BoxDecoration(
-    image: DecorationImage(
-      image: AssetImage(FinImages.darkAppBg2),
-      fit: BoxFit.cover,
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        FinColors.bottomSheetGradientStart,
+        FinColors.bottomSheetGradientEnd,
+      ],
+      stops: [0.01, 0.72],
     ),
   );
 
   static const BoxDecoration lightBackground = BoxDecoration(
-    color: Color(0xFFFFFFFF), // Your light background color
+    color: Color(0xFFFFFFFF),
   );
 }

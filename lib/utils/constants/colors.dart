@@ -27,6 +27,10 @@ class FinColors {
   static const Color gradientStart = Color(0xFF252532); // Top of gradient
   static const Color gradientEnd = Color(0xFF111111);   // Bottom of gradient
 
+  // Bottom sheet/modal background gradient
+  static const Color bottomSheetGradientStart = Color(0xFF252532);  // 1%
+  static const Color bottomSheetGradientEnd = Color(0xFF030D2C);    // 72%
+
   // Background colors (Light)
   static const Color light = Color(0xFFF6F6F6);
 

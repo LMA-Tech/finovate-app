@@ -44,6 +44,7 @@ class PerfilController extends GetxController {
   String? get profilePhotoUrl => _getUserMetadata('profile_photo_url');
 
   // Subscription status (will be backend-driven)
+  // TODO: Replace with real subscription status from backend
   final RxString planType = 'free'.obs; // 'free' or 'pro'
   bool get isPro => planType.value == 'pro';
 

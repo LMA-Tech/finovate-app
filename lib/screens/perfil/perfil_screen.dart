@@ -6,6 +6,7 @@ import '../../common/widgets/app_background.dart';
 import '../../common/widgets/profile_avatar.dart';
 import '../../common/widgets/segmented_tabs.dart';
 import '../../common/widgets/toast_notification.dart';
+import '../../controllers/bottom_navigation_controller.dart';
 import '../../services/activity_tracker.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
@@ -17,6 +18,8 @@ import 'widgets/email_change_bottom_sheet.dart';
 import 'widgets/meu_plano_tab.dart';
 import 'widgets/perfil_info_tab.dart';
 import 'widgets/preferencias_tab.dart';
+import 'widgets/premium_plan_bottom_sheet.dart';
+import 'widgets/subscription_success_bottom_sheet.dart';
 
 /// Perfil Screen - User profile and account settings
 ///
@@ -98,9 +101,9 @@ class PerfilScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Back button
+          // Back button - go to home tab
           GestureDetector(
-            onTap: () => Get.back(),
+            onTap: () => Get.find<BottomNavigationController>().changeTab(0),
             child: const Icon(
               Icons.chevron_left,
               color: FinColors.textWhite,
@@ -166,9 +169,7 @@ class PerfilScreen extends StatelessWidget {
           nextPaymentDate: controller.planNextPaymentDate,
           annualPrice: controller.planAnnualPrice,
           paymentMethodLast4: controller.paymentMethodLast4,
-          onViewPlansTap: () {
-            // TODO: Navigate to plans screen
-          },
+          onViewPlansTap: () => _showPremiumPlanSheet(context, controller),
         );
       case 1:
         return PerfilInfoTab(
@@ -288,5 +289,27 @@ class PerfilScreen extends StatelessWidget {
     if (await canLaunchUrl(emailUri)) {
       await launchUrl(emailUri);
     }
+  }
+
+  void _showPremiumPlanSheet(BuildContext context, PerfilController controller) {
+    PremiumPlanBottomSheet.show(
+      context,
+      userName: controller.fullName,
+      userPhotoUrl: controller.profilePhotoUrl,
+      onSubscribe: () {
+        Navigator.pop(context);
+        // TODO: Implement real payment flow before showing success
+        _showSubscriptionSuccessSheet(context);
+      },
+    );
+  }
+
+  void _showSubscriptionSuccessSheet(BuildContext context) {
+    SubscriptionSuccessBottomSheet.show(
+      context,
+      onStartNow: () {
+        Navigator.pop(context);
+      },
+    );
   }
 }

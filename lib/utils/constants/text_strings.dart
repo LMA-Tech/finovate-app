@@ -317,6 +317,23 @@ class FinTexts {
   static const String perfilPlanoAssineDesc = " e tenha acesso a ferramentas e insights exclusivos.";
   static const String perfilPlanoVerPlanos = "Ver planos";
 
+  // Premium Plan Bottom Sheet
+  static const String premiumPlanTitle = "Plano Premium";
+  static const String premiumPlanSubtitle = "{NAME}, agora é o seu momento de investir com inteligência!";
+  static const String premiumPriceTextPart1 = "Tenha acesso a tudo ";
+  static const String premiumPriceHighlight = "por apenas R\$ 9,90/mês";
+  static const String premiumPriceTextPart2 = " com insights e recursos feitos pra você investir melhor.";
+  static const String premiumFeature1Title = "Acesso ilimitado aos prompts de IA";
+  static const String premiumFeature1Description = "Obtenha respostas personalizadas e recomendações sempre que quiser.";
+  static const String premiumFeature2Title = "Acesso completo à aba de Conjuntura";
+  static const String premiumFeature2Description = "Veja análises econômicas atualizadas para tomar decisões melhores.";
+  static const String premiumSubscribeButton = "Assinar Premium";
+
+  // Subscription Success
+  static const String subscriptionSuccessTitle = "Agora você é Premium!";
+  static const String subscriptionSuccessSubtitle = "Você já pode aproveitar IA ilimitada e conteúdos exclusivos.";
+  static const String subscriptionSuccessButton = "Começar agora!";
+
   // Perfil - Preferências Tab (Geral section)
   static const String perfilGeral = "Geral";
   static const String perfilAparencia = "Aparência";

@@ -12,8 +12,7 @@ class FinImages {
   static const String darkLogoTipo = "assets/finovate/logotipo/svg/full_white.svg";
 
   // -- Background Images
-  static const String darkAppBg = "assets/backgrounds/background_img.svg";
-  static const String darkAppBg2 = "assets/backgrounds/bg-dark.png";
+  static const String darkAppBgOverlay = "assets/backgrounds/bg-dark-overlay.png";  // White dots/grid overlay
   static const String lightAppBg = "";
 
   // -- Social Logos
@@ -35,6 +34,9 @@ class FinImages {
   static const String bottomNavSofia = "assets/icons/bottom_nav/sofia_icon.svg";
   static const String bottomNavWallet = "assets/icons/bottom_nav/waller_icon.svg";
   static const String bottomNavProfile = "assets/icons/bottom_nav/my_profile.svg";
+
+  // -- Premium/Subscription Icons
+  static const String premiumCheckmark = "assets/icons/premium_checkmark.svg";
 
 
 
