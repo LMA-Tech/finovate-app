@@ -13,6 +13,7 @@ import '../../models/models.dart';
 import '../../services/activity_tracker.dart';
 import '../../services/finovate_api_service.dart';
 import '../../services/session_manager.dart';
+import '../../utils/constants/colors.dart';
 import '../../utils/constants/routes.dart';
 import '../../utils/constants/sizes.dart';
 import '../../utils/constants/text_strings.dart';
@@ -75,6 +76,8 @@ class _HomeScreen extends HomeController {
               // Show content with pull-to-refresh
               return RefreshIndicator(
                 onRefresh: refreshData,
+                color: FinColors.primary,
+                backgroundColor: FinColors.cardBackground,
                 child: _buildHomeContent(sessionManager, activityTracker),
               );
             }),

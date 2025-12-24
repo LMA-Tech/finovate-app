@@ -11,6 +11,9 @@ abstract class HomeController extends State<HomeScreen> {
   // Loading state - single loading state for all home data
   final isLoading = true.obs;
 
+  // Refreshing state - separate from loading for pull-to-refresh
+  final isRefreshing = false.obs;
+
   // Data state
   final Rx<DashboardSummary?> dashboardSummary = Rx<DashboardSummary?>(null);
 
@@ -48,8 +51,23 @@ abstract class HomeController extends State<HomeScreen> {
   }
 
   /// Refresh all data (for pull-to-refresh)
+  /// Does NOT show skeleton loader - keeps content visible during refresh
   Future<void> refreshData() async {
-    await _loadDashboardData();
+    if (isRefreshing.value) return; // Prevent multiple refreshes
+
+    isRefreshing.value = true;
+    error.value = '';
+
+    try {
+      final summary = await FinovateApiService.getDashboardSummary();
+      dashboardSummary.value = summary;
+      log('Dashboard refreshed: user=${summary.user.firstName}');
+    } catch (e) {
+      log('Error refreshing dashboard: $e');
+      // Don't set error during refresh - keep existing data visible
+    } finally {
+      isRefreshing.value = false;
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

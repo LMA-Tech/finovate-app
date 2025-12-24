@@ -101,9 +101,13 @@ class PerfilScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Back button - go to home tab
+          // Back button - pop back to previous screen
           GestureDetector(
-            onTap: () => Get.find<BottomNavigationController>().changeTab(0),
+            onTap: () {
+              // Reset bottom nav to home tab and pop back
+              Get.find<BottomNavigationController>().resetToHome();
+              Get.back();
+            },
             child: const Icon(
               Icons.chevron_left,
               color: FinColors.textWhite,

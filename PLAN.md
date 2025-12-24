@@ -537,6 +537,8 @@ Screens with proper structure ✅:
 - [✅] Add pull-to-refresh for all sections - **DONE** (RefreshIndicator wrapping content)
 - [✅] Implement skeleton loading states for each section - **DONE**
 - [✅] Add error states with retry buttons - **DONE** (ErrorState component with FinTexts)
+- [✅] Separate refresh state from loading state - **DONE** (isRefreshing keeps content visible during refresh)
+- [✅] Style RefreshIndicator with FinColors - **DONE** (primary color, card background)
 - [ ] Optimize data refresh on app foreground
 - [ ] Cache data locally for offline viewing
 
@@ -571,6 +573,7 @@ Screens with proper structure ✅:
 - Logout with confirmation dialog
 - Gradient tab styling based on subscription status (Free/Pro)
 - Plan type display (currently set to 'free' for testing)
+- **Navigation fix:** Profile uses push navigation (Get.toNamed) for smooth back button transitions
 
 **Tasks:**
 

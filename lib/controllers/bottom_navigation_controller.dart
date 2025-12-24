@@ -45,7 +45,7 @@ class BottomNavigationController extends GetxController {
   /// Change to specific tab and navigate to corresponding route
   ///
   /// [index] - Tab index (0-4)
-  /// Uses GetX offAllNamed to replace the current route stack
+  /// Uses GetX offAllNamed for main tabs, Get.to for profile (smoother transition)
   void changeTab(int index) {
     if (index < 0 || index >= routes.length) return;
 
@@ -57,17 +57,22 @@ class BottomNavigationController extends GetxController {
       return;
     }
 
-    // Update current index first
-    currentIndex.value = index;
-
     // Debug print to help track navigation
     if (kDebugMode) {
       print('Navigating to tab $index: ${routes[index]}');
     }
 
     try {
-      // Navigate to corresponding route
-      Get.offAllNamed(routes[index]);
+      // Profile tab (index 4) uses push navigation for smooth back transition
+      // since it doesn't have bottom nav and uses a back button
+      if (index == 4) {
+        currentIndex.value = index;
+        Get.toNamed(routes[index]);
+      } else {
+        // For other tabs, use offAllNamed to clear stack
+        currentIndex.value = index;
+        Get.offAllNamed(routes[index]);
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Navigation error: $e');
