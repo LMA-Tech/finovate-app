@@ -21,6 +21,7 @@ import 'package:finovate_app/services/session_manager.dart';
 import 'package:finovate_app/controllers/bottom_navigation_controller.dart';
 import 'package:finovate_app/utils/constants/routes.dart';
 import 'package:finovate_app/utils/theme/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
