@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
+import '../../services/app_logger.dart';
 import '../../services/finovate_api_service.dart';
 
 /// Controller for Sofia Chat Screen
 /// Handles backend chat integration with streaming responses
 class SofiaChatController extends GetxController {
+  static const String _tag = 'SofiaChatController';
   static SofiaChatController get instance => Get.find();
 
   // ═══════════════════════════════════════════════════════════════
@@ -37,7 +39,7 @@ class SofiaChatController extends GetxController {
     if (args != null && args is Map && args.containsKey('initialMessage')) {
       final initialMessage = args['initialMessage'] as String?;
       if (initialMessage != null && initialMessage.isNotEmpty) {
-        debugPrint('Received initial message: $initialMessage');
+        AppLogger.debug('Received initial message: $initialMessage', tag: _tag);
         // Wait a moment for UI to build, then send message
         Future.delayed(const Duration(milliseconds: 500), () {
           messageController.text = initialMessage;
@@ -67,10 +69,10 @@ class SofiaChatController extends GetxController {
       );
       if (sessions.isNotEmpty) {
         currentSessionId.value = sessions.first.sessionId;
-        debugPrint('📋 Loaded session [correlationId: $correlationId]');
+        AppLogger.debug('Loaded session [correlationId: $correlationId]', tag: _tag);
       }
     } catch (e) {
-      debugPrint('❌ Failed to load sessions: $e');
+      AppLogger.error('Failed to load sessions', error: e, tag: _tag);
     }
   }
 
@@ -81,7 +83,7 @@ class SofiaChatController extends GetxController {
 
     messageController.clear();
     final correlationId = _uuid.v4();
-    debugPrint('🔗 Sending message [correlationId: $correlationId]');
+    AppLogger.debug('Sending message [correlationId: $correlationId]', tag: _tag);
 
     // Add user message
     messages.add(ChatMessage(
@@ -100,7 +102,7 @@ class SofiaChatController extends GetxController {
           correlationId: correlationId,
         );
         currentSessionId.value = session.sessionId;
-        debugPrint('✅ Created session [correlationId: $correlationId]');
+        AppLogger.info('Created session [correlationId: $correlationId]', tag: _tag);
       } catch (e) {
         isLoading.value = false;
         messages.add(ChatMessage(
@@ -147,7 +149,7 @@ class SofiaChatController extends GetxController {
           }
           scrollToBottom();
         } else if (chunk.event == 'end') {
-          debugPrint('✅ Stream completed [correlationId: $correlationId]');
+          AppLogger.debug('Stream completed [correlationId: $correlationId]', tag: _tag);
 
           isLoading.value = false;
           if (messages.isNotEmpty && messages.last.isStreaming) {
@@ -166,7 +168,7 @@ class SofiaChatController extends GetxController {
         }
       }
     } catch (e) {
-      debugPrint('❌ Stream error [correlationId: $correlationId]: $e');
+      AppLogger.error('Stream error [correlationId: $correlationId]', error: e, tag: _tag);
 
       isLoading.value = false;
       if (messages.isNotEmpty && messages.last.isStreaming) {

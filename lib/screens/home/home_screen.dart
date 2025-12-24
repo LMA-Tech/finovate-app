@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +9,7 @@ import '../../common/widgets/skeleton_loader.dart';
 import '../../controllers/bottom_navigation_controller.dart';
 import '../../models/models.dart';
 import '../../services/activity_tracker.dart';
+import '../../services/app_logger.dart';
 import '../../services/finovate_api_service.dart';
 import '../../services/session_manager.dart';
 import '../../utils/constants/colors.dart';

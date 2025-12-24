@@ -1,13 +1,14 @@
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../common/dialogs/app_dialogs.dart';
 import '../utils/constants/colors.dart';
 import '../utils/constants/text_strings.dart';
+import 'app_logger.dart';
 
 /// Centralized service for handling all email sending operations
 /// Manages rate limiting, error handling, and user feedback consistently
 class EmailService {
+  static const String _tag = 'EmailService';
   static final SupabaseClient _supabase = Supabase.instance.client;
 
   // Track email sending to prevent rapid requests
@@ -91,18 +92,13 @@ class EmailService {
       // Show success message
       _showSuccessMessage(emailType);
 
-      if (kDebugMode) {
-        debugPrint('✅ Email sent successfully: $emailType to $email');
-      }
+      AppLogger.info('Email sent successfully: $emailType to $email', tag: _tag);
 
       return true;
 
     } catch (e) {
       // Log error for debugging (but don't show to user)
-      if (kDebugMode) {
-        debugPrint('❌ Email sending failed: $emailType');
-        debugPrint('Error: $e');
-      }
+      AppLogger.error('Email sending failed: $emailType', error: e, tag: _tag);
 
       // Handle different types of errors gracefully
       _handleEmailError(e, emailType);

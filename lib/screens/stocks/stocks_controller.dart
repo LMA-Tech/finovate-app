@@ -1,14 +1,15 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 
 import '../../models/stock.dart';
+import '../../services/app_logger.dart';
 import '../../services/finovate_api_service.dart';
 import '../../utils/constants/text_strings.dart';
 import '../../utils/helpers/helper_functions.dart';
 
 /// Controller for Stocks list screen
 class StocksController extends GetxController {
+  static const String _tag = 'StocksController';
+
   // Filter options
   static List<String> get filterOptions => [
         FinTexts.stocksFilterAll,
@@ -58,9 +59,9 @@ class StocksController extends GetxController {
 
       stocks.value = response.stocks;
       pagination.value = response.pagination;
-      log('Stocks loaded: ${stocks.length} items, page ${response.pagination.page} of ${response.pagination.totalPages}');
+      AppLogger.debug('Stocks loaded: ${stocks.length} items, page ${response.pagination.page} of ${response.pagination.totalPages}', tag: _tag);
     } catch (e) {
-      log('Error loading stocks: $e');
+      AppLogger.error('Error loading stocks', error: e, tag: _tag);
       error.value = FinHelperFunctions.getErrorMessage(e);
     } finally {
       isLoading.value = false;
@@ -102,7 +103,7 @@ class StocksController extends GetxController {
       );
       searchSuggestions.value = suggestions;
     } catch (e) {
-      log('Error searching stocks: $e');
+      AppLogger.error('Error searching stocks', error: e, tag: _tag);
     } finally {
       isSearching.value = false;
     }

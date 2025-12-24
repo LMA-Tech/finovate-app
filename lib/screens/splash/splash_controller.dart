@@ -1,6 +1,7 @@
 part of 'splash_screen.dart';
 
 abstract class SplashController extends State<SplashScreen> {
+  static const String _tag = 'SplashController';
   final OnboardingService _onboardingService = OnboardingService();
 
   @override
@@ -23,12 +24,12 @@ abstract class SplashController extends State<SplashScreen> {
         precacheImage(const AssetImage(FinImages.onboardingImage3), context),
       ]);
     } catch (e) {
-      debugPrint('Error precaching onboarding images: $e');
+      AppLogger.warning('Error precaching onboarding images', error: e, tag: _tag);
     }
   }
 
   void navigateToNextScreen() async {
-    print('Starting navigation logic...');
+    AppLogger.debug('Starting navigation logic', tag: _tag);
 
     // Show splash for 3 seconds
     await Future.delayed(const Duration(seconds: 3));
@@ -37,27 +38,27 @@ abstract class SplashController extends State<SplashScreen> {
 
     // Check authentication state first
     final user = Supabase.instance.client.auth.currentUser;
-    print('Current user: ${user?.email ?? 'null'}');
+    AppLogger.debug('Current user: ${user?.email ?? 'null'}', tag: _tag);
 
     if (user != null) {
       // User is authenticated, go to home
-      print('User authenticated - going to home');
+      AppLogger.info('User authenticated - going to home', tag: _tag);
       Get.offAllNamed(AppRoutes.home);
       return;
     }
 
     // User not authenticated, check if first launch
-    print('User not authenticated - checking first launch');
+    AppLogger.debug('User not authenticated - checking first launch', tag: _tag);
     bool isFirstLaunch = await _onboardingService.isFirstLaunch();
-    print('Is first launch: $isFirstLaunch');
+    AppLogger.debug('Is first launch: $isFirstLaunch', tag: _tag);
 
     if (isFirstLaunch) {
       // First launch, show onboarding
-      print('Going to onboarding');
+      AppLogger.info('Going to onboarding', tag: _tag);
       Get.offAllNamed(AppRoutes.onboarding);
     } else {
       // Not first launch, show get started screen
-      print('Going to get started');
+      AppLogger.info('Going to get started', tag: _tag);
       Get.offAllNamed(AppRoutes.getStarted);
     }
   }

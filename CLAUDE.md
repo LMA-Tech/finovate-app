@@ -250,10 +250,24 @@ final response = await FinovateApiService.post(
 - This ensures the UI adapts to various screen sizes
 - Extract repeated UI patterns into separate widget classes
 
-### Logging
-- **Use `log` from `dart:developer`** rather than `print` or `debugPrint`
-- Example: `import 'dart:developer'; log('message');`
-- Never leave `print()` statements in production code
+### Logging Best Practices
+- **Use the centralized `AppLogger` service** for all logging (`lib/services/app_logger.dart`)
+- **Never use** `print()` or `debugPrint()` directly - these don't support log levels or production filtering
+- **Log levels** (use appropriately):
+  - `AppLogger.verbose()` - Detailed debug info (network payloads, state changes)
+  - `AppLogger.debug()` - Development debugging
+  - `AppLogger.info()` - Important events (navigation, user actions)
+  - `AppLogger.warning()` - Potential issues that don't break functionality
+  - `AppLogger.error()` - Errors with optional stack traces
+- **Production behavior**: Only `warning` and `error` levels are logged in release builds
+- **Include context**: Use the `tag` parameter for module identification
+  ```dart
+  AppLogger.info('User logged in', tag: 'AuthService');
+  AppLogger.error('API call failed', error: e, stackTrace: stack, tag: 'ApiService');
+  ```
+- **Don't log sensitive data**: Never log passwords, tokens, or PII
+- **Log uniformly**: All network calls should use the same log level (verbose)
+- **Reference**: Based on Flutter logging best practices (Logger package pattern)
 
 ### Utils & Constants
 - **Always use utils directory** to avoid inline code for:
@@ -285,7 +299,8 @@ final response = await FinovateApiService.post(
 
 ### Code Quality Checklist
 Before committing code, verify:
-- [ ] No `print()` statements (use `log()` instead)
+- [ ] No `print()` or `debugPrint()` statements (use `AppLogger.*` instead)
+- [ ] Appropriate log levels used (verbose for debug, error for errors)
 - [ ] No hardcoded colors (use `FinColors.*`)
 - [ ] No hardcoded sizes (use `FinSizes.*`)
 - [ ] No hardcoded strings for UI text
@@ -293,6 +308,7 @@ Before committing code, verify:
 - [ ] Flex values used instead of fixed sizes where appropriate
 - [ ] Similar code extracted to common widgets
 - [ ] Follows screen/controller/widgets structure
+- [ ] No sensitive data logged (passwords, tokens, PII)
 
 ## Important Notes
 

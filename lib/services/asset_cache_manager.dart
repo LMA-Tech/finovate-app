@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../utils/constants/image_strings.dart';
+import 'app_logger.dart';
 
 class AssetCacheManager {
+  static const String _tag = 'AssetCache';
 
   static Future<void> preloadCriticalAssets() async {
     try {
@@ -16,7 +18,7 @@ class AssetCacheManager {
         ]);
       }
     } catch (e) {
-      debugPrint('Asset preloading failed: $e');
+      AppLogger.warning('Asset preloading failed', error: e, tag: _tag);
     }
   }
 

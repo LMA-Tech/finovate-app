@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../common/widgets/custom_text_field.dart';
+import '../../../services/app_logger.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/session_manager.dart';
 import '../../../utils/constants/colors.dart';
@@ -91,7 +90,7 @@ class _EmailChangeBottomSheetState extends State<EmailChangeBottomSheet> {
         _otpSent = true;
       });
     } catch (e) {
-      log('Error sending OTP: $e');
+      AppLogger.error('Error sending OTP', error: e, tag: 'EmailChange');
       setState(() {
         _errorMessage = e.toString();
       });
@@ -125,7 +124,7 @@ class _EmailChangeBottomSheetState extends State<EmailChangeBottomSheet> {
         Navigator.of(context).pop(true);
       }
     } catch (e) {
-      log('Error verifying OTP: $e');
+      AppLogger.error('Error verifying OTP', error: e, tag: 'EmailChange');
       setState(() {
         _errorMessage = e.toString();
       });

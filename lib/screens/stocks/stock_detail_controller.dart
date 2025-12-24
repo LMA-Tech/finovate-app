@@ -1,13 +1,14 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 
 import '../../models/stock.dart';
+import '../../services/app_logger.dart';
 import '../../services/finovate_api_service.dart';
 import '../../utils/helpers/helper_functions.dart';
 
 /// Controller for the stock detail screen
 class StockDetailController extends GetxController {
+  static const String _tag = 'StockDetailController';
+
   final String ticker;
 
   StockDetailController({required this.ticker});
@@ -51,7 +52,7 @@ class StockDetailController extends GetxController {
       stockDetail.value = detail;
       isFavorite.value = detail.isFavorite;
     } catch (e) {
-      log('Error loading stock detail: $e');
+      AppLogger.error('Error loading stock detail', error: e, tag: _tag);
       final errorString = e.toString().toLowerCase();
 
       // Check if it's a "not found" error (data unavailable)
@@ -84,7 +85,7 @@ class StockDetailController extends GetxController {
       // Only update the chart data, keep other data
       stockDetail.value = detail;
     } catch (e) {
-      log('Error loading chart data: $e');
+      AppLogger.error('Error loading chart data', error: e, tag: _tag);
       // Don't show error for range changes, just keep existing data
     } finally {
       isChartLoading.value = false;
@@ -107,7 +108,7 @@ class StockDetailController extends GetxController {
         await FinovateApiService.addFavorite(ticker: ticker);
       }
     } catch (e) {
-      log('Error toggling favorite: $e');
+      AppLogger.error('Error toggling favorite', error: e, tag: _tag);
       // Revert on error
       isFavorite.value = wasFavorite;
     }

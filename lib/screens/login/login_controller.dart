@@ -1,14 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../common/dialogs/app_dialogs.dart';
+import '../../services/app_logger.dart';
 import '../../services/auth_service.dart';
 import '../../services/biometric_service.dart';
 import '../../utils/constants/text_strings.dart';
 import '../../utils/constants/colors.dart';
 
 class LoginController extends GetxController {
+  static const String _tag = 'LoginController';
   final AuthService _auth = AuthService();
 
   late FormGroup loginForm;
@@ -76,9 +77,7 @@ class LoginController extends GetxController {
       // Offer biometric enrollment after successful login
       await _offerBiometricEnrollment();
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Login error: $e');
-      }
+      AppLogger.error('Login error', error: e, tag: _tag);
       // Parse error message to provide better UX
       String errorMessage = e.toString();
       String errorTitle = FinTexts.dialogErrorTitle;

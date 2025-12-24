@@ -1,8 +1,9 @@
-
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart';
+
+import 'app_logger.dart';
 
 class AuthService {
+  static const String _tag = 'AuthService';
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// Check if email already exists by querying the users table
@@ -16,9 +17,7 @@ class AuthService {
 
       return response != null;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error checking email: $e');
-      }
+      AppLogger.error('Error checking email', error: e, tag: _tag);
       return false;
     }
   }
@@ -37,9 +36,7 @@ class AuthService {
 
       return response != null;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error checking tax ID: $e');
-      }
+      AppLogger.error('Error checking tax ID', error: e, tag: _tag);
       return false;
     }
   }
@@ -71,7 +68,7 @@ class AuthService {
     required Map<String, dynamic> userData,
   }) async {
     try {
-      print('🔍 userData being sent: $userData');
+      AppLogger.verbose('userData being sent: $userData', tag: _tag);
       final response = await _supabase.auth.signUp(
         phone: phoneNumber,
         password: password,
@@ -209,9 +206,7 @@ class AuthService {
 
       return response;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error getting user profile: $e');
-      }
+      AppLogger.error('Error getting user profile', error: e, tag: _tag);
       return null;
     }
   }

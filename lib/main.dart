@@ -21,11 +21,11 @@ import 'package:finovate_app/services/session_manager.dart';
 import 'package:finovate_app/controllers/bottom_navigation_controller.dart';
 import 'package:finovate_app/utils/constants/routes.dart';
 import 'package:finovate_app/utils/theme/theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/env_config.dart';
+import 'services/app_logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,9 +35,7 @@ void main() async {
     await EnvConfig.load();
 
     // Debug configuration in development
-    if (kDebugMode) {
-      EnvConfig.debugPrintConfig();
-    }
+    EnvConfig.debugPrintConfig();
 
     // Validate required configuration
     if (!EnvConfig.isConfigValid) {
@@ -58,9 +56,7 @@ void main() async {
 
     runApp(const FinovateApp());
   } catch (e) {
-    if (kDebugMode) {
-      debugPrint('❌ Initialization error: $e');
-    }
+    AppLogger.error('Initialization error', error: e, tag: 'Main');
     runApp(const ErrorApp());
   }
 }

@@ -6,6 +6,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../common/dialogs/app_dialogs.dart';
+import '../../services/app_logger.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../services/finovate_api_service.dart';
@@ -24,6 +25,7 @@ import '../../utils/constants/text_strings.dart';
 /// Step 5: Success Screen ("Conta criada com sucesso!")
 /// Step 6: Questionnaire Intro ("Queremos te conhecer!")
 class SignupController extends GetxController {
+  static const String _tag = 'SignupController';
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // SERVICES
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -445,7 +447,7 @@ class SignupController extends GetxController {
       }
 
       if (response.user != null) {
-        print('Verification successful!');
+        AppLogger.info('Verification successful', tag: _tag);
 
         // Create user profile
         final userData = _buildUserData();
@@ -460,7 +462,7 @@ class SignupController extends GetxController {
           phoneNumber: userData['phone_number'],
         );
 
-        print('User profile created successfully');
+        AppLogger.info('User profile created successfully', tag: _tag);
 
         // Go to success screen (Step 5)
         currentStep.value = 5;
@@ -473,7 +475,7 @@ class SignupController extends GetxController {
         );
       }
     } catch (e) {
-      print('Verification error: $e');
+      AppLogger.error('Verification error', error: e, tag: _tag);
       await AppDialogs.showError(
         title: FinTexts.signupErrorTitle,
         message: FinTexts.signupErrorVerificationInvalid,
@@ -604,7 +606,7 @@ class SignupController extends GetxController {
           userData['birthdate'] = date.toIso8601String();
         }
       } catch (e) {
-        print('Invalid date format: $birthdate');
+        AppLogger.warning('Invalid date format: $birthdate', tag: _tag);
       }
     }
 
@@ -612,12 +614,11 @@ class SignupController extends GetxController {
   }
 
   void _handleSignUpResponse(AuthResponse response) {
-    print('=== SIGNUP RESPONSE ===');
-    print('User exists: ${response.user != null}');
+    AppLogger.debug('Signup response: user exists=${response.user != null}', tag: _tag);
 
     if (response.user != null) {
       // Go to OTP verification (Step 4)
-      print('Moving to OTP verification');
+      AppLogger.info('Moving to OTP verification', tag: _tag);
       currentStep.value = 4;
       _animateToPage(4);
       startResendTimer();
@@ -764,11 +765,7 @@ class SignupController extends GetxController {
       final decisionStyle = _mapAnswerToBackendEnum(3, questionnaireAnswers[3]!);
       final riskProfile = _mapAnswerToBackendEnum(4, questionnaireAnswers[4]!);
 
-      print('Submitting questionnaire:');
-      print('  Wealth: $wealthRange');
-      print('  Knowledge: $investmentKnowledge');
-      print('  Decision: $decisionStyle');
-      print('  Risk: $riskProfile');
+      AppLogger.debug('Submitting questionnaire: wealth=$wealthRange, knowledge=$investmentKnowledge, decision=$decisionStyle, risk=$riskProfile', tag: _tag);
 
       // Submit to backend
       await FinovateApiService.submitQuestionnaire(
@@ -778,14 +775,14 @@ class SignupController extends GetxController {
         riskProfile: riskProfile,
       );
 
-      print('Questionnaire submitted successfully!');
+      AppLogger.info('Questionnaire submitted successfully', tag: _tag);
 
       // Navigate to final welcome screen (step 11)
       // Don't mark signup complete yet - final screen will do that
       nextStep(); // Moves to Success Screen
 
     } catch (e) {
-      print('Questionnaire submission error: $e');
+      AppLogger.error('Questionnaire submission error', error: e, tag: _tag);
       await AppDialogs.showError(
         title: 'Erro ao enviar',
         message: 'Não foi possível enviar o questionário. Tente novamente.',

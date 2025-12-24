@@ -2,9 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app_logger.dart';
+
 /// Tracks user activity and manages session timeout requirements
 /// Handles both biometric re-authentication and full session logout timeouts
 class ActivityTracker extends GetxController {
+  static const String _tag = 'ActivityTracker';
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
   // TIMEOUT CONFIGURATION
@@ -42,30 +45,21 @@ class ActivityTracker extends GetxController {
   /// Call this method whenever the user interacts with the app
   void recordActivity() {
     lastActivity.value = DateTime.now();
-
-    if (kDebugMode) {
-      debugPrint('🎯 Atividade registrada: ${_formatTime(DateTime.now())}');
-    }
+    AppLogger.verbose('Activity recorded: ${_formatTime(DateTime.now())}', tag: _tag);
   }
 
   /// Marks that biometric authentication was successfully completed
   /// Resets the biometric timeout counter
   void markBiometricAuth() {
     lastBiometricAuth.value = DateTime.now();
-
-    if (kDebugMode) {
-      debugPrint('🔒 Autenticação biométrica confirmada: ${_formatTime(DateTime.now())}');
-    }
+    AppLogger.debug('Biometric authentication confirmed: ${_formatTime(DateTime.now())}', tag: _tag);
   }
 
   /// Clears biometric authentication state
   /// Used when user logs out or session is reset
   void clearBiometricAuth() {
     lastBiometricAuth.value = null;
-
-    if (kDebugMode) {
-      debugPrint('🔓 Estado biométrico limpo');
-    }
+    AppLogger.debug('Biometric state cleared', tag: _tag);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -78,19 +72,14 @@ class ActivityTracker extends GetxController {
   bool get needsBiometricAuth {
     // First time biometric auth is always required
     if (lastBiometricAuth.value == null) {
-      if (kDebugMode) {
-        debugPrint('🔒 Primeira autenticação biométrica necessária');
-      }
+      AppLogger.debug('First biometric auth required', tag: _tag);
       return true;
     }
 
     final timeSinceBiometric = DateTime.now().difference(lastBiometricAuth.value!);
     final isExpired = timeSinceBiometric > BIOMETRIC_TIMEOUT;
 
-    if (kDebugMode) {
-      debugPrint('⏰ Tempo desde última biometria: ${_formatDuration(timeSinceBiometric)} / ${_formatDuration(BIOMETRIC_TIMEOUT)}');
-      debugPrint('🔍 Biometria necessária: ${isExpired ? "SIM" : "NÃO"}');
-    }
+    AppLogger.verbose('Time since biometric: ${_formatDuration(timeSinceBiometric)} / ${_formatDuration(BIOMETRIC_TIMEOUT)}, needed: $isExpired', tag: _tag);
 
     return isExpired;
   }
@@ -102,9 +91,7 @@ class ActivityTracker extends GetxController {
 
     // No user or no sign-in timestamp means full reauth required
     if (user?.lastSignInAt == null) {
-      if (kDebugMode) {
-        debugPrint('❌ Usuário ou timestamp de login não encontrado');
-      }
+      AppLogger.warning('User or login timestamp not found', tag: _tag);
       return true;
     }
 
@@ -113,17 +100,11 @@ class ActivityTracker extends GetxController {
       final timeSinceLogin = DateTime.now().difference(lastSignIn);
       final isExpired = timeSinceLogin > FULL_LOGOUT_TIMEOUT;
 
-      if (kDebugMode) {
-        debugPrint('📅 Último login: ${_formatTime(lastSignIn)}');
-        debugPrint('⏰ Tempo desde login: ${_formatDuration(timeSinceLogin)} / ${_formatDuration(FULL_LOGOUT_TIMEOUT)}');
-        debugPrint('🔍 Logout necessário: ${isExpired ? "SIM" : "NÃO"}');
-      }
+      AppLogger.verbose('Last login: ${_formatTime(lastSignIn)}, time since: ${_formatDuration(timeSinceLogin)} / ${_formatDuration(FULL_LOGOUT_TIMEOUT)}, logout needed: $isExpired', tag: _tag);
 
       return isExpired;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Erro ao analisar timestamp de login: $e');
-      }
+      AppLogger.error('Error parsing login timestamp', error: e, tag: _tag);
       return true; // If we can't parse, require reauth for safety
     }
   }
@@ -153,14 +134,12 @@ class ActivityTracker extends GetxController {
 
   /// Prints current state for debugging purposes
   void debugCurrentState() {
-    if (kDebugMode) {
-      debugPrint('=== Activity Tracker State ===');
-      debugPrint('Última atividade: ${_formatTime(lastActivity.value)}');
-      debugPrint('Última biometria: ${lastBiometricAuth.value != null ? _formatTime(lastBiometricAuth.value!) : "Nunca"}');
-      debugPrint('Precisa biometria: ${needsBiometricAuth ? "SIM" : "NÃO"}');
-      debugPrint('Precisa logout: ${needsFullReauth ? "SIM" : "NÃO"}');
-      debugPrint('==============================');
-    }
+    AppLogger.debug(
+      'Activity state: lastActivity=${_formatTime(lastActivity.value)}, '
+      'lastBiometric=${lastBiometricAuth.value != null ? _formatTime(lastBiometricAuth.value!) : "never"}, '
+      'needsBiometric=$needsBiometricAuth, needsLogout=$needsFullReauth',
+      tag: _tag,
+    );
   }
 
   /// Resets all activity tracking state
@@ -168,9 +147,6 @@ class ActivityTracker extends GetxController {
   void reset() {
     lastActivity.value = DateTime.now();
     lastBiometricAuth.value = null;
-
-    if (kDebugMode) {
-      debugPrint('🔄 Activity Tracker resetado');
-    }
+    AppLogger.info('Activity tracker reset', tag: _tag);
   }
 }

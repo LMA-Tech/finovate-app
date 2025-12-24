@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
 import '../models/models.dart';
+import 'app_logger.dart';
 import 'session_manager.dart';
 
 /// Service for communicating with Finovate backend API
@@ -43,21 +42,19 @@ class FinovateApiService {
     };
   }
 
-  /// Log request details in debug mode
+  static const String _tag = 'ApiService';
+
+  /// Log request details
   static void _logRequest(String method, String endpoint, String correlationId) {
-    if (kDebugMode) {
-      log('🔗 [$method] $endpoint [correlationId: $correlationId]');
-    }
+    AppLogger.verbose('[$method] $endpoint [corrId: $correlationId]', tag: _tag);
   }
 
-  /// Log response details in debug mode
+  /// Log response details
   static void _logResponse(int statusCode, String correlationId, {String? error}) {
-    if (kDebugMode) {
-      if (error != null) {
-        log('❌ Response $statusCode [correlationId: $correlationId] - Error: $error');
-      } else {
-        log('✅ Response $statusCode [correlationId: $correlationId]');
-      }
+    if (error != null) {
+      AppLogger.error('Response $statusCode [corrId: $correlationId] - $error', tag: _tag);
+    } else {
+      AppLogger.verbose('Response $statusCode [corrId: $correlationId]', tag: _tag);
     }
   }
 

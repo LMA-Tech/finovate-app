@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import '../../common/dialogs/app_dialogs.dart';
+import '../../services/app_logger.dart';
 import '../../services/auth_service.dart';
 import '../../services/centralized_email_service.dart';
 import '../../utils/constants/colors.dart';
@@ -18,6 +18,8 @@ import '../../utils/constants/text_strings.dart';
 /// - Password reset flow via Supabase
 /// - UI state management for buttons, loading states, etc.
 class ForgotPasswordController extends GetxController {
+  static const String _tag = 'ForgotPasswordController';
+
   // Services
   final AuthService _auth = AuthService();
 
@@ -311,14 +313,10 @@ class ForgotPasswordController extends GetxController {
       // Update password via AuthService
       await _auth.updatePassword(newPassword);
 
-      if (kDebugMode) {
-        debugPrint('✅ Password updated successfully');
-      }
+      AppLogger.info('Password updated successfully', tag: _tag);
 
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Password update failed: $e');
-      }
+      AppLogger.error('Password update failed', error: e, tag: _tag);
 
       // Show error and don't proceed to next step
       await AppDialogs.showError(

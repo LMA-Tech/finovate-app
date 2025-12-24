@@ -31,6 +31,8 @@ abstract class HomeController extends State<HomeScreen> {
     super.dispose();
   }
 
+  static const String _tag = 'HomeController';
+
   /// Load all home screen data from single dashboard endpoint
   Future<void> _loadDashboardData() async {
     isLoading.value = true;
@@ -39,11 +41,11 @@ abstract class HomeController extends State<HomeScreen> {
     try {
       final summary = await FinovateApiService.getDashboardSummary();
       dashboardSummary.value = summary;
-      log('Dashboard loaded: user=${summary.user.firstName}, b3Connected=${summary.user.hasB3Connected}');
-      log('Featured stocks: ${summary.featuredStocks.length}');
-      log('Indicators: ${summary.indicators.length}');
+      AppLogger.info('Dashboard loaded: user=${summary.user.firstName}, b3Connected=${summary.user.hasB3Connected}', tag: _tag);
+      AppLogger.verbose('Featured stocks: ${summary.featuredStocks.length}', tag: _tag);
+      AppLogger.verbose('Indicators: ${summary.indicators.length}', tag: _tag);
     } catch (e) {
-      log('Error loading dashboard: $e');
+      AppLogger.error('Error loading dashboard', error: e, tag: _tag);
       error.value = e.toString();
     } finally {
       isLoading.value = false;
@@ -61,9 +63,9 @@ abstract class HomeController extends State<HomeScreen> {
     try {
       final summary = await FinovateApiService.getDashboardSummary();
       dashboardSummary.value = summary;
-      log('Dashboard refreshed: user=${summary.user.firstName}');
+      AppLogger.info('Dashboard refreshed: user=${summary.user.firstName}', tag: _tag);
     } catch (e) {
-      log('Error refreshing dashboard: $e');
+      AppLogger.warning('Error refreshing dashboard', error: e, tag: _tag);
       // Don't set error during refresh - keep existing data visible
     } finally {
       isRefreshing.value = false;
@@ -290,7 +292,7 @@ abstract class HomeController extends State<HomeScreen> {
 
   /// Handle stock card tap - navigate to stock detail screen
   void _handleStockTap(Stock stock) {
-    log('Stock tapped: ${stock.ticker}');
+    AppLogger.debug('Stock tapped: ${stock.ticker}', tag: _tag);
     Get.to(
       () => StockDetailScreen(
         ticker: stock.ticker,

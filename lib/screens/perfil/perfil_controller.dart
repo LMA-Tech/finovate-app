@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/app_logger.dart';
 import '../../services/auth_service.dart';
 import '../../services/biometric_service.dart';
 import '../../services/session_manager.dart';
@@ -15,6 +14,7 @@ import '../../services/session_manager.dart';
 /// - Subscription status
 /// - User preferences/settings
 class PerfilController extends GetxController {
+  static const String _tag = 'PerfilController';
   final SessionManager _sessionManager = Get.find<SessionManager>();
   final AuthService _authService = Get.find<AuthService>();
 
@@ -64,7 +64,7 @@ class PerfilController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    log('PerfilController initialized');
+    AppLogger.debug('Initialized', tag: _tag);
     _loadUserData();
     _loadPreferences();
     _checkBiometricAvailability();
@@ -86,7 +86,7 @@ class PerfilController extends GetxController {
     // User data is already available from SessionManager
     // Additional data loading can be added here when backend is ready
     final user = _sessionManager.currentUser.value;
-    log('User metadata: ${user?.userMetadata}');
+    AppLogger.verbose('User metadata: ${user?.userMetadata}', tag: _tag);
   }
 
   // Preference keys for SharedPreferences
@@ -120,9 +120,9 @@ class PerfilController extends GetxController {
         }
       }
 
-      log('Loaded preferences - notifications: ${notificationsEnabled.value}, biometric: ${biometricEnabled.value}');
+      AppLogger.debug('Loaded preferences - notifications: ${notificationsEnabled.value}, biometric: ${biometricEnabled.value}', tag: _tag);
     } catch (e) {
-      log('Error loading preferences: $e');
+      AppLogger.error('Error loading preferences', error: e, tag: _tag);
     }
   }
 
@@ -135,7 +135,7 @@ class PerfilController extends GetxController {
       // If biometric not available, ensure it's disabled
       biometricEnabled.value = false;
     }
-    log('Biometric available: ${biometricAvailable.value}, type: ${biometricType.value}');
+    AppLogger.debug('Biometric available: ${biometricAvailable.value}, type: ${biometricType.value}', tag: _tag);
   }
 
   /// Saves a preference to both SharedPreferences and metadata
@@ -147,10 +147,10 @@ class PerfilController extends GetxController {
 
       // Save to metadata (async, fire and forget)
       _authService.updateUserPreference(metadataKey, value.toString()).catchError((e) {
-        log('Failed to save preference to metadata: $e');
+        AppLogger.warning('Failed to save preference to metadata', error: e, tag: _tag);
       });
     } catch (e) {
-      log('Error saving preference: $e');
+      AppLogger.error('Error saving preference', error: e, tag: _tag);
     }
   }
 
@@ -165,14 +165,14 @@ class PerfilController extends GetxController {
   Future<void> toggleNotifications(bool value) async {
     notificationsEnabled.value = value;
     await _savePreference(_keyNotifications, value, 'notifications_enabled');
-    log('Notifications toggled: $value');
+    AppLogger.debug('Notifications toggled: $value', tag: _tag);
   }
 
   /// Toggles biometric preference
   /// When enabling, requires biometric authentication first
   Future<void> toggleBiometric(bool value) async {
     if (!biometricAvailable.value) {
-      log('Biometric not available on this device');
+      AppLogger.warning('Biometric not available on this device', tag: _tag);
       return;
     }
 
@@ -183,14 +183,14 @@ class PerfilController extends GetxController {
       );
 
       if (!result.success) {
-        log('Biometric authentication failed: ${result.errorMessage}');
+        AppLogger.warning('Biometric authentication failed: ${result.errorMessage}', tag: _tag);
         return; // Don't enable if auth failed
       }
     }
 
     biometricEnabled.value = value;
     await _savePreference(_keyBiometric, value, 'biometric_enabled');
-    log('Biometric toggled: $value');
+    AppLogger.debug('Biometric toggled: $value', tag: _tag);
   }
 
   /// Signs out the user
@@ -207,7 +207,7 @@ class PerfilController extends GetxController {
       await _loadUserData();
     } catch (e) {
       error.value = e.toString();
-      log('Error refreshing profile data: $e');
+      AppLogger.error('Error refreshing profile data', error: e, tag: _tag);
     } finally {
       isLoading.value = false;
     }
@@ -215,7 +215,7 @@ class PerfilController extends GetxController {
 
   /// Updates a profile field
   Future<void> updateField(String fieldKey, String newValue) async {
-    log('Updating field: $fieldKey with value: $newValue');
+    AppLogger.debug('Updating field: $fieldKey with value: $newValue', tag: _tag);
 
     switch (fieldKey) {
       case 'fullName':

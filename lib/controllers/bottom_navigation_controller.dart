@@ -1,13 +1,14 @@
 // lib/controllers/bottom_navigation_controller.dart
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
+import '../services/app_logger.dart';
 import '../utils/constants/routes.dart';
 
 /// Controller for managing bottom navigation state and tab switching
 /// Handles navigation logic and maintains current tab state across the app
 class BottomNavigationController extends GetxController {
+  static const String _tag = 'BottomNav';
   static BottomNavigationController get instance => Get.find();
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -51,16 +52,12 @@ class BottomNavigationController extends GetxController {
 
     // Don't navigate if already on the same tab
     if (currentIndex.value == index) {
-      if (kDebugMode) {
-        print('Already on tab $index (${routes[index]}) - skipping navigation');
-      }
+      AppLogger.verbose('Already on tab $index (${routes[index]}) - skipping navigation', tag: _tag);
       return;
     }
 
     // Debug print to help track navigation
-    if (kDebugMode) {
-      print('Navigating to tab $index: ${routes[index]}');
-    }
+    AppLogger.debug('Navigating to tab $index: ${routes[index]}', tag: _tag);
 
     try {
       // Profile tab (index 4) uses push navigation for smooth back transition
@@ -74,9 +71,7 @@ class BottomNavigationController extends GetxController {
         Get.offAllNamed(routes[index]);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Navigation error: $e');
-      }
+      AppLogger.error('Navigation error', error: e, tag: _tag);
       // Fallback to home if navigation fails
       currentIndex.value = 0;
       Get.offAllNamed('/home');
@@ -118,9 +113,7 @@ class BottomNavigationController extends GetxController {
   /// Reset to home tab (index 0)
   /// Call this when navigating to home after login/signup
   void resetToHome() {
-    if (kDebugMode) {
-      debugPrint('🏠 Resetting bottom navigation to Home tab');
-    }
+    AppLogger.debug('Resetting bottom navigation to Home tab', tag: _tag);
     currentIndex.value = 0;
   }
 
@@ -132,15 +125,11 @@ class BottomNavigationController extends GetxController {
     final index = routes.indexOf(currentRoute);
 
     if (index != -1 && index != currentIndex.value) {
-      if (kDebugMode) {
-        debugPrint('🔄 Syncing tab: route=$currentRoute, updating index to $index');
-      }
+      AppLogger.verbose('Syncing tab: route=$currentRoute, updating index to $index', tag: _tag);
       currentIndex.value = index;
     } else if (index == -1) {
       // Route not in bottom nav - don't change tab selection
-      if (kDebugMode) {
-        debugPrint('📍 Route $currentRoute not in bottom nav - keeping current tab');
-      }
+      AppLogger.verbose('Route $currentRoute not in bottom nav - keeping current tab', tag: _tag);
     }
   }
 
@@ -161,22 +150,16 @@ class BottomNavigationController extends GetxController {
   void _setInitialTab() {
     final currentRoute = Get.currentRoute;
 
-    if (kDebugMode) {
-      debugPrint('📍 Setting initial tab for route: $currentRoute');
-    }
+    AppLogger.debug('Setting initial tab for route: $currentRoute', tag: _tag);
 
     final index = routes.indexOf(currentRoute);
     if (index != -1) {
       currentIndex.value = index;
-      if (kDebugMode) {
-        debugPrint('✅ Tab set to index $index');
-      }
+      AppLogger.verbose('Tab set to index $index', tag: _tag);
     } else {
       // Default to home if route not found
       currentIndex.value = 0;
-      if (kDebugMode) {
-        debugPrint('⚠️ Route not found, defaulting to Home (index 0)');
-      }
+      AppLogger.verbose('Route not found, defaulting to Home (index 0)', tag: _tag);
     }
   }
 }

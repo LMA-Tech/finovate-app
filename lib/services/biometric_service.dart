@@ -5,6 +5,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 
 import '../config/env_config.dart';
+import 'app_logger.dart';
 
 /// Context for biometric authentication to provide appropriate messaging
 enum BiometricContext {
@@ -52,6 +53,7 @@ enum BiometricErrorType {
 /// Enhanced service for handling biometric authentication across different platforms
 /// Supports Face ID, Touch ID, Fingerprint, and other biometric types with comprehensive error handling
 class BiometricService {
+  static const String _tag = 'BiometricService';
   static final LocalAuthentication _localAuth = LocalAuthentication();
 
   // ═══════════════════════════════════════════════════════════════════════════════════════
@@ -70,19 +72,11 @@ class BiometricService {
           isDeviceSupported &&
           availableBiometrics.isNotEmpty;
 
-      if (kDebugMode) {
-        debugPrint('🔍 Biometric Setup Status:');
-        debugPrint('  - Can check biometrics: $isAvailable');
-        debugPrint('  - Device supported: $isDeviceSupported');
-        debugPrint('  - Available types: $availableBiometrics');
-        debugPrint('  - Fully setup: $isFullySetup');
-      }
+      AppLogger.debug('Biometric setup: canCheck=$isAvailable, supported=$isDeviceSupported, types=$availableBiometrics, fullySetup=$isFullySetup', tag: _tag);
 
       return isFullySetup;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error checking biometric setup: $e');
-      }
+      AppLogger.error('Error checking biometric setup', error: e, tag: _tag);
       return false;
     }
   }
@@ -94,9 +88,7 @@ class BiometricService {
       final isSupported = await _localAuth.isDeviceSupported();
       return canCheck || isSupported;
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error checking biometric availability: $e');
-      }
+      AppLogger.error('Error checking biometric availability', error: e, tag: _tag);
       return false;
     }
   }
@@ -139,9 +131,7 @@ class BiometricService {
     try {
       final availableBiometrics = await _localAuth.getAvailableBiometrics();
 
-      if (kDebugMode) {
-        debugPrint('🔍 Available biometrics: $availableBiometrics');
-      }
+      AppLogger.verbose('Available biometrics: $availableBiometrics', tag: _tag);
 
       // iOS/Android specific biometric types (prioritize more secure methods)
       if (availableBiometrics.contains(BiometricType.face)) {
@@ -160,9 +150,7 @@ class BiometricService {
         return "Biometria"; // Fallback generic term
       }
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error detecting biometric type: $e');
-      }
+      AppLogger.error('Error detecting biometric type', error: e, tag: _tag);
       return "Biometria";
     }
   }
@@ -190,9 +178,7 @@ class BiometricService {
         return Icons.security; // Fallback security icon
       }
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error detecting biometric icon: $e');
-      }
+      AppLogger.error('Error detecting biometric icon', error: e, tag: _tag);
       return Icons.security;
     }
   }
@@ -217,8 +203,7 @@ class BiometricService {
     try {
       // Only allow test mode if explicitly enabled via env variable
       if (kDebugMode && EnvConfig.allowBiometricTestMode) {
-        debugPrint('🧪 TEST MODE: Simulating biometric authentication...');
-        debugPrint('⚠️ WARNING: Test mode should NEVER be enabled in production');
+        AppLogger.warning('TEST MODE: Simulating biometric authentication - should NEVER be enabled in production', tag: _tag);
         await Future.delayed(const Duration(seconds: 2));
         return BiometricResult.success();
       }
@@ -245,8 +230,10 @@ class BiometricService {
         ),
       );
 
-      if (kDebugMode) {
-        debugPrint(result ? '✅ Biometric authentication successful' : '❌ Biometric authentication failed');
+      if (result) {
+        AppLogger.info('Biometric authentication successful', tag: _tag);
+      } else {
+        AppLogger.warning('Biometric authentication failed', tag: _tag);
       }
 
       return result
@@ -257,16 +244,10 @@ class BiometricService {
       );
 
     } on PlatformException catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Biometric Platform Exception: ${e.code} - ${e.message}');
-      }
-
+      AppLogger.error('Biometric platform exception: ${e.code}', error: e, tag: _tag);
       return _handlePlatformException(e);
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Biometric authentication error: $e');
-      }
-
+      AppLogger.error('Biometric authentication error', error: e, tag: _tag);
       return BiometricResult.failure(
         errorMessage: 'Erro inesperado na autenticação biométrica',
         errorType: BiometricErrorType.systemError,
@@ -358,9 +339,7 @@ class BiometricService {
     try {
       return await _localAuth.getAvailableBiometrics();
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error getting available biometrics: $e');
-      }
+      AppLogger.error('Error getting available biometrics', error: e, tag: _tag);
       return [];
     }
   }
@@ -392,9 +371,7 @@ class BiometricService {
       final availableTypes = await _localAuth.getAvailableBiometrics();
       return availableTypes.contains(type);
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('❌ Error checking biometric type support: $e');
-      }
+      AppLogger.error('Error checking biometric type support', error: e, tag: _tag);
       return false;
     }
   }

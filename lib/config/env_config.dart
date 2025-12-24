@@ -2,11 +2,14 @@
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../services/app_logger.dart';
+
 /// Environment configuration manager
 ///
 /// Handles loading and accessing environment variables from .env file
 /// Includes validation and debug helpers for development
 class EnvConfig {
+  static const String _tag = 'EnvConfig';
   // ═══════════════════════════════════════════════════════════════════════════
   // INITIALIZATION
   // ═══════════════════════════════════════════════════════════════════════════
@@ -53,17 +56,12 @@ class EnvConfig {
   /// Only shows whether values are present or not
   static void debugPrintConfig() {
     if (!isProduction) {
-      print('╔════════════════════════════════════════════════════════════╗');
-      print('║            ENVIRONMENT CONFIGURATION                       ║');
-      print('╠════════════════════════════════════════════════════════════╣');
-      print('║ Environment: $environment');
-      print('║ API Base URL: $apiBaseUrl');
-      print('║ ');
-      print('║ SUPABASE:');
-      print('║   URL configured: ${supabaseUrl.isNotEmpty ? "✓" : "✗"}');
-      print('║   Key configured: ${supabaseAnonKey.isNotEmpty ? "✓" : "✗"}');
-      print('║ ');
-      print('╚════════════════════════════════════════════════════════════╝');
+      AppLogger.info(
+        'Environment config: env=$environment, api=$apiBaseUrl, '
+        'supabaseUrl=${supabaseUrl.isNotEmpty ? "configured" : "missing"}, '
+        'supabaseKey=${supabaseAnonKey.isNotEmpty ? "configured" : "missing"}',
+        tag: _tag,
+      );
     }
   }
 }

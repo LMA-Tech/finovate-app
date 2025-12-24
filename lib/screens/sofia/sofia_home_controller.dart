@@ -1,13 +1,14 @@
 // lib/screens/sofia/sofia_home_controller.dart
 
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart';
+import '../../services/app_logger.dart';
 import '../../services/session_manager.dart';
 import '../../utils/constants/text_strings.dart';
 
 /// Controller for Sofia Home Screen
 /// Handles welcome screen state and user greeting
 class SofiaHomeController extends GetxController {
+  static const String _tag = 'SofiaHomeController';
   static SofiaHomeController get instance => Get.find();
 
   // ═══════════════════════════════════════════════════════════════
@@ -25,12 +26,12 @@ class SofiaHomeController extends GetxController {
   void onInit() {
     super.onInit();
     initializeUser();
-    if (kDebugMode) print('[SofiaHomeController] Initialized');
+    AppLogger.debug('Initialized', tag: _tag);
   }
 
   @override
   void onClose() {
-    if (kDebugMode) print('[SofiaHomeController] Disposed');
+    AppLogger.debug('Disposed', tag: _tag);
     super.onClose();
   }
 
@@ -49,16 +50,16 @@ class SofiaHomeController extends GetxController {
           final emailPart = email.split('@')[0];
           userName.value = _capitalizeFirstLetter(emailPart);
         }
-        if (kDebugMode) print('[SofiaHomeController] User initialized: ${userName.value}');
+        AppLogger.debug('User initialized: ${userName.value}', tag: _tag);
       }
     } catch (e) {
-      if (kDebugMode) print('[SofiaHomeController] Error initializing user: $e');
+      AppLogger.error('Error initializing user', error: e, tag: _tag);
     }
   }
 
   /// Handle suggestion card tap
   void onSuggestionTap(String suggestion) {
-    if (kDebugMode) print('[SofiaHomeController] Suggestion tapped: $suggestion');
+    AppLogger.debug('Suggestion tapped: $suggestion', tag: _tag);
   }
 
   // ═══════════════════════════════════════════════════════════════
