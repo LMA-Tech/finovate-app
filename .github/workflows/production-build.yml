@@ -1,0 +1,128 @@
+# Production Build Workflow
+# Builds release artifacts for App Store submission
+# Does NOT distribute to Firebase - artifacts are downloaded manually for store upload
+
+name: Production Build
+
+on:
+  push:
+    branches:
+      - main
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.24.0'
+  JAVA_VERSION: '17'
+
+jobs:
+  # ============================================
+  # ANDROID PRODUCTION BUILD
+  # ============================================
+  build-android:
+    name: Build Android Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Create google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+
+      - name: Set up Android signing
+        run: |
+          echo '${{ secrets.ANDROID_KEY_PROPERTIES }}' > android/key.properties
+          echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > android/upload-keystore.jks
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build App Bundle for Play Store (preferred format)
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      # Also build APK for direct installation
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+  # ============================================
+  # iOS PRODUCTION BUILD
+  # ============================================
+  build-ios:
+    name: Build iOS Release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Create GoogleService-Info.plist
+        run: echo '${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}' > ios/Runner/GoogleService-Info.plist
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      # Build without code signing - you'll sign in Xcode or Transporter
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
+
+      - name: Create xcarchive
+        run: |
+          mkdir -p build/ios/archive
+          cp -r build/ios/iphoneos/Runner.app build/ios/archive/
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: build/ios/archive/
+          retention-days: 30

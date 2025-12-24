@@ -1,4 +1,4 @@
-package com.example.finovate_app
+package com.lma.finovateApp
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

@@ -1,0 +1,233 @@
+# Firebase App Distribution CI/CD Pipeline
+# This workflow builds the Flutter app and distributes it to testers via Firebase
+#
+# Branch Strategy:
+#   - test: Builds and distributes to Firebase App Distribution (for testers)
+#   - main: Production builds for App Store (no Firebase distribution)
+#   - dev: Local development only (no CI/CD)
+#
+# Required GitHub Secrets (set in repo Settings > Secrets and variables > Actions):
+#   FIREBASE_ANDROID_APP_ID    - Firebase App ID for Android (from Firebase Console)
+#   FIREBASE_IOS_APP_ID        - Firebase App ID for iOS (from Firebase Console)
+#   FIREBASE_SERVICE_ACCOUNT   - Firebase service account JSON
+#   ANDROID_KEYSTORE_BASE64    - Base64 encoded keystore file
+#   ANDROID_KEY_PROPERTIES     - Contents of key.properties file
+#   GOOGLE_SERVICES_JSON       - Contents of google-services.json
+#   GOOGLE_SERVICE_INFO_PLIST  - Contents of GoogleService-Info.plist
+#   ENV_FILE                   - Contents of .env file
+
+name: Build & Distribute to Firebase
+
+on:
+  # Trigger on push to test branch only (for Firebase distribution)
+  push:
+    branches:
+      - test
+
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+      release_notes:
+        description: 'Release notes for testers'
+        required: false
+        default: 'New build from CI/CD pipeline'
+
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.24.0'
+  JAVA_VERSION: '17'
+
+jobs:
+  # ============================================
+  # ANDROID BUILD
+  # ============================================
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    # Only run if platform is 'android' or 'both', or if triggered by push
+    if: >
+      github.event_name == 'push' ||
+      github.event.inputs.platform == 'android' ||
+      github.event.inputs.platform == 'both'
+
+    steps:
+      # 1. Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Java (required for Android builds)
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      # 3. Set up Flutter
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      # 4. Create .env file from secret
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      # 5. Create google-services.json from secret
+      - name: Create google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+
+      # 6. Set up Android signing
+      - name: Set up Android signing
+        run: |
+          # Create key.properties
+          echo '${{ secrets.ANDROID_KEY_PROPERTIES }}' > android/key.properties
+
+          # Decode and create keystore file
+          echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > android/upload-keystore.jks
+
+      # 7. Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 8. Build release APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 9. Upload APK as artifact (for debugging/manual download)
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+
+      # 10. Distribute to Firebase
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          groups: testers
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: |
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            ${{ github.event.inputs.release_notes || 'Automated build' }}
+
+  # ============================================
+  # iOS BUILD
+  # ============================================
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    # Only run if platform is 'ios' or 'both', or if triggered by push
+    if: >
+      github.event_name == 'push' ||
+      github.event.inputs.platform == 'ios' ||
+      github.event.inputs.platform == 'both'
+
+    steps:
+      # 1. Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Flutter
+      - name: Set up Flutter ${{ env.FLUTTER_VERSION }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      # 3. Create .env file from secret
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      # 4. Create GoogleService-Info.plist from secret
+      - name: Create GoogleService-Info.plist
+        run: echo '${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}' > ios/Runner/GoogleService-Info.plist
+
+      # 5. Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 6. Install CocoaPods dependencies
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      # 7. Build iOS app (no code signing for now - ad-hoc distribution)
+      # Note: For full App Store builds, you'll need to add provisioning profiles
+      - name: Build iOS
+        run: |
+          flutter build ios --release --no-codesign
+
+      # 8. Create unsigned IPA for Firebase Distribution
+      # Firebase App Distribution can handle ad-hoc signed builds
+      - name: Create IPA
+        run: |
+          mkdir -p build/ios/ipa
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r ../ipa/app-release.ipa Payload
+          rm -rf Payload
+
+      # 9. Upload IPA as artifact
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/ipa/app-release.ipa
+          retention-days: 7
+
+      # 10. Distribute to Firebase
+      # Note: iOS requires additional setup for code signing
+      # This step is commented out until signing is configured
+      # - name: Upload to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+      #     serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      #     groups: testers
+      #     file: build/ios/ipa/app-release.ipa
+      #     releaseNotes: |
+      #       Branch: ${{ github.ref_name }}
+      #       Commit: ${{ github.sha }}
+      #       ${{ github.event.inputs.release_notes || 'Automated build' }}
+
+  # ============================================
+  # NOTIFY ON COMPLETION
+  # ============================================
+  notify:
+    name: Notify completion
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
+    if: always()
+
+    steps:
+      - name: Check build results
+        run: |
+          echo "Android build: ${{ needs.build-android.result }}"
+          echo "iOS build: ${{ needs.build-ios.result }}"
+
+          if [ "${{ needs.build-android.result }}" == "failure" ] || [ "${{ needs.build-ios.result }}" == "failure" ]; then
+            echo "::error::One or more builds failed!"
+            exit 1
+          fi
+
+          echo "All builds completed successfully!"

@@ -38,8 +38,10 @@ local.properties
 .idea/
 *.log
 crashlytics.properties
-app/google-services.json
-app/*.keystore
+android/app/google-services.json
+*.keystore
+*.jks
+android/key.properties
 
 # Web
 web/.dart_tool/

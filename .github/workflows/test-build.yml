@@ -1,0 +1,129 @@
+# Test Build Workflow
+# This is a lighter workflow that just verifies the app builds correctly
+# Runs on pull requests to catch issues before merging
+
+name: Test Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - test
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.24.0'
+  JAVA_VERSION: '17'
+
+jobs:
+  # Run Flutter analyze and tests
+  analyze:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      # Create a dummy .env for the build (not real values, just so it compiles)
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=https://example.supabase.co" > .env
+          echo "SUPABASE_ANON_KEY=dummy-key-for-build-test" >> .env
+          echo "API_BASE_URL=https://api.example.com" >> .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+  # Quick Android build check
+  build-android:
+    name: Build Android (Debug)
+    runs-on: ubuntu-latest
+    needs: analyze
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=https://example.supabase.co" > .env
+          echo "SUPABASE_ANON_KEY=dummy-key-for-build-test" >> .env
+          echo "API_BASE_URL=https://api.example.com" >> .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build debug APK (faster, no signing needed)
+      - name: Build Android Debug
+        run: flutter build apk --debug
+
+      - name: Build succeeded
+        run: echo "Android build successful!"
+
+  # Quick iOS build check
+  build-ios:
+    name: Build iOS (Debug)
+    runs-on: macos-latest
+    needs: analyze
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=https://example.supabase.co" > .env
+          echo "SUPABASE_ANON_KEY=dummy-key-for-build-test" >> .env
+          echo "API_BASE_URL=https://api.example.com" >> .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          pod install
+
+      # Build debug iOS (no signing needed)
+      - name: Build iOS Debug
+        run: flutter build ios --debug --no-codesign
+
+      - name: Build succeeded
+        run: echo "iOS build successful!"
