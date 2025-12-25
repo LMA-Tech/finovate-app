@@ -93,11 +93,11 @@ jobs:
       # 6. Set up Android signing
       - name: Set up Android signing
         run: |
-          # Create key.properties
+          # Create key.properties in android/ folder
           echo '${{ secrets.ANDROID_KEY_PROPERTIES }}' > android/key.properties
 
-          # Decode and create keystore file
-          echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > android/upload-keystore.jks
+          # Decode and create keystore file in android/app/ folder (where storeFile points)
+          echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > android/app/upload-keystore.jks
 
       # 7. Install dependencies
       - name: Install dependencies

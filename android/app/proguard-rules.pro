@@ -6,6 +6,11 @@
 -keep class io.flutter.view.** { *; }
 -keep class io.flutter.embedding.** { *; }
 
+# Play Core library (deferred components) - ignore missing classes
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+
 # Keep Kotlin metadata
 -keepattributes *Annotation*
 -keep class kotlin.Metadata { *; }
