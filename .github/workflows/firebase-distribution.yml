@@ -201,17 +201,57 @@ jobs:
       # 8. Build iOS app with signing
       - name: Build iOS
         run: |
-          flutter build ios --release
+          # Get provisioning profile UUID
+          PROFILE_UUID=$(security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A1 "UUID" | grep string | sed 's/.*<string>\(.*\)<\/string>/\1/')
+          echo "Profile UUID: $PROFILE_UUID"
 
-      # 9. Create signed IPA
-      - name: Create IPA
+          # Build Flutter iOS without codesign first
+          flutter build ios --release --no-codesign
+
+          # Then sign with xcodebuild
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/Runner.xcarchive \
+            archive \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="Finovate App Ad Hoc Distribution" \
+            DEVELOPMENT_TEAM=R7R2UD6685
+
+      # 9. Export IPA
+      - name: Export IPA
         run: |
+          # Create export options plist
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>ad-hoc</string>
+              <key>teamID</key>
+              <string>R7R2UD6685</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.lma.finovateApp</key>
+                  <string>Finovate App Ad Hoc Distribution</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+
           mkdir -p build/ios/ipa
-          cd build/ios/iphoneos
-          mkdir Payload
-          cp -r Runner.app Payload/
-          zip -r ../ipa/app-release.ipa Payload
-          rm -rf Payload
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
+
+          mv build/ios/ipa/Runner.ipa build/ios/ipa/app-release.ipa
 
       # 10. Upload IPA as artifact
       - name: Upload IPA artifact
