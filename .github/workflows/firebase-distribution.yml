@@ -201,34 +201,33 @@ jobs:
       # 8. Build iOS app with signing
       - name: Build iOS
         run: |
-          # Get provisioning profile UUID
-          PROFILE_UUID=$(security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | grep -A1 "UUID" | grep string | sed 's/.*<string>\(.*\)<\/string>/\1/')
-          echo "Profile UUID: $PROFILE_UUID"
-
           # Build Flutter iOS without codesign first
           flutter build ios --release --no-codesign
 
           # Sign the Runner.app manually
           cd build/ios/iphoneos
 
-          # Find the provisioning profile
-          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
+          # Find and copy the provisioning profile into the app
+          PROFILE_PATH=$(find ~/Library/MobileDevice/Provisioning\ Profiles -name "*.mobileprovision" -type f | head -1)
+          echo "Using profile: $PROFILE_PATH"
+          cp "$PROFILE_PATH" Runner.app/embedded.mobileprovision
 
-          # Copy provisioning profile into the app
-          cp $PROFILE_PATH Runner.app/embedded.mobileprovision
+          # Extract entitlements from the provisioning profile
+          security cms -D -i "$PROFILE_PATH" > profile.plist
+          /usr/libexec/PlistBuddy -x -c 'Print :Entitlements' profile.plist > entitlements.plist
 
-          # Sign the app
+          # Sign all frameworks first
+          find Runner.app/Frameworks -name "*.framework" -type d | while read framework; do
+            /usr/bin/codesign --force --sign "Apple Distribution: Ariel Moraes (R7R2UD6685)" "$framework"
+          done
+
+          # Sign the main app
           /usr/bin/codesign --force --sign "Apple Distribution: Ariel Moraes (R7R2UD6685)" \
-            --entitlements /Users/runner/work/finovate-app/finovate-app/ios/Runner/Runner.entitlements \
-            --timestamp=none \
-            Runner.app || true
+            --entitlements entitlements.plist \
+            Runner.app
 
-          # If entitlements file doesn't exist, sign without it
-          if [ ! -f /Users/runner/work/finovate-app/finovate-app/ios/Runner/Runner.entitlements ]; then
-            /usr/bin/codesign --force --sign "Apple Distribution: Ariel Moraes (R7R2UD6685)" \
-              --timestamp=none \
-              Runner.app
-          fi
+          # Verify the signature
+          codesign -vvv Runner.app
 
       # 9. Create IPA
       - name: Create IPA
