@@ -208,50 +208,37 @@ jobs:
           # Build Flutter iOS without codesign first
           flutter build ios --release --no-codesign
 
-          # Then sign with xcodebuild
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath $RUNNER_TEMP/Runner.xcarchive \
-            archive \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="Finovate App Ad Hoc Distribution" \
-            DEVELOPMENT_TEAM=R7R2UD6685
+          # Sign the Runner.app manually
+          cd build/ios/iphoneos
 
-      # 9. Export IPA
-      - name: Export IPA
+          # Find the provisioning profile
+          PROFILE_PATH=~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
+
+          # Copy provisioning profile into the app
+          cp $PROFILE_PATH Runner.app/embedded.mobileprovision
+
+          # Sign the app
+          /usr/bin/codesign --force --sign "Apple Distribution: Ariel Moraes (R7R2UD6685)" \
+            --entitlements /Users/runner/work/finovate-app/finovate-app/ios/Runner/Runner.entitlements \
+            --timestamp=none \
+            Runner.app || true
+
+          # If entitlements file doesn't exist, sign without it
+          if [ ! -f /Users/runner/work/finovate-app/finovate-app/ios/Runner/Runner.entitlements ]; then
+            /usr/bin/codesign --force --sign "Apple Distribution: Ariel Moraes (R7R2UD6685)" \
+              --timestamp=none \
+              Runner.app
+          fi
+
+      # 9. Create IPA
+      - name: Create IPA
         run: |
-          # Create export options plist
-          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>ad-hoc</string>
-              <key>teamID</key>
-              <string>R7R2UD6685</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>com.lma.finovateApp</key>
-                  <string>Finovate App Ad Hoc Distribution</string>
-              </dict>
-          </dict>
-          </plist>
-          EOF
-
           mkdir -p build/ios/ipa
-          xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/Runner.xcarchive \
-            -exportPath build/ios/ipa \
-            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
-
-          mv build/ios/ipa/Runner.ipa build/ios/ipa/app-release.ipa
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r ../ipa/app-release.ipa Payload
+          rm -rf Payload
 
       # 10. Upload IPA as artifact
       - name: Upload IPA artifact
