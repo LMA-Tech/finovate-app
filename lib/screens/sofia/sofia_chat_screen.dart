@@ -2,7 +2,9 @@
 
 import 'package:finovate_app/screens/sofia/sofia_chat_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../common/widgets/app_background.dart';
 import '../../utils/constants/colors.dart';
 import '../../utils/constants/sizes.dart';
@@ -133,13 +135,73 @@ class SofiaChatScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              message.text.isEmpty ? ' ' : message.text,
-              style: TextStyle(
-                color: message.isError ? FinColors.error : FinColors.textWhite,
-                fontSize: FinSizes.fontSizeMd,
+            // Use MarkdownBody for assistant messages, plain Text for user messages
+            if (message.isUser || message.isError)
+              Text(
+                message.text.isEmpty ? ' ' : message.text,
+                style: TextStyle(
+                  color: message.isError ? FinColors.error : FinColors.textWhite,
+                  fontSize: FinSizes.fontSizeMd,
+                ),
+              )
+            else
+              MarkdownBody(
+                data: message.text.isEmpty ? ' ' : message.text,
+                selectable: true,
+                onTapLink: (text, href, title) {
+                  if (href != null) {
+                    launchUrl(Uri.parse(href));
+                  }
+                },
+                styleSheet: MarkdownStyleSheet(
+                  p: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
+                  ),
+                  strong: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  em: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  h1: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeXXLg,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  h2: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeLg,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  h3: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  listBullet: const TextStyle(
+                    color: FinColors.textWhite,
+                    fontSize: FinSizes.fontSizeMd,
+                  ),
+                  code: TextStyle(
+                    color: FinColors.primary,
+                    backgroundColor: FinColors.inputBackground,
+                    fontSize: FinSizes.fontSizeSm,
+                  ),
+                  codeblockDecoration: BoxDecoration(
+                    color: FinColors.inputBackground,
+                    borderRadius: BorderRadius.circular(FinSizes.borderRadiusSm),
+                  ),
+                  a: const TextStyle(
+                    color: FinColors.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: FinSizes.xs),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -147,7 +209,7 @@ class SofiaChatScreen extends StatelessWidget {
                 Text(
                   controller.formatTime(message.timestamp),
                   style: TextStyle(
-                    color: FinColors.textWhite.withOpacity(0.5),
+                    color: FinColors.textWhite.withValues(alpha: 0.5),
                     fontSize: FinSizes.fontSizeSm,
                   ),
                 ),
@@ -159,7 +221,7 @@ class SofiaChatScreen extends StatelessWidget {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        FinColors.textWhite.withOpacity(0.5),
+                        FinColors.textWhite.withValues(alpha: 0.5),
                       ),
                     ),
                   ),

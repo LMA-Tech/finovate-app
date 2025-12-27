@@ -439,10 +439,42 @@ class FinovateApiService {
   }
 
   // ========================================
+  // SOFIA USAGE ENDPOINTS
+  // ========================================
+
+  /// Get user's daily prompt usage stats
+  /// Returns usage info including daily limit, used today, and remaining prompts
+  static Future<SofiaUsage> getSofiaUsage({
+    String? correlationId,
+  }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
+
+    _logRequest('GET', '/sofia/usage', corrId);
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/sofia/usage'),
+      headers: headers,
+    ).timeout(_timeout);
+
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+    _logResponse(response.statusCode, responseCorrId);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return SofiaUsage.fromJson(data['data']);
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Failed to fetch usage';
+      _logResponse(response.statusCode, responseCorrId, error: error);
+      throw Exception(error);
+    }
+  }
+
+  // ========================================
   // CHAT ENDPOINTS
   // ========================================
 
-  /// Create a new chat session
+  /// Create a new chat session (optional - backend auto-creates on first message)
   static Future<ChatSession> createChatSession({
     String? title,
     String? correlationId,
@@ -524,6 +556,35 @@ class FinovateApiService {
 
     if (response.statusCode != 200) {
       final error = jsonDecode(response.body)['error'] ?? 'Failed to delete session';
+      _logResponse(response.statusCode, responseCorrId, error: error);
+      throw Exception(error);
+    }
+  }
+
+  /// Get messages for a specific chat session
+  /// Used to restore conversation history when reopening a session
+  static Future<SessionMessages> getSessionMessages(
+      String sessionId, {
+        String? correlationId,
+      }) async {
+    final headers = await _getHeaders(correlationId: correlationId);
+    final corrId = headers['X-Correlation-Id']!;
+
+    _logRequest('GET', '/chat/sessions/$sessionId/messages', corrId);
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/chat/sessions/$sessionId/messages'),
+      headers: headers,
+    ).timeout(_timeout);
+
+    final responseCorrId = response.headers['x-correlation-id'] ?? corrId;
+    _logResponse(response.statusCode, responseCorrId);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return SessionMessages.fromJson(data['data']);
+    } else {
+      final error = jsonDecode(response.body)['error'] ?? 'Failed to fetch messages';
       _logResponse(response.statusCode, responseCorrId, error: error);
       throw Exception(error);
     }
@@ -630,4 +691,86 @@ class ChatChunk {
 
   String? get chunk => data?['chunk'];
   String? get message => data?['message'];
+  String? get sessionId => data?['session_id'];
+}
+
+/// Sofia usage stats model
+class SofiaUsage {
+  final bool isPro;
+  final int? dailyLimit;
+  final int usedToday;
+  final int? remaining;
+  final DateTime? resetsAt;
+
+  SofiaUsage({
+    required this.isPro,
+    this.dailyLimit,
+    required this.usedToday,
+    this.remaining,
+    this.resetsAt,
+  });
+
+  factory SofiaUsage.fromJson(Map<String, dynamic> json) {
+    return SofiaUsage(
+      isPro: json['is_pro'] ?? false,
+      dailyLimit: json['daily_limit'],
+      usedToday: json['used_today'] ?? 0,
+      remaining: json['remaining'],
+      resetsAt: json['resets_at'] != null
+          ? DateTime.parse(json['resets_at'])
+          : null,
+    );
+  }
+
+  bool get hasReachedLimit => !isPro && remaining != null && remaining! <= 0;
+}
+
+/// Session messages response model
+class SessionMessages {
+  final String sessionId;
+  final List<SessionMessage> messages;
+  final int messageCount;
+
+  SessionMessages({
+    required this.sessionId,
+    required this.messages,
+    required this.messageCount,
+  });
+
+  factory SessionMessages.fromJson(Map<String, dynamic> json) {
+    return SessionMessages(
+      sessionId: json['session_id'],
+      messages: (json['messages'] as List)
+          .map((m) => SessionMessage.fromJson(m))
+          .toList(),
+      messageCount: json['message_count'] ?? 0,
+    );
+  }
+}
+
+/// Individual message in a session
+class SessionMessage {
+  final String id;
+  final String role;
+  final String content;
+  final DateTime timestamp;
+
+  SessionMessage({
+    required this.id,
+    required this.role,
+    required this.content,
+    required this.timestamp,
+  });
+
+  factory SessionMessage.fromJson(Map<String, dynamic> json) {
+    return SessionMessage(
+      id: json['id'],
+      role: json['role'],
+      content: json['content'],
+      timestamp: DateTime.parse(json['timestamp']),
+    );
+  }
+
+  bool get isUser => role == 'user';
+  bool get isAssistant => role == 'assistant';
 }

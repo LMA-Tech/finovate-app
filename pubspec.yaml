@@ -41,6 +41,9 @@ dependencies:
   flutter_chat_core: ^2.8.0
   flutter_cache_manager: ^3.3.1
 
+  # Markdown rendering for AI responses
+  flutter_markdown: ^0.7.6
+
 
   # Product Specific
   # Charts

@@ -8,6 +8,12 @@ import '../../services/finovate_api_service.dart';
 
 /// Controller for Sofia Chat Screen
 /// Handles backend chat integration with streaming responses
+///
+/// Session Flow (per API contract):
+/// 1. First message: Don't pass session_id → backend auto-creates one
+/// 2. Capture session_id from first SSE event (event: "session")
+/// 3. Subsequent messages: Always pass session_id to continue conversation
+/// 4. New conversation: Clear session_id → gets a new one
 class SofiaChatController extends GetxController {
   static const String _tag = 'SofiaChatController';
   static SofiaChatController get instance => Get.find();
@@ -25,6 +31,10 @@ class SofiaChatController extends GetxController {
   final RxnString currentSessionId = RxnString();
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
 
+  // Usage stats
+  final Rx<SofiaUsage?> usage = Rx<SofiaUsage?>(null);
+  final RxBool isLoadingUsage = false.obs;
+
   // ═══════════════════════════════════════════════════════════════
   // LIFECYCLE
   // ═══════════════════════════════════════════════════════════════
@@ -32,7 +42,15 @@ class SofiaChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadSessions();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    // Load usage stats and sessions in parallel
+    await Future.wait([
+      loadUsage(),
+      loadSessions(),
+    ]);
 
     // Check if there's an initial message to send
     final args = Get.arguments;
@@ -47,6 +65,14 @@ class SofiaChatController extends GetxController {
         });
       }
     }
+
+    // Check if resuming an existing session
+    if (args != null && args is Map && args.containsKey('sessionId')) {
+      final sessionId = args['sessionId'] as String?;
+      if (sessionId != null && sessionId.isNotEmpty) {
+        await loadSessionMessages(sessionId);
+      }
+    }
   }
   @override
   void onClose() {
@@ -59,6 +85,24 @@ class SofiaChatController extends GetxController {
   // METHODS
   // ═══════════════════════════════════════════════════════════════
 
+  /// Load user's daily usage stats
+  Future<void> loadUsage() async {
+    try {
+      isLoadingUsage.value = true;
+      final correlationId = _uuid.v4();
+      usage.value = await FinovateApiService.getSofiaUsage(
+        correlationId: correlationId,
+      );
+      AppLogger.debug(
+        'Loaded usage: ${usage.value?.usedToday}/${usage.value?.dailyLimit} [correlationId: $correlationId]',
+        tag: _tag,
+      );
+    } catch (e) {
+      AppLogger.error('Failed to load usage', error: e, tag: _tag);
+    } finally {
+      isLoadingUsage.value = false;
+    }
+  }
 
   /// Load existing sessions on startup
   Future<void> loadSessions() async {
@@ -67,19 +111,62 @@ class SofiaChatController extends GetxController {
       final sessions = await FinovateApiService.getChatSessions(
         correlationId: correlationId,
       );
-      if (sessions.isNotEmpty) {
-        currentSessionId.value = sessions.first.sessionId;
-        AppLogger.debug('Loaded session [correlationId: $correlationId]', tag: _tag);
-      }
+      AppLogger.debug('Loaded ${sessions.length} sessions [correlationId: $correlationId]', tag: _tag);
     } catch (e) {
       AppLogger.error('Failed to load sessions', error: e, tag: _tag);
     }
   }
 
+  /// Load messages for a specific session (when resuming a conversation)
+  Future<void> loadSessionMessages(String sessionId) async {
+    try {
+      isLoading.value = true;
+      final correlationId = _uuid.v4();
+      final sessionMessages = await FinovateApiService.getSessionMessages(
+        sessionId,
+        correlationId: correlationId,
+      );
+
+      currentSessionId.value = sessionId;
+      messages.clear();
+
+      for (final msg in sessionMessages.messages) {
+        messages.add(ChatMessage(
+          text: msg.content,
+          isUser: msg.isUser,
+          timestamp: msg.timestamp,
+        ));
+      }
+
+      AppLogger.debug(
+        'Loaded ${sessionMessages.messageCount} messages for session $sessionId',
+        tag: _tag,
+      );
+      scrollToBottom();
+    } catch (e) {
+      AppLogger.error('Failed to load session messages', error: e, tag: _tag);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   /// Send message to backend
+  /// Session is auto-created by backend on first message
   Future<void> sendMessage() async {
     final messageText = messageController.text.trim();
     if (messageText.isEmpty || isLoading.value) return;
+
+    // Check if user has reached daily limit
+    if (usage.value?.hasReachedLimit == true) {
+      messages.add(ChatMessage(
+        text: 'Você atingiu o limite diário de perguntas. Volte amanhã ou faça upgrade para o plano Pro.',
+        isUser: false,
+        isError: true,
+        timestamp: DateTime.now(),
+      ));
+      scrollToBottom();
+      return;
+    }
 
     messageController.clear();
     final correlationId = _uuid.v4();
@@ -94,27 +181,6 @@ class SofiaChatController extends GetxController {
     isLoading.value = true;
     streamingBuffer.value = '';
 
-    // Create session if needed
-    if (currentSessionId.value == null) {
-      try {
-        final session = await FinovateApiService.createChatSession(
-          title: messageText.substring(0, messageText.length > 30 ? 30 : messageText.length),
-          correlationId: correlationId,
-        );
-        currentSessionId.value = session.sessionId;
-        AppLogger.info('Created session [correlationId: $correlationId]', tag: _tag);
-      } catch (e) {
-        isLoading.value = false;
-        messages.add(ChatMessage(
-          text: 'Failed to create session: $e',
-          isUser: false,
-          isError: true,
-          timestamp: DateTime.now(),
-        ));
-        return;
-      }
-    }
-
     // Add streaming placeholder
     messages.add(ChatMessage(
       text: '',
@@ -126,6 +192,7 @@ class SofiaChatController extends GetxController {
     scrollToBottom();
 
     // Stream response from backend
+    // Note: Session is auto-created by backend on first message if sessionId is null
     try {
       final stream = await FinovateApiService.streamChatMessage(
         message: messageText,
@@ -135,7 +202,14 @@ class SofiaChatController extends GetxController {
 
       // Listen to stream
       await for (final chunk in stream) {
-        if (chunk.event == 'token') {
+        // Handle session event (first event when new session is created)
+        if (chunk.event == 'session') {
+          final newSessionId = chunk.sessionId;
+          if (newSessionId != null) {
+            currentSessionId.value = newSessionId;
+            AppLogger.info('Session auto-created: $newSessionId', tag: _tag);
+          }
+        } else if (chunk.event == 'token') {
           final token = chunk.chunk ?? '';
           streamingBuffer.value += token;
 
@@ -162,6 +236,9 @@ class SofiaChatController extends GetxController {
           }
           streamingBuffer.value = '';
           scrollToBottom();
+
+          // Refresh usage after successful message
+          loadUsage();
           break;
         } else if (chunk.event == 'error') {
           throw Exception(chunk.message ?? 'Stream error');
@@ -209,6 +286,23 @@ class SofiaChatController extends GetxController {
   /// Format time for display
   String formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Get usage display text (e.g., "3 de 5 perguntas restantes")
+  String get usageDisplayText {
+    if (usage.value == null) return '';
+    if (usage.value!.isPro) return 'Plano Pro - ilimitado';
+    final remaining = usage.value!.remaining ?? 0;
+    final limit = usage.value!.dailyLimit ?? 5;
+    return '$remaining de $limit perguntas restantes';
+  }
+
+  /// Start a new conversation (clears current session)
+  void startNewConversation() {
+    messages.clear();
+    currentSessionId.value = null;
+    streamingBuffer.value = '';
+    AppLogger.debug('Started new conversation', tag: _tag);
   }
 }
 

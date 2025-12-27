@@ -83,12 +83,14 @@ POST /api/v1/onboarding/questionnaire  - Submit questionnaire (auth)
 GET  /api/v1/onboarding/questionnaire  - Get user's answers (auth)
 ```
 
-### Chat (Sofia)
+### Chat (Sofia) ✅ IMPLEMENTED
 ```
-POST   /api/v1/chat/sessions           - Create session (auth)
-GET    /api/v1/chat/sessions           - List sessions (auth)
-DELETE /api/v1/chat/sessions/:id       - Delete session (auth)
-POST   /api/v1/chat/stream             - Stream message (auth, SSE)
+GET    /api/v1/sofia/usage                    - Get usage stats (auth)
+GET    /api/v1/chat/sessions                  - List sessions (auth)
+GET    /api/v1/chat/sessions/:id/messages     - Get session history (auth)
+DELETE /api/v1/chat/sessions/:id              - Delete session (auth)
+POST   /api/v1/chat/stream                    - Stream message, auto-creates session (auth, SSE)
+POST   /api/v1/chat/sessions                  - Create session manually (auth, optional)
 ```
 
 ### B3 Portfolio (Raw Data)
@@ -103,15 +105,45 @@ GET /api/v1/portfolio/events                    - Corporate events (auth)
 GET /api/v1/portfolio/events/:taxId             - Investor events (auth)
 ```
 
-### B3 OAuth (User Authorization) ✅ IMPLEMENTED
+### B3 OAuth & Connection ✅ IMPLEMENTED
 ```
-GET  /api/v1/b3/login          - Get B3 authorization URL (auth)
-GET  /api/v1/b3/callback       - OAuth callback handler (internal)
-GET  /api/v1/b3/status         - Check B3 connection status (auth)
-POST /api/v1/b3/disconnect     - Disconnect B3 account (auth)
+GET    /api/v1/b3/connect      - Get B3 authorization URL (auth)
+GET    /api/v1/b3/callback     - OAuth callback handler (internal)
+GET    /api/v1/b3/status       - Check B3 connection status (auth)
+DELETE /api/v1/b3/disconnect   - Disconnect B3 account + revoke at B3 (auth)
 ```
 
-**Note:** Waiting on B3 to register redirect URI before full testing.
+### B3 Authorization (Admin) ✅ IMPLEMENTED
+```
+GET /api/v1/b3/authorizations                      - List all authorized investors (auth)
+GET /api/v1/b3/authorizations/check/:documentNumber - Check specific investor (auth)
+```
+
+### B3 Data APIs ✅ IMPLEMENTED
+```
+GET /api/v1/b3/position/:assetType/:documentNumber  - Get positions (auth)
+GET /api/v1/b3/movement/:assetType/:documentNumber  - Get movements (auth)
+GET /api/v1/b3/trading/:documentNumber              - Get buy/sell transactions (auth)
+GET /api/v1/b3/investors                            - Sandbox investors list (auth)
+GET /api/v1/b3/portfolio/:documentNumber            - Complete portfolio (auth)
+```
+
+**Asset types:** `derivatives`, `equities`, `treasury-bonds`, `fixed-income`, `securities-lending`, `all`
+
+**Query params (required):** `referenceStartDate`, `referenceEndDate` (YYYY-MM-DD)
+**Query params (optional):** `page`, `pageSize` (trading only)
+
+**B3 API Mapping:**
+
+| Our Endpoint | B3 API |
+|--------------|--------|
+| `/b3/position/:assetType/:doc` | `/api/position/v3/{assetType}/investors/{doc}` |
+| `/b3/movement/:assetType/:doc` | `/api/movement/v2/{assetType}/investors/{doc}` |
+| `/b3/trading/:doc` | `/api/assets-trading/v2/investors/{doc}` |
+| `/b3/investors` | `/api/updated-product/v1/investors` |
+| `/b3/authorizations` | `/api/authorization-investor/v1/authorizations/investors` |
+
+**Note:** Waiting on B3 to register redirect URI before full OAuth testing.
 
 ---
 
@@ -1410,11 +1442,55 @@ Get detailed section data with indicators and charts.
 
 ---
 
-## Phase 4: Sofia & User Endpoints (Not Yet Implemented)
+## Phase 4: Sofia & User Endpoints ✅ IMPLEMENTED
 
-### GET /api/v1/sofia/prompts/usage
+### Architecture Note: Langfuse Integration
 
-Get user's daily prompt usage.
+Sofia chat usage is tracked via **Langfuse** (hosted in the same Railway project). The backend queries Langfuse's Supabase database directly for usage stats instead of maintaining a separate `user_prompt_usage` table.
+
+**Data Flow:**
+```
+Flutter App → Backend → Langflow → Langfuse (auto-tracked)
+                ↓
+        Backend queries Langfuse for usage stats
+```
+
+### Frontend Flow for Sofia Chat
+
+```
+1. User opens Sofia screen
+   → GET /sofia/usage              (show "3 de 5 perguntas restantes")
+   → GET /chat/sessions            (list previous conversations)
+
+2. User sends first message (no session yet)
+   → POST /chat/stream { "message": "O que é PETR4?" }
+   ← SSE: {"event":"session","data":{"session_id":"uuid"}}  ← SAVE THIS!
+   ← SSE: {"event":"token","data":{"chunk":"PETR4"}}
+   ← SSE: {"event":"token","data":{"chunk":" é..."}}
+   ← SSE: {"event":"end"}
+
+3. User sends follow-up message (has session)
+   → POST /chat/stream { "message": "E VALE3?", "session_id": "uuid" }
+   ← SSE stream...
+
+4. User taps previous conversation
+   → GET /chat/sessions/:id/messages  (restore history)
+
+5. User deletes conversation
+   → DELETE /chat/sessions/:id
+```
+
+**Key Points:**
+- First message: Don't pass `session_id` → backend auto-creates one
+- Capture `session_id` from the first SSE event (`event: "session"`)
+- Subsequent messages: Always pass `session_id` to continue conversation
+- New conversation: Don't pass `session_id` → gets a new one
+
+---
+
+### GET /api/v1/sofia/usage
+
+Get user's daily prompt usage. Queries Langfuse `traces` table for real-time count.
 
 **Auth:** Required
 
@@ -1446,50 +1522,73 @@ Get user's daily prompt usage.
 }
 ```
 
+**Implementation Notes:**
+- Query Langfuse: `SELECT COUNT(*) FROM traces WHERE user_id = ? AND DATE(timestamp) = CURRENT_DATE`
+- `is_pro` determined by `subscription_tier` in backend `users` table
+- `resets_at` is always midnight UTC of next day
+- No tracking endpoint needed - Langfuse auto-tracks via Langflow integration
+
 ---
 
-### POST /api/v1/sofia/prompts/track
+### GET /api/v1/chat/sessions/:sessionId/messages
 
-Track a prompt usage. Called automatically after each Sofia message.
+Get conversation history for a specific chat session. Queries Langfuse `traces` table.
 
 **Auth:** Required
 
-**Request Body:**
-```json
-{
-  "session_id": "uuid"
-}
-```
+**Path Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| `sessionId` | string (UUID) | The chat session ID |
 
 **Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "used_today": 4,
-    "remaining": 1,
-    "limit_reached": false
+    "session_id": "e9b4bcd6-705f-4559-8673-491f4a2d5a29",
+    "messages": [
+      {
+        "id": "trace-uuid-1",
+        "role": "user",
+        "content": "What is PETR4?",
+        "timestamp": "2024-01-15T10:30:00Z"
+      },
+      {
+        "id": "trace-uuid-2",
+        "role": "assistant",
+        "content": "PETR4 is the ticker for Petrobras preferred shares...",
+        "timestamp": "2024-01-15T10:30:05Z"
+      }
+    ],
+    "message_count": 2
   }
 }
 ```
 
-**Response when limit reached (200):**
+**Error Response (404):**
 ```json
 {
-  "success": true,
-  "data": {
-    "used_today": 5,
-    "remaining": 0,
-    "limit_reached": true,
-    "message": "Você atingiu o limite diário de 5 perguntas. Faça upgrade para Pro para perguntas ilimitadas!"
-  }
+  "success": false,
+  "error": "Session not found",
+  "code": "NOT_FOUND"
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "error": "You do not have access to this session",
+  "code": "FORBIDDEN"
 }
 ```
 
 **Implementation Notes:**
-- Increment count in `user_prompt_usage` table
-- Reset count at midnight (based on user timezone or UTC)
-- Pro users: always return `limit_reached: false`
+- First verify session ownership via backend `chat_sessions` table
+- Query Langfuse: `SELECT id, input, output, timestamp FROM traces WHERE session_id = ? ORDER BY timestamp ASC`
+- Parse `input` and `output` JSONB fields to extract message content
+- Frontend can use this to restore chat history when reopening a session
 
 ---
 
@@ -1559,19 +1658,21 @@ CREATE TABLE user_preferences (
 CREATE INDEX idx_user_preferences_auth_id ON user_preferences(user_auth_id);
 ```
 
-### user_prompt_usage
-```sql
-CREATE TABLE user_prompt_usage (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_auth_id UUID NOT NULL REFERENCES auth.users(id),
-  usage_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  prompt_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_auth_id, usage_date)
-);
+### ~~user_prompt_usage~~ (DEPRECATED - Using Langfuse)
 
-CREATE INDEX idx_user_prompt_usage_lookup ON user_prompt_usage(user_auth_id, usage_date);
+**Note:** This table is NO LONGER NEEDED. Usage tracking now queries the Langfuse `traces` table directly.
+
+Langfuse tables (in separate Supabase project):
+```sql
+-- traces: Each conversation turn (auto-populated by Langflow → Langfuse)
+traces (
+  id TEXT PRIMARY KEY,
+  user_id TEXT,           -- Supabase auth user ID
+  session_id TEXT,        -- Chat session UUID
+  timestamp TIMESTAMP,
+  input JSONB,
+  output JSONB
+)
 ```
 
 ### user_feedback
@@ -1653,15 +1754,32 @@ CREATE INDEX idx_market_data_date ON market_data(market_date DESC);
 
 ## Implementation Status
 
-### Phase 0: B3 OAuth ✅ COMPLETE
+### Phase 0: B3 Integration ✅ COMPLETE
+
+**OAuth & Connection:**
 | Endpoint | Status | Notes |
 |----------|--------|-------|
-| `GET /b3/login` | ✅ Done | Returns B3 authorization URL |
+| `GET /b3/connect` | ✅ Done | Returns B3 authorization URL |
 | `GET /b3/callback` | ✅ Done | Handles OAuth callback |
 | `GET /b3/status` | ✅ Done | Check connection status |
-| `POST /b3/disconnect` | ✅ Done | Disconnect B3 account |
+| `DELETE /b3/disconnect` | ✅ Done | Disconnect locally + revoke at B3 |
 
-**Note:** Waiting on B3 to register redirect URI for production testing.
+**Authorization (Admin):**
+| Endpoint | Status | Notes |
+|----------|--------|-------|
+| `GET /b3/authorizations` | ✅ Done | List all authorized investors |
+| `GET /b3/authorizations/check/:doc` | ✅ Done | Check specific investor |
+
+**Data APIs:**
+| Endpoint | Status | Notes |
+|----------|--------|-------|
+| `GET /b3/position/:assetType/:doc` | ✅ Done | Position API v3 |
+| `GET /b3/movement/:assetType/:doc` | ✅ Done | Movement API v2 |
+| `GET /b3/trading/:doc` | ✅ Done | Trading API v2 |
+| `GET /b3/investors` | ✅ Done | Sandbox investors list |
+| `GET /b3/portfolio/:doc` | ✅ Done | Aggregated portfolio |
+
+**Note:** Waiting on B3 to register redirect URI for production OAuth testing.
 
 ### Phase 1: Home Screen MVP ✅ COMPLETE
 | Endpoint | Status | Data Source | Notes |
@@ -1702,13 +1820,18 @@ CREATE INDEX idx_market_data_date ON market_data(market_date DESC);
 | `GET /conjuntura/sections` | ⏳ Pending | Static section list |
 | `GET /conjuntura/:sectionId` | ⏳ Pending | Hardcode indicators per section |
 
-### Phase 4: Sofia & Preferences (Pending)
+### Phase 4: Sofia & Preferences ✅ COMPLETE (Sofia), Pending (Preferences)
 | Endpoint | Status | Notes |
 |----------|--------|-------|
-| `GET /sofia/prompts/usage` | ⏳ Pending | Real usage tracking |
-| `POST /sofia/prompts/track` | ⏳ Pending | Real usage tracking |
+| `GET /sofia/usage` | ✅ Done | Query Langfuse `traces` for usage count |
+| `POST /chat/stream` | ✅ Done | Auto-creates session, returns `session_id` in SSE |
+| `GET /chat/sessions` | ✅ Done | List user's sessions |
+| `GET /chat/sessions/:id/messages` | ✅ Done | Query Langfuse for conversation history |
+| `DELETE /chat/sessions/:id` | ✅ Done | Delete session |
 | `GET /user/preferences` | ⏳ Pending | Real user data |
 | `PUT /user/preferences` | ⏳ Pending | Real user data |
+
+**Architecture:** Hybrid approach - Backend Supabase for session metadata (`chat_sessions` table), Langfuse for usage stats and message history. Session auto-created on first `/chat/stream` call if no `session_id` provided.
 
 ---
 
@@ -1784,3 +1907,5 @@ src/
 | 2025-12-16 | 2.4.0 | **Stock Detail & Search Improvements:** Stock detail endpoint now uses `balanceSheetHistory` and `incomeStatementHistory` modules instead of `financialData` (requires higher brapi plan). Financial ratios (ROE, Profit Margin, Current Ratio, Debt/Equity, Payout Ratio) are now calculated from balance sheet and income statement data. |
 | 2025-12-16 | 2.4.1 | **Search Performance Fix:** Stock search autocomplete switched back to brapi.dev as primary source (~400ms) with ETL as fallback. ETL queries were taking 5+ seconds due to unindexed LIKE queries on large historical data table. Fixed `has_next` pagination bug - now correctly returns `false` when fewer results than requested are returned. |
 | 2025-12-16 | 2.5.0 | **Stock Detail Enhancements:** Added `1d` intraday range with hourly intervals. Chart now includes `dates` array with ISO datetime strings for tooltips. Added company info: `headquarters`, `address`, `phone`. Chart labels format by range: 1d="10:00", 1w="Seg 10:00", 1mo="16/12", 3mo/6mo="16 Dez", 1y/max="Dez/24". Stocks with placeholder logos (BRAPI.svg) return `logo_url: null` so frontend can show default icon. |
+| 2025-12-17 | 2.6.0 | **B3 API Refactor:** Consolidated B3 data APIs into unified endpoints with `assetType` parameter. Position/Movement now use single endpoint each with asset type: `derivatives`, `equities`, `treasury-bonds`, `fixed-income`, `securities-lending`, `all`. Added Trading API (`/b3/trading/:doc`). Consolidated `/b3/disconnect` to revoke both locally and at B3 (removed separate `/b3/optout`). Added B3 Authorization endpoints for admin use. Full B3 API mapping documented. |
+| 2025-12-24 | 3.0.0 | **Phase 4 Langfuse Integration:** Major architecture change for Sofia chat. Usage tracking now queries Langfuse `traces` table directly instead of maintaining separate `user_prompt_usage` table. Removed `POST /sofia/prompts/track` endpoint (auto-tracked via Langflow → Langfuse). Renamed `GET /sofia/prompts/usage` to `GET /sofia/usage`. Added `GET /chat/sessions/:sessionId/messages` to retrieve conversation history from Langfuse. Backend now connects to Langfuse Supabase for observability data while keeping session metadata in main Supabase. Hybrid approach: Langfuse for usage/messages, backend Supabase for session titles and user preferences. |
